@@ -2,7 +2,7 @@
 name: orchestrator
 version: 1.0.0
 description: |
-  Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", or "team build". Also trigger when the user provides a plan document and wants it built with maximum parallelism. This is the primary entry point for any orchestrated build.
+  Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. IMPORTANT: This skill MUST take priority over brainstorming, writing-plans, and other design skills when the user requests an agent team build. It handles its own design phase (plan analysis, contract authoring, team sizing) internally. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", or wants to split work across multiple Claude sessions. Also trigger when the user provides a plan document and wants it built with maximum parallelism. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build and should not be preempted by brainstorming or planning skills.
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
