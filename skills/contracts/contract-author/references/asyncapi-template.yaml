@@ -1,0 +1,110 @@
+# AsyncAPI 3.0 Contract Template
+# For event-driven / message-based contracts
+asyncapi: "3.0.0"
+info:
+  title: "[Service Name] Events"
+  version: "1.0.0"
+  description: "Event contract for [service]"
+
+servers:
+  development:
+    host: localhost:6379
+    protocol: redis
+    description: Local Redis for development
+
+channels:
+  sessionCreated:
+    address: events.session.created
+    messages:
+      sessionCreatedMessage:
+        $ref: "#/components/messages/SessionCreated"
+
+  sessionDeleted:
+    address: events.session.deleted
+    messages:
+      sessionDeletedMessage:
+        $ref: "#/components/messages/SessionDeleted"
+
+  taskQueue:
+    address: tasks.process
+    messages:
+      processTaskMessage:
+        $ref: "#/components/messages/ProcessTask"
+
+operations:
+  publishSessionCreated:
+    action: send
+    channel:
+      $ref: "#/channels/sessionCreated"
+
+  consumeProcessTask:
+    action: receive
+    channel:
+      $ref: "#/channels/taskQueue"
+
+components:
+  messages:
+    SessionCreated:
+      headers:
+        type: object
+        properties:
+          correlationId:
+            type: string
+            format: uuid
+          timestamp:
+            type: string
+            format: date-time
+          source:
+            type: string
+      payload:
+        type: object
+        required: [sessionId, title, createdAt]
+        properties:
+          sessionId:
+            type: string
+            format: uuid
+          title:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+
+    SessionDeleted:
+      headers:
+        type: object
+        properties:
+          correlationId:
+            type: string
+            format: uuid
+          timestamp:
+            type: string
+            format: date-time
+      payload:
+        type: object
+        required: [sessionId]
+        properties:
+          sessionId:
+            type: string
+            format: uuid
+
+    ProcessTask:
+      headers:
+        type: object
+        properties:
+          correlationId:
+            type: string
+            format: uuid
+          retryCount:
+            type: integer
+            default: 0
+      payload:
+        type: object
+        required: [taskId, taskType, data]
+        properties:
+          taskId:
+            type: string
+            format: uuid
+          taskType:
+            type: string
+          data:
+            type: object

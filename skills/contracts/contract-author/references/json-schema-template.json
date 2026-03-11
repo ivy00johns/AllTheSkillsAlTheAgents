@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/types.json",
+  "title": "Shared Type Definitions",
+  "description": "SINGLE SOURCE OF TRUTH — all agents reference these definitions",
+
+  "$defs": {
+    "Session": {
+      "type": "object",
+      "required": ["id", "title", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "Message": {
+      "type": "object",
+      "required": ["id", "sessionId", "role", "content", "createdAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "sessionId": { "type": "string", "format": "uuid" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "CreateSessionRequest": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+
+    "CreateMessageRequest": {
+      "type": "object",
+      "required": ["role", "content"],
+      "properties": {
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "MessageListResponse": {
+      "type": "object",
+      "required": ["messages", "total"],
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Message" }
+        },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "ErrorDetail": {
+      "type": "object",
+      "required": ["message"],
+      "properties": {
+        "field": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+
+    "ApiError": {
+      "type": "object",
+      "required": ["error", "code", "details"],
+      "properties": {
+        "error": { "type": "string" },
+        "code": {
+          "type": "string",
+          "enum": ["VALIDATION_ERROR", "NOT_FOUND", "UNAUTHORIZED", "FORBIDDEN", "INTERNAL_ERROR", "RATE_LIMITED"]
+        },
+        "details": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ErrorDetail" }
+        }
+      }
+    }
+  }
+}
