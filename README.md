@@ -46,6 +46,8 @@ Each agent role skill works on its own without the orchestrator:
 
 ## Architecture
 
+See **[docs/architecture.md](docs/architecture.md)** for full mermaid diagrams covering system overview, build phase sequence, file ownership map, skill inventory, and runtime degradation.
+
 ```
 skills/
 ├── orchestrator/              # Lead coordinator — the entry point
