@@ -97,7 +97,7 @@ If an agent needs a change to a file they don't own (e.g., frontend needs a new 
 
 **In the agent definition, list shared file assignments explicitly:**
 
-```
+```text
 Agent: backend
   Owns: backend/, .env, .env.example, docker-compose.yml
   Off-limits: frontend/, contracts/ (read-only)
@@ -116,7 +116,7 @@ Lead post-creates: README.md
 
 Enable tmux split panes so each agent is visible:
 
-```
+```yaml
 teammateMode: "tmux"
 ```
 
@@ -130,7 +130,7 @@ This is the most critical phase. **Machine-readable contracts between agents are
 
 Identify which layers must agree on interfaces. Typical chains:
 
-```
+```text
 Database → function signatures, data shapes, storage semantics → Backend
 Backend → API contract (URLs, methods, request/response shapes, status codes, SSE) → Frontend
 Shared → type definitions, enums, constants → All agents
@@ -181,7 +181,7 @@ Define each integration contract with enough specificity that agents can build t
 
 **Backend → Frontend Contract (v1)**
 
-```
+```markdown
 ## API Contract (v1)
 
 ### Conventions
@@ -218,7 +218,7 @@ POST /api/v1/sessions/{sessionId}/stream
 
 **Database → Backend Contract (v1)**
 
-```
+```markdown
 ## Data Layer Contract (v1)
 
 ### Function Signatures
@@ -286,7 +286,7 @@ Each agent prompt contains:
 
 ### Agent Prompt Template
 
-```
+```text
 You are the [ROLE] agent for this build.
 
 ## Your Ownership
@@ -366,7 +366,8 @@ When an agent requests a contract deviation:
 2. **Evaluate**: Determine if the change is necessary. What other agents does it affect?
 3. **Update**: Write the updated contract with an incremented version (v1 → v2). Write the full updated contract, not just the diff
 4. **Notify**: Send the updated contract to ALL affected agents with explicit instructions:
-   ```
+
+   ```text
    CONTRACT UPDATE: Backend → Frontend contract is now v2.
    CHANGE: GET /api/v1/sessions/{id} now returns
      {"session": {...}, "messages": [...]}
@@ -374,9 +375,11 @@ When an agent requests a contract deviation:
    ACTION REQUIRED: Update your fetch calls to destructure
    from the new response envelope.
    ```
+
 5. **Confirm**: Wait for each affected agent to acknowledge the update before they resume
 6. **Log**: Keep a running changelog so you can trace integration issues:
-   ```
+
+   ```text
    Contract Changelog:
    - v1 (initial): [description]
    - v2 (agent-B request): Added session envelope to GET /sessions/{id} response
@@ -406,7 +409,7 @@ Agents cannot talk to each other directly. You relay all inter-agent communicati
 
 Maintain a shared task list:
 
-```
+```text
 [ ] Agent A: Build UI components (frontend/)
 [ ] Agent B: Implement API endpoints (backend/)
 [ ] Lead: Pre-completion contract verification (blocked by A, B)
@@ -450,12 +453,14 @@ Before any agent reports "done", verify that the implemented interfaces actually
 Each agent runs their domain-specific validation checklist. Tailor these to the plan with specific commands, not vague instructions.
 
 **Data layer validates:**
+
 - Schema creates without errors (`python -m database.init` or equivalent)
 - All CRUD functions work (create, read, update, delete — test each one)
 - Foreign keys and cascade deletes behave correctly
 - Indexes exist for contracted query patterns
 
 **Backend agent validates:**
+
 - Server starts without errors on the contracted port
 - Every contracted endpoint responds correctly (test with curl, show the commands)
 - Request/response formats match the contract EXACTLY (compare JSON shapes)
@@ -464,6 +469,7 @@ Each agent runs their domain-specific validation checklist. Tailor these to the 
 - CORS headers are present for the frontend's origin (`Access-Control-Allow-Origin`)
 
 **Frontend agent validates:**
+
 - TypeScript compiles cleanly (`tsc --noEmit`)
 - Build succeeds (`npm run build` with zero errors)
 - Dev server starts and loads without console errors
@@ -476,18 +482,21 @@ Each agent runs their domain-specific validation checklist. Tailor these to the 
 After all agents pass their validation and the contract diff is clean, you run end-to-end testing yourself. This catches integration issues that no single agent can see.
 
 **Startup test:**
+
 1. Start all services (database, backend, frontend) in order
 2. Verify zero startup errors
 3. Verify backend can connect to database
 4. Verify frontend can reach backend (no CORS errors, no connection refused)
 
 **Happy path test:**
+
 1. Walk through the primary user flow end-to-end
 2. Each step produces the expected result
 3. Data flows correctly: frontend → backend → database → backend → frontend
 4. Verify data persists (reload the page — does it still show?)
 
 **Edge case tests:**
+
 1. Empty states render correctly (no data yet)
 2. Error states show user-friendly messages (kill the backend — does frontend handle it?)
 3. Loading states appear during async operations
@@ -496,17 +505,20 @@ After all agents pass their validation and the contract diff is clean, you run e
 ### When Validation Fails
 
 **Single-agent bug** (contract is correct, implementation is wrong):
+
 - Identify which agent's domain contains the bug
 - Re-spawn that agent with: the specific error message, the expected behavior, and the file(s) involved
 - Re-run the failed validation after fix
 
 **Contract bug** (the contract itself was wrong or incomplete):
+
 - Follow the full Contract Change Protocol (Phase 7)
 - Increment the version number
 - Re-spawn ALL affected agents with the updated contract
 - Re-run full end-to-end validation
 
 **Cascading failure** (contract change ripples across multiple agents):
+
 1. Stop all agents
 2. Assess the full scope of the change
 3. Rewrite all affected contracts with new version numbers

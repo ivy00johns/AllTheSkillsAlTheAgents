@@ -16,12 +16,15 @@ Each agent pair creates an integration surface. Coordination cost grows quadrati
 ## Hard Constraints
 
 ### Shared Data Model Rule
+
 If more than 2 agents need to read/write the same data model, reduce agent count. Give one agent broader scope instead of splitting and fighting over schemas.
 
 ### Dependency Chain Rule
+
 If Agent C can't start until Agent B finishes, and Agent B can't start until Agent A finishes, that's 1 sequential pipeline — not 3 parallel agents. Only count agents that do meaningful *simultaneous* work.
 
 ### Review Capacity Rule
+
 You can only review as fast as you can validate. Scaling beyond your review capacity produces five half-reviewed implementations instead of two solid ones.
 
 ## Agent Definition Template
@@ -45,11 +48,26 @@ Every file in the repo has exactly one owner. No exceptions.
 | `docker-compose.yml` | Backend or Infrastructure | Defines service topology |
 | `tsconfig.json` (root) | Frontend | Frontend build tooling more sensitive to TS config |
 | `.gitignore` | Lead (pre-created) | Rarely changes |
-| `README.md` | Lead (post-build) | Agents lack full-system context |
+| `README.md` | Docs-agent (post-build) | Orchestrator provides full-system context; docs-agent writes it |
 
-## When to Add Specialist Agents
+## Built-In Specialist Agents
 
-Add a specialist agent only when the service:
+The ecosystem includes 5 specialist role skills. These are not "extra agents" — they're first-class members of the toolkit. Spawn them based on project needs:
+
+| Specialist | When to Include | When to Skip |
+|-----------|-----------------|--------------|
+| security-agent | Any project with user auth, external APIs, or sensitive data | Internal tools, prototypes |
+| docs-agent | Any project shipping to users or teams | Personal projects, throwaway proofs of concept |
+| observability-agent | Production services needing monitoring | Prototypes, single-use scripts |
+| db-migration-agent | Projects with existing databases or evolving schemas | Greenfield with simple schema, SQLite prototypes |
+| performance-agent | APIs with latency SLAs or high traffic expectations | Internal tools, low-traffic services |
+
+These specialists add coordination cost (more integration pairs), so include them judiciously. A 2-agent core (backend + frontend) with 1 specialist is common; 4+ specialists simultaneously is rare.
+
+## When to Add Custom Specialist Agents
+
+Add a custom specialist agent only when the service:
+
 - Has its **own runtime** (separate process)
 - Has its **own data store** or external dependencies
 - Has its **own API surface**

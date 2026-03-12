@@ -11,6 +11,7 @@ Quick-reference for validation commands, project structure, and common gotchas a
 **Scaffold**: `npm create vite@latest frontend -- --template react-ts`
 
 **Validation commands:**
+
 ```bash
 cd frontend
 npx tsc --noEmit                    # Type checking
@@ -20,6 +21,7 @@ npm run lint                        # Linting (if eslint configured)
 ```
 
 **API proxy (dev):** In `vite.config.ts`:
+
 ```typescript
 export default defineConfig({
   server: {
@@ -31,6 +33,7 @@ export default defineConfig({
 **Env vars:** Prefix with `VITE_` — e.g., `VITE_API_URL`
 
 **Gotchas:**
+
 - Vite uses port 5173 by default (not 3000)
 - Env vars must start with `VITE_` or they're not exposed to client code
 - `import.meta.env.VITE_API_URL` (not `process.env`)
@@ -42,6 +45,7 @@ export default defineConfig({
 **Scaffold**: `npx create-next-app@latest frontend --typescript --app`
 
 **Validation commands:**
+
 ```bash
 cd frontend
 npx tsc --noEmit
@@ -51,6 +55,7 @@ npm run lint
 ```
 
 **API proxy:** In `next.config.js` using `rewrites`:
+
 ```javascript
 module.exports = {
   async rewrites() {
@@ -62,6 +67,7 @@ module.exports = {
 **Env vars:** Prefix with `NEXT_PUBLIC_` for client-side, no prefix for server-side
 
 **Gotchas:**
+
 - App Router (app/) vs Pages Router (pages/) — check which the plan uses
 - Server Components can't use browser APIs
 - `next build` fails on type errors by default (good — catches issues early)
@@ -73,6 +79,7 @@ module.exports = {
 **Scaffold**: `npm create vue@latest frontend` (select TypeScript)
 
 **Validation commands:**
+
 ```bash
 cd frontend
 npx vue-tsc --noEmit               # Type checking (note: vue-tsc, not tsc)
@@ -83,6 +90,7 @@ npm run dev                         # Default: localhost:5173
 **Env vars:** Prefix with `VITE_` (same as React + Vite)
 
 **Gotchas:**
+
 - Use `vue-tsc` for type checking, not `tsc` (handles `.vue` SFCs)
 - Pinia for state management (Vuex is legacy)
 - Composition API (`<script setup>`) is the modern default
@@ -94,6 +102,7 @@ npm run dev                         # Default: localhost:5173
 **Scaffold**: `npm create svelte@latest frontend`
 
 **Validation commands:**
+
 ```bash
 cd frontend
 npm run check                       # Type checking + Svelte checks
@@ -102,6 +111,7 @@ npm run dev                         # Default: localhost:5173
 ```
 
 **Gotchas:**
+
 - SvelteKit has server-side routes (`+server.ts`) — make sure frontend agent doesn't accidentally create API routes
 - `$lib` alias for `src/lib/`
 - Form actions vs API calls — clarify in the plan which pattern to use
@@ -113,6 +123,7 @@ npm run dev                         # Default: localhost:5173
 ### FastAPI (Python)
 
 **Setup:**
+
 ```bash
 cd backend
 python -m venv venv
@@ -122,6 +133,7 @@ pip freeze > requirements.txt
 ```
 
 **Validation commands:**
+
 ```bash
 cd backend
 uvicorn main:app --port 8000        # Start server
@@ -130,12 +142,14 @@ ruff check .                        # Linting (if ruff installed)
 ```
 
 **CORS setup:**
+
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
 ```
 
 **Env vars:** `python-dotenv` or `pydantic-settings`:
+
 ```python
 from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
@@ -146,6 +160,7 @@ class Settings(BaseSettings):
 ```
 
 **Gotchas:**
+
 - FastAPI auto-generates OpenAPI docs at `/docs` — useful for QE testing
 - Async endpoints (`async def`) vs sync (`def`) — async for I/O-bound work
 - SQLAlchemy 2.0 syntax differs significantly from 1.x
@@ -156,6 +171,7 @@ class Settings(BaseSettings):
 ### Express + TypeScript (Node)
 
 **Setup:**
+
 ```bash
 cd backend
 npm init -y
@@ -165,6 +181,7 @@ npx tsc --init
 ```
 
 **Validation commands:**
+
 ```bash
 cd backend
 npx tsc --noEmit                    # Type checking
@@ -173,12 +190,14 @@ npm test                            # Run tests (if configured)
 ```
 
 **CORS setup:**
+
 ```typescript
 import cors from 'cors';
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173' }));
 ```
 
 **Env vars:** `dotenv`:
+
 ```typescript
 import dotenv from 'dotenv';
 dotenv.config();
@@ -186,6 +205,7 @@ const PORT = process.env.PORT || 8000;
 ```
 
 **Gotchas:**
+
 - Express doesn't return JSON by default for errors — need `app.use(express.json())` and custom error handler
 - No built-in validation — use `zod`, `joi`, or `express-validator`
 - TypeScript compilation: `tsc` then `node dist/index.js`, or use `ts-node` / `tsx` for dev
@@ -196,6 +216,7 @@ const PORT = process.env.PORT || 8000;
 ### Django + DRF (Python)
 
 **Setup:**
+
 ```bash
 cd backend
 python -m venv venv
@@ -206,6 +227,7 @@ python manage.py startapp api
 ```
 
 **Validation commands:**
+
 ```bash
 cd backend
 python manage.py runserver 8000     # Start server
@@ -215,6 +237,7 @@ python manage.py migrate            # Apply migrations
 ```
 
 **CORS setup:** In `settings.py`:
+
 ```python
 INSTALLED_APPS = [..., 'corsheaders']
 MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware', ...]
@@ -222,6 +245,7 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
 ```
 
 **Gotchas:**
+
 - Django uses `snake_case` for field names — may need serializer to convert to `camelCase` for the API contract
 - Migrations are separate from models — run `makemigrations` then `migrate`
 - DRF serializers vs Django forms — use serializers for API
@@ -232,12 +256,14 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
 ### Go (stdlib + common libraries)
 
 **Setup:**
+
 ```bash
 mkdir backend && cd backend
 go mod init [module-name]
 ```
 
 **Validation commands:**
+
 ```bash
 cd backend
 go build ./...                      # Compile check
@@ -247,6 +273,7 @@ go vet ./...                        # Static analysis
 ```
 
 **CORS setup:** Using `rs/cors`:
+
 ```go
 import "github.com/rs/cors"
 handler := cors.New(cors.Options{
@@ -256,6 +283,7 @@ handler := cors.New(cors.Options{
 ```
 
 **Gotchas:**
+
 - Go uses `PascalCase` for exported types, `camelCase` for JSON tags — always set JSON tags: `json:"fieldName"`
 - No ORM by default — use `sqlx` (lightweight) or `gorm` (full ORM)
 - Error handling is explicit (`if err != nil`) — every database call needs error handling
@@ -272,6 +300,7 @@ handler := cors.New(cors.Options{
 **Connection string:** `postgresql://user:password@host:5432/dbname`
 
 **CLI check:**
+
 ```bash
 psql -U postgres -d dbname -c "SELECT 1;"
 # Docker: docker compose exec db psql -U postgres -d appdb -c "\dt"
@@ -280,6 +309,7 @@ psql -U postgres -d dbname -c "SELECT 1;"
 **Health check (Docker):** `pg_isready -U postgres`
 
 **Gotchas:**
+
 - Default port: 5432
 - Needs `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` for UUID generation
 - Connection pooling recommended for production (PgBouncer)
@@ -291,12 +321,14 @@ psql -U postgres -d dbname -c "SELECT 1;"
 **Connection string:** `sqlite:///./app.db` (file-based)
 
 **CLI check:**
+
 ```bash
 sqlite3 app.db ".tables"
 sqlite3 app.db "SELECT * FROM sessions LIMIT 5;"
 ```
 
 **Gotchas:**
+
 - No separate server process — it's a file
 - Foreign keys are OFF by default — enable with `PRAGMA foreign_keys = ON;`
 - No concurrent write support — fine for dev, not for production with multiple workers
@@ -311,6 +343,7 @@ sqlite3 app.db "SELECT * FROM sessions LIMIT 5;"
 **Connection string:** `mysql://user:password@host:3306/dbname`
 
 **CLI check:**
+
 ```bash
 mysql -u root -p -e "SHOW TABLES;" dbname
 # Docker: docker compose exec db mysql -u root -p -e "\s"
@@ -319,6 +352,7 @@ mysql -u root -p -e "SHOW TABLES;" dbname
 **Health check (Docker):** `mysqladmin ping -h localhost`
 
 **Gotchas:**
+
 - Default port: 3306
 - `utf8mb4` charset for full Unicode support (not `utf8` which is 3-byte)
 - Case sensitivity varies by platform and collation
@@ -332,12 +366,14 @@ mysql -u root -p -e "SHOW TABLES;" dbname
 **Connection string:** `mongodb://user:password@host:27017/dbname`
 
 **CLI check:**
+
 ```bash
 mongosh --eval "db.sessions.find().limit(5)"
 # Docker: docker compose exec db mongosh --eval "db.stats()"
 ```
 
 **Gotchas:**
+
 - Schema-less by default — use Mongoose (Node) or Motor (Python) for schema enforcement
 - `_id` field is auto-generated (ObjectId, not UUID)
 - No joins — denormalize or use `$lookup` aggregation

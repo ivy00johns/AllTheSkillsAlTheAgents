@@ -1,6 +1,7 @@
 # k6 Performance Testing Patterns
 
 ## Installation
+
 ```bash
 # macOS
 brew install k6
@@ -10,6 +11,7 @@ docker run --rm -i grafana/k6 run - <script.js
 ```
 
 ## Basic Load Test Script
+
 ```javascript
 import http from 'k6/http';
 import { check, sleep } from 'k6';
@@ -54,6 +56,7 @@ export default function () {
 ```
 
 ## Smoke Test
+
 ```javascript
 export const options = {
   vus: 1,
@@ -66,6 +69,7 @@ export const options = {
 ```
 
 ## Stress Test
+
 ```javascript
 export const options = {
   stages: [
@@ -81,6 +85,7 @@ export const options = {
 ```
 
 ## Soak Test
+
 ```javascript
 export const options = {
   stages: [
@@ -92,6 +97,7 @@ export const options = {
 ```
 
 ## Running
+
 ```bash
 # Basic run
 k6 run script.js
@@ -118,6 +124,7 @@ k6 run --out json=results.json script.js
 | `vus` | Active virtual users | As configured |
 
 ## Custom Metrics
+
 ```javascript
 import { Trend, Counter } from 'k6/metrics';
 

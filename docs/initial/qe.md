@@ -123,7 +123,7 @@ Verify that both sides reference the same type definitions:
 
 For each contracted interface, record:
 
-```
+```text
 ENDPOINT: POST /api/v1/sessions
   Route exists:          PASS | FAIL (details)
   Request shape:         PASS | FAIL (details)
@@ -145,7 +145,7 @@ With contracts confirmed, verify that the layers actually connect and data flows
 
 Start all services in dependency order. Record what happens:
 
-```
+```text
 DATABASE:  ✅ Started on port XXXX | ❌ Error: [message]
 BACKEND:   ✅ Started on port XXXX | ❌ Error: [message]
            ✅ Connected to database | ❌ Connection refused
@@ -172,7 +172,7 @@ Walk through the primary user flow end-to-end. This is the single most important
 
 Identify the happy path from the plan's acceptance criteria. A typical flow:
 
-```
+```text
 1. Create a resource          → POST, verify 201 + response shape
 2. List/retrieve the resource → GET, verify it appears with correct data
 3. Update the resource        → PUT/PATCH, verify changes persist
@@ -182,7 +182,7 @@ Identify the happy path from the plan's acceptance criteria. A typical flow:
 
 **Execute each step and record:**
 
-```
+```text
 STEP 1: Create session
   Request:  POST /api/v1/sessions {"title": "Test Session"}
   Expected: 201 {"id": "...", "title": "Test Session", "createdAt": "..."}

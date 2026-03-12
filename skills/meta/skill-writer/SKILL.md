@@ -30,7 +30,7 @@ Generate correctly structured SKILL.md files for the Claude Code skill ecosystem
 
 ## Skill Directory Structure
 
-```
+```text
 skill-name/
 ├── SKILL.md              # Required — frontmatter + instructions
 └── references/           # Optional — loaded on demand
@@ -65,6 +65,7 @@ Keep SKILL.md bodies concise. Move detailed checklists, templates, and reference
 Every SKILL.md starts with YAML frontmatter. See `references/frontmatter-spec.md` for the complete field reference.
 
 Required fields:
+
 - `name` — kebab-case, max 64 chars
 - `version` — semver (start at 1.0.0)
 - `description` — action verb + what it does + trigger contexts (≤200 chars target)
@@ -82,6 +83,7 @@ Structure the body around:
 5. **Guidelines** — principles and common pitfalls
 
 For agent role skills, also include:
+
 - **Ownership** — directories/files owned exclusively
 - **Off-limits** — what this agent must never touch
 - **Validation** — link to `references/validation-checklist.md`
@@ -89,12 +91,14 @@ For agent role skills, also include:
 ### Step 4: Create Reference Files
 
 Move detailed content to `references/`:
+
 - Validation checklists with specific commands
 - Templates and examples
 - Detailed technical guides
 - Tables longer than 20 rows
 
 Reference files from the body with guidance on when to read:
+
 ```markdown
 For the complete validation procedure, read `references/validation-checklist.md`
 before reporting done.
@@ -105,7 +109,8 @@ before reporting done.
 - [ ] Frontmatter has all required fields
 - [ ] Description is ≤200 characters and "pushy"
 - [ ] Body is under 500 lines
-- [ ] File ownership doesn't overlap with existing agents
+- [ ] File ownership doesn't overlap with existing agents (check v1.1 resolved conflicts)
+- [ ] Directory ownership takes precedence over pattern ownership
 - [ ] Reference files are linked from the body
 - [ ] No duplicate content between body and references
 
@@ -114,7 +119,8 @@ before reporting done.
 - **Vague descriptions** — "Helps with backend stuff" won't trigger. Be specific.
 - **Body too long** — Approaching 500 lines? Move content to references.
 - **Missing ownership** — Agent roles must declare owned and off-limits files.
-- **Overlapping ownership** — Two agents can't own the same directory.
+- **Overlapping ownership** — Two agents can't own the same directory. Directory ownership takes precedence over pattern ownership (see `references/frontmatter-spec.md` §Ownership Resolution Rules).
+- **Ignoring resolved conflicts** — Check the v1.1 resolved conflicts table before declaring ownership of `contracts/`, `.claude/handoffs/`, `CLAUDE.md`, `README.md`, or `tests/performance/`.
 - **Hardcoded project details** — Global skills never change per project. Use profile.yaml.
 
 ## Reference Files

@@ -1,7 +1,7 @@
 # Claude Code Skill Ecosystem — Design Specification v1.0
 
-**Status:** PRE-BUILD BLUEPRINT — requires sign-off before implementation begins  
-**Date:** 2026-03-10  
+**Status:** PRE-BUILD BLUEPRINT — requires sign-off before implementation begins
+**Date:** 2026-03-10
 **Scope:** Global multi-agent orchestration toolkit + project profile system
 
 ---
@@ -21,7 +21,7 @@
 
 ### 2.1 Global Skills (`~/.claude/skills/`)
 
-```
+```text
 ~/.claude/skills/
 │
 ├── orchestrator/
@@ -107,7 +107,7 @@
 
 ### 2.2 Per-Project Files (committed to each project repo)
 
-```
+```text
 <project-root>/
 ├── CLAUDE.md                            # Project profile (human-readable, ≤200 lines)
 └── .claude/
@@ -122,6 +122,7 @@
 ```
 
 **Known project profiles to build after global skills are done:**
+
 - `tricentis-tais/` — AI-Hub API, Tosca Cloud, NeoLoad conventions
 - `acu-app/` — Vue 3 / .NET 9.0, Congressional fact sheet app
 - `epstein-watch/` — document processing pipeline, search DB
@@ -267,7 +268,7 @@ notes: string | null                  # Anything agents need to know that doesn'
 
 ### 4.2 `CLAUDE.md` Structure
 
-```markdown
+````markdown
 # [Project Display Name]
 
 ## What This Is
@@ -289,26 +290,33 @@ notes: string | null                  # Anything agents need to know that doesn'
 ```
 
 ## Directory Map
+
 | Directory | Owner Agent | Contents |
 |-----------|-------------|----------|
 | src/api   | backend     | Route handlers, middleware |
 | ...       | ...         | ... |
 
 ## Auth Pattern
+
 [1 paragraph: how auth works, token format, where it lives]
 
 ## Coding Conventions
+
 [Bullet list of the 5-10 most important conventions]
 
 ## Do NOT
+
 [Bullet list of forbidden patterns — the most important rules]
 
 ## CI/CD
+
 [Build → test → deploy pipeline in 3-5 lines]
 
 ## Agent Notes
+
 [Anything specific agents need to know: rate limits, quirks, active migrations, etc.]
-```
+
+````
 
 **Hard limit: CLAUDE.md ≤200 lines.** Anything longer → move to `.claude/` reference files.
 
@@ -329,12 +337,14 @@ Skills must work in both Claude Code CLI and claude.ai. The strategy:
 
 ### Degradation Decision Tree (in orchestrator SKILL.md)
 
-```
+```text
+
 Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS set?
   YES → Use native Agent Teams (TeammateTool, inbox, shared task list)
   NO → Is this Claude Code CLI (bash tool available)?
     YES → Use subagents via Task tool (parallel but no TeammateTool)
     NO → Sequential mode: work through roles one at a time, user coordinates
+
 ```
 
 Each agent role SKILL.md works standalone. The orchestrator is the only skill that needs the full runtime decision tree.
@@ -345,20 +355,41 @@ Each agent role SKILL.md works standalone. The orchestrator is the only skill th
 
 This is the canonical ownership table the orchestrator enforces before any agent is spawned.
 
+### Ownership Rules
+
+1. **Exclusive means exclusive.** No two agents may own the same file or directory.
+2. **Directory ownership takes precedence over pattern ownership.** If a file matches agent A's glob pattern but lives inside agent B's owned directory, agent B owns it. Example: `src/api/routes.test.ts` matches qe-agent's `*.test.*` pattern but lives in backend-agent's `src/api/` — backend-agent owns it.
+3. **Subdirectory carve-outs are explicit.** A more specific directory path overrides a parent. Example: performance-agent owns `tests/performance/` even though qe-agent owns `tests/`.
+4. **Orchestrator resolves ambiguity at spawn time.** If a conflict can't be resolved by rules 1-3, the orchestrator assigns the file to one agent before spawning. Unresolvable conflicts → human decision.
+
+### Canonical Ownership Table
+
 | Agent Role | Owns (Exclusive) | Shared Read | Never Touches |
 |------------|-----------------|-------------|---------------|
+| orchestrator | `.gitignore` | `contracts/`, `.claude/handoffs/`, `*` | `src/` |
 | backend | `src/api/`, `src/services/`, `src/models/`, `src/middleware/`, `src/utils/` | `contracts/`, `shared/`, `src/types/` | `src/components/`, `src/pages/` |
-| frontend | `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/` | `contracts/`, `shared/`, `src/types/` | `src/api/`, `src/services/` |
-| infrastructure | `Dockerfile*`, `docker-compose*`, `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/` | All (read-only audit) | `src/` |
-| qe | `tests/`, `e2e/`, `__tests__/`, `*.test.*`, `*.spec.*` | All (read-only) | `src/` (creates test files only) |
-| security | `SECURITY.md`, `.github/security/` | All (read-only audit) | Nothing else |
-| docs | `docs/`, `README.md`, `CHANGELOG.md`, `*.md` (non-config) | All (read-only) | `src/`, configs |
+| frontend | `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/`, `*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css` | `contracts/`, `shared/`, `src/types/` | `src/api/`, `src/services/` |
+| infrastructure | `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/`, `Dockerfile*`, `docker-compose*`, `Makefile`, `justfile` | All (read-only audit) | `src/` |
+| qe | `tests/` *(excluding `tests/performance/`)*, `e2e/`, `__tests__/`, `*.test.*`, `*.spec.*`, `qa-report.md`, `qa-report.json` | All (read-only) | `src/` (test files in `src/` owned by their directory's agent) |
+| performance | `tests/performance/`, `load-tests/` | All (read-only) | `src/`, `tests/` (except `tests/performance/`) |
+| security | `.github/security/`, `SECURITY.md` | All (read-only audit) | Nothing else |
+| docs | `docs/`, `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md` | All (read-only) | `src/`, configs |
 | observability | `src/telemetry/`, `src/logging/`, `monitoring/`, `alerts/` | `src/` (read-only) | Other `src/` subdirs |
 | db-migration | `migrations/`, `seeds/`, `prisma/`, `alembic/` | `src/models/` (read-only) | `src/` otherwise |
-| performance | `tests/performance/`, `load-tests/` | All (read-only) | `src/`, `tests/` |
 | contract-author | `contracts/`, `schemas/`, `openapi.yaml`, `asyncapi.yaml` | All (read-only) | `src/` |
+| project-profiler | `CLAUDE.md`, `.claude/profile.yaml` | All (read-only) | `src/` |
+| context-manager | `.claude/handoffs/` | All (read-only) | `src/` |
 
-**Rule:** If two roles would touch the same file, the orchestrator resolves the conflict by assigning that file to exactly one role before spawning agents. Conflicts → human decision.
+### Resolved Conflicts (v1.0 → v1.1)
+
+| Resource | Previously Claimed By | Resolved Owner | Rationale |
+|----------|-----------------------|----------------|-----------|
+| `contracts/` | orchestrator, contract-author | **contract-author** | contract-author creates and maintains contracts; orchestrator coordinates via shared read |
+| `.claude/handoffs/` | orchestrator, context-manager | **context-manager** | context-manager writes handoffs at context limits; orchestrator reads to spawn continuations |
+| `CLAUDE.md` | orchestrator, project-profiler | **project-profiler** | project-profiler generates it; orchestrator reads for project context |
+| `README.md` | orchestrator, docs-agent | **docs-agent** | docs-agent writes documentation; orchestrator reads |
+| `*.md` (broad) | docs-agent (was `*.md`) | **docs-agent** (narrowed to `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`) | Broad `*.md` conflicted with `qa-report.md` (qe), `SECURITY.md` (security), `CLAUDE.md` (project-profiler) |
+| `tests/performance/` | qe-agent (via `tests/`), performance-agent | **performance-agent** (carved out from qe's `tests/`) | Performance testing is a specialized concern distinct from functional QA |
 
 ---
 
@@ -373,7 +404,7 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
   "agent_role": "qe",
   "build_session_id": "string",
   "status": "PASS | FAIL | PARTIAL | BLOCKED",
-  
+
   "scores": {
     "correctness": { "score": 1-5, "notes": "string" },
     "completeness": { "score": 1-5, "notes": "string" },
@@ -381,7 +412,7 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
     "security": { "score": 1-5, "notes": "string" },
     "contract_conformance": { "score": 1-5, "notes": "string" }
   },
-  
+
   "test_results": {
     "unit": { "pass": 0, "fail": 0, "skip": 0 },
     "integration": { "pass": 0, "fail": 0, "skip": 0 },
@@ -389,7 +420,7 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
     "contract": { "pass": 0, "fail": 0, "skip": 0 },
     "security_scan": { "pass": 0, "fail": 0, "skip": 0 }
   },
-  
+
   "blockers": [
     {
       "id": "string",
@@ -401,7 +432,7 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
       "suggested_fix": "string"
     }
   ],
-  
+
   "issues": [
     {
       "id": "string",
@@ -413,9 +444,9 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
       "suggested_fix": "string"
     }
   ],
-  
+
   "recommendations": ["string"],
-  
+
   "gate_decision": {
     "proceed": true,
     "reason": "string"
@@ -424,6 +455,7 @@ The QE agent outputs this JSON schema. The orchestrator's `TaskCompleted` hook p
 ```
 
 **Orchestrator rule:** `gate_decision.proceed = false` when:
+
 - Any `status = FAIL` or `BLOCKED`
 - Any blocker with `severity = CRITICAL`
 - `scores.contract_conformance < 3`
@@ -477,6 +509,7 @@ suggested_first_action: string     # Exact next step for continuation agent
 Skills will be built in this sequence to ensure each new file can reference already-defined standards:
 
 **Phase 1 — Foundation (build first)**
+
 1. `meta/skill-writer/SKILL.md` + frontmatter-spec.md + description-patterns.md
 2. `roles/qe-agent/references/qa-report-schema.json` (the gate spec)
 3. `contracts/contract-author/references/` (all template files)
@@ -511,17 +544,17 @@ Skills will be built in this sequence to ensure each new file can reference alre
 
 ---
 
-## 10. Open Decisions (Needs Sign-off)
+## 10. Design Decisions (Resolved)
 
-These are the only unresolved questions. Everything else above is decided.
+All decisions resolved as of v1.1. Original recommendations accepted unless noted.
 
-| # | Decision | Option A | Option B | Recommendation |
-|---|----------|----------|----------|----------------|
-| 1 | **Orchestrator trigger style** | Single orchestrator SKILL.md triggered by "build", "create app", etc. | Separate entry-point skills per project type (web app, API, CLI) | **A** — simpler, project profiles handle the rest |
-| 2 | **Specialist agents** | Include auth/ML/search/worker agent skills in Phase 2 | Leave as future additions | **B** — scope creep; add when needed |
-| 3 | **Performance agent scope** | NeoLoad + k6 both covered | NeoLoad-only (matches TAIS use case) | **A** — generic toolkit, NeoLoad depth in project profile |
-| 4 | **Plugin manifest** | Include `.claude-plugin/plugin.json` for marketplace distribution | Skip for now, add later | **A** — trivial to add, future-proofs for community release |
-| 5 | **Version lock** | Pin skills to specific Claude model versions | Float to latest model | **B** — float; model pinning is enterprise concern |
+| # | Decision | Chosen | Rationale |
+|---|----------|--------|-----------|
+| 1 | **Orchestrator trigger style** | **A** — Single orchestrator | Project profiles handle per-project variation |
+| 2 | **Specialist agents** | **Modified B** — Core specialists included (security, docs, observability, db-migration, performance); auth/ML/search/worker deferred | The 5 included specialists address universal build concerns; domain-specific agents (auth, ML, search) add when needed |
+| 3 | **Performance agent scope** | **A** — NeoLoad + k6 both | Generic toolkit with NeoLoad depth via project profile |
+| 4 | **Plugin manifest** | **B** — Deferred | Not built in Phase 1-4; add when marketplace submission is needed |
+| 5 | **Version lock** | **B** — Float to latest model | No model pinning; enterprise concern if needed later |
 
 ---
 
@@ -535,7 +568,4 @@ To keep this deliverable finite:
 - No Agent Skills standard `.skill` packaging (directory structure is sufficient)
 - No A2A protocol integration (local orchestration only)
 - No multi-LLM portability (Claude-first, SKILL.md cross-platform is a bonus)
-
----
-
-*Sign off on §10 Open Decisions, then Phase 1 build begins.*
+- No `.claude-plugin/plugin.json` manifest (deferred — see §10 #4)

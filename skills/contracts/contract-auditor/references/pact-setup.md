@@ -13,6 +13,7 @@ For simple 2-agent builds (frontend + backend), static contract auditing is usua
 ## Consumer Side (Frontend / API Client)
 
 ### JavaScript (Pact-JS)
+
 ```bash
 npm install --save-dev @pact-foundation/pact
 ```
@@ -58,6 +59,7 @@ describe('Sessions API', () => {
 ```
 
 ### Python (Pact-Python)
+
 ```bash
 pip install pact-python
 ```
@@ -89,6 +91,7 @@ def test_create_session():
 ## Provider Side (Backend)
 
 ### Provider Verification
+
 ```typescript
 import { Verifier } from '@pact-foundation/pact';
 

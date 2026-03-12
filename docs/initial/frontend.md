@@ -179,6 +179,7 @@ grep -rn "fetch\|axios\|\.get\|\.post\|\.put\|\.delete" src/ \
 ```
 
 For each call, manually verify:
+
 - URL matches contract (including path, params, trailing slashes)
 - HTTP method matches
 - Request body shape matches

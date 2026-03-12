@@ -1,6 +1,7 @@
 # QE Agent Validation Checklist
 
 ## Pre-Testing Setup
+
 ```bash
 # Verify all services are running
 docker compose ps        # or check individual processes
@@ -9,6 +10,7 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:${FRONTEND_PORT}        
 ```
 
 ## Phase 1: Contract Conformance
+
 ```bash
 # For each contracted endpoint:
 # 1. Check route exists
@@ -32,6 +34,7 @@ grep -rn "fetch\|axios\|\.get\|\.post\|\.put\|\.delete" frontend/src/ \
 ```
 
 ## Phase 2: Integration
+
 ```bash
 # CORS check (#1 failure)
 curl -s -I -X OPTIONS http://localhost:${BACKEND_PORT}/api/v1/sessions \
@@ -43,6 +46,7 @@ curl -s -I -X OPTIONS http://localhost:${BACKEND_PORT}/api/v1/sessions \
 ```
 
 ## Phase 3: Adversarial
+
 ```bash
 # Empty body
 curl -s -w "\n%{http_code}" -X POST http://localhost:${PORT}/api/v1/sessions \
@@ -63,6 +67,7 @@ curl -s -X POST http://localhost:${PORT}/api/v1/sessions \
 ```
 
 ## Phase 4: QA Report Quality
+
 - [ ] Every contracted endpoint has at least one test result
 - [ ] Every critical issue has exact reproduction steps (commands, not prose)
 - [ ] Every critical issue identifies the responsible agent

@@ -63,22 +63,26 @@ Follow the same principles as the backend agent, adapted to your service type:
 Implement the specific integration pattern the lead assigned:
 
 **HTTP API** (most common for service-to-service):
+
 - Implement endpoints per the service contract
 - Return contracted response shapes
 - Handle the contracted error cases
 
 **Message Queue** (for async work):
+
 - Consumer: Listen on the contracted queue/topic
 - Producer: Publish to the contracted queue/topic
 - Message format matches the contracted schema
 - Handle retries and dead-letter queues
 
 **Shared Database** (use cautiously — shared data is an integration magnet):
+
 - Only read/write tables assigned to you
 - Use the schema defined in the shared types
 - Coordinate schema changes through the lead
 
 **gRPC** (for performance-critical service-to-service):
+
 - Proto file is the contract — implement the service defined in it
 - Proto file lives in `contracts/` (read-only for you)
 
@@ -87,23 +91,27 @@ Implement the specific integration pattern the lead assigned:
 Adapt to your specialist role:
 
 **Auth service:**
+
 - Token generation and validation (JWT, session tokens)
 - Password hashing (bcrypt, argon2 — never plaintext)
 - Rate limiting on login endpoints
 - Token refresh flow
 
 **Background worker:**
+
 - Job queue connection (Redis, RabbitMQ, SQS)
 - Job processing with error handling and retries
 - Dead-letter queue for failed jobs
 - Graceful shutdown (finish current job before stopping)
 
 **Search service:**
+
 - Index management (create, update, delete)
 - Query processing with relevance scoring
 - Sync mechanism with source of truth (database events, polling, webhook)
 
 **ML/AI pipeline:**
+
 - Model loading and inference
 - Request queuing if inference is slow
 - Timeout handling for long-running predictions

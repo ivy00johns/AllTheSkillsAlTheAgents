@@ -7,11 +7,16 @@ requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
 owns:
-  directories: ["contracts/", ".claude/handoffs/"]
-  patterns: ["CLAUDE.md", ".gitignore", "README.md"]
-  shared_read: ["*"]
+  directories: []
+  patterns: [".gitignore"]
+  shared_read: ["contracts/", ".claude/handoffs/", "*"]
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
-composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent", "qe-agent", "contract-author", "contract-auditor"]
+composes_with: [
+  "backend-agent", "frontend-agent", "infrastructure-agent", "qe-agent",
+  "security-agent", "docs-agent", "observability-agent", "db-migration-agent", "performance-agent",
+  "contract-author", "contract-auditor",
+  "context-manager", "deployment-checklist", "code-reviewer", "project-profiler"
+]
 spawned_by: []
 license: MIT
 author: john-ladwig
@@ -36,7 +41,7 @@ For the full 14-phase playbook, read `references/phase-guide.md`.
 
 ## Runtime Detection
 
-```
+```text
 Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS set?
   YES → Native Agent Teams (tmux, TeammateTool, inbox, shared task list)
   NO → Is bash tool available?
@@ -46,14 +51,20 @@ Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS set?
 
 Each agent role skill works standalone regardless of runtime. Only this orchestrator skill needs the full decision tree.
 
+**Sequential mode**: When neither Agent Teams nor subagent spawning is available, work through each role one at a time within a single session. Apply the relevant role skill as your own instructions for that phase. The user may need to coordinate context resets between roles. Contracts and validation still apply — only the parallelism changes.
+
 ## File Ownership Map
+
+Directory ownership takes precedence over pattern ownership. Subdirectory carve-outs are explicit (e.g., performance-agent owns `tests/performance/` carved out from qe-agent's `tests/`). See the full canonical table in the design spec §6.
 
 | Agent Role | Owns (Exclusive) | Shared Read | Never Touches |
 |------------|-----------------|-------------|---------------|
-| backend | `src/api/`, `src/services/`, `src/models/`, `src/middleware/` | `contracts/`, `shared/`, `src/types/` | `src/components/`, `src/pages/` |
+| orchestrator | `.gitignore` | `contracts/`, `.claude/handoffs/`, `*` | `src/` |
+| backend | `src/api/`, `src/services/`, `src/models/`, `src/middleware/`, `src/utils/` | `contracts/`, `shared/`, `src/types/` | `src/components/`, `src/pages/` |
 | frontend | `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/` | `contracts/`, `shared/`, `src/types/` | `src/api/`, `src/services/` |
-| infrastructure | `Dockerfile*`, `docker-compose*`, `.github/workflows/`, `nginx/` | All (read-only) | `src/` |
-| qe | `tests/`, `e2e/`, `__tests__/`, `*.test.*`, `*.spec.*` | All (read-only) | `src/` (test files only) |
+| infrastructure | `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/`, `Dockerfile*`, `docker-compose*` | All (read-only) | `src/` |
+| qe | `tests/` *(excl. `tests/performance/`)*, `e2e/`, `__tests__/`, `*.test.*`, `*.spec.*` | All (read-only) | `src/` (test files in `src/` owned by directory's agent) |
+| performance | `tests/performance/`, `load-tests/` | All (read-only) | `src/` |
 
 **Rule**: If two roles would touch the same file, resolve the conflict by assigning that file to exactly one role before spawning. Unresolvable conflicts → human decision.
 
@@ -72,7 +83,7 @@ Use the `contract-author` skill and templates in `contracts/contract-author/refe
 
 Each agent receives ONLY what they need:
 
-```
+```text
 You are the [ROLE] agent for this build.
 
 ## Your Ownership
@@ -113,6 +124,7 @@ You are the [ROLE] agent for this build.
 ## QA Gate Rules
 
 The QE agent outputs structured JSON per `roles/qe-agent/references/qa-report-schema.json`. Build is blocked when:
+
 - `gate_decision.proceed = false`
 - Any blocker with `severity: CRITICAL`
 - `scores.contract_conformance < 3`
@@ -139,6 +151,7 @@ When agents approach context limits, follow the handoff protocol in `references/
 ## Definition of Done
 
 ALL must be true:
+
 1. Every agent passed their validation checklist
 2. Contract diff — zero mismatches
 3. End-to-end validation passed (startup, happy path, edge cases)

@@ -25,12 +25,26 @@ Analyze a codebase and generate a project profile that agents can consume. You p
 
 You are the **project profiler**. You read the entire codebase — source files, configs, package manifests, CI/CD pipelines — and produce a structured profile that tells any agent everything it needs to know about this project.
 
+## Your Ownership
+
+- **You own (exclusive):** `CLAUDE.md`, `.claude/profile.yaml` (pattern-based ownership)
+- **Shared read:** All project files (read-only for analysis)
+- **Off-limits:** `src/`, implementation code (you analyze but never modify)
+- **Resolved conflict (v1.1):** `CLAUDE.md` was previously claimed by both orchestrator and project-profiler. Project-profiler is the definitive owner — you generate and maintain it. The orchestrator reads it for project context.
+
+## Inputs
+
+- **Codebase access** — full read access to the project repository
+- **Existing profile (optional)** — if `CLAUDE.md` or `.claude/profile.yaml` already exist, read them first and update rather than overwrite
+- **Orchestrator context (optional)** — the orchestrator may provide specific focus areas or questions about the project
+
 ## Process
 
 ### 1. Detect Tech Stack
 
 Scan for indicators:
-```
+
+```text
 package.json → Node.js (check for React, Vue, Svelte, Next.js, Express)
 requirements.txt / pyproject.toml → Python (check for FastAPI, Django, Flask)
 go.mod → Go
@@ -44,6 +58,7 @@ alembic/ → SQLAlchemy + Alembic
 ### 2. Map Directory Structure
 
 Identify which directories contain what:
+
 - API routes/handlers
 - Business logic/services
 - Data models
@@ -55,6 +70,7 @@ Identify which directories contain what:
 ### 3. Detect Conventions
 
 Scan code for patterns:
+
 - Naming convention (camelCase, snake_case, PascalCase)
 - Import style (absolute vs relative)
 - Error handling patterns
@@ -65,6 +81,7 @@ Scan code for patterns:
 ### 4. Identify Auth Pattern
 
 Look for:
+
 - JWT middleware
 - Session management
 - OAuth callbacks
@@ -74,6 +91,7 @@ Look for:
 ### 5. Map CI/CD
 
 Check for:
+
 - `.github/workflows/` → GitHub Actions
 - `.gitlab-ci.yml` → GitLab CI
 - `Jenkinsfile` → Jenkins
@@ -86,6 +104,7 @@ Follow the schema in `references/profile-schema.yaml`. Fill in every field that 
 ### 7. Generate CLAUDE.md
 
 Structure per the spec (≤200 lines):
+
 - What This Is (1-2 sentences)
 - Tech Stack (bullet list)
 - How to Run (install, dev, test, lint commands)

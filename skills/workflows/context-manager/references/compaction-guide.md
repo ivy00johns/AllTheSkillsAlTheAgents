@@ -5,6 +5,7 @@
 ### Monitoring Usage
 
 Context usage is approximate. Watch for these signals:
+
 - Responses becoming shorter or less detailed
 - Agent starting to "forget" earlier instructions
 - System messages about context limits
@@ -20,6 +21,7 @@ Break large tasks into subtasks. Complete each subtask fully (including validati
 
 **Strategy 3: External State**
 Write important decisions and state to files rather than keeping them only in context:
+
 - Write a `STATUS.md` tracking what's done and what's next
 - Write decision logs to `.claude/handoffs/`
 - Write partial results to files as you go
@@ -49,7 +51,8 @@ Don't push to 100%. At ~80% usage, write a handoff file and let the orchestrator
 This free-text field is the most important part of the handoff. Write it as if briefing a colleague:
 
 **Good:**
-```
+
+```text
 Backend API is 90% done. All CRUD endpoints for sessions work.
 The streaming endpoint (POST /api/v1/sessions/{id}/stream) is
 partially implemented — the SSE connection establishes and sends
@@ -60,7 +63,8 @@ appending. Fix that, then run the validation checklist.
 ```
 
 **Bad:**
-```
+
+```text
 I was working on the backend and made good progress on most
 things. There might be a bug in the streaming code. The frontend
 agent might need to check their side too.
@@ -69,6 +73,7 @@ agent might need to check their side too.
 ## Recovery from Failed Handoff
 
 If a continuation agent can't make sense of the handoff:
+
 1. Read all files in `files_modified` and `files_created`
 2. Read the relevant contracts
 3. Run the validation checklist to understand current state
@@ -78,12 +83,14 @@ If a continuation agent can't make sense of the handoff:
 ## Context-Efficient Patterns
 
 ### Do
+
 - Read files once, note key information
 - Write incremental results to disk
 - Use grep/glob instead of reading entire directories
 - Focus on the current subtask
 
 ### Don't
+
 - Re-read the same file multiple times
 - Keep large file contents in conversational context
 - Ask for the full plan when you only need one section

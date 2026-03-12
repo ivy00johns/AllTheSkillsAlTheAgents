@@ -148,6 +148,7 @@ curl -s -X POST http://localhost:8000/api/v1/sessions \
 ## Post-Deployment Verification
 
 After deployment, run these checks against the target environment:
+
 - [ ] Health endpoints return 200
 - [ ] Frontend loads without console errors
 - [ ] Primary user flow works

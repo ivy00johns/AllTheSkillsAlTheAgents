@@ -25,6 +25,19 @@ Run pre-deployment verification before pushing to staging or production.
 
 You verify that a build is ready for deployment by running through a structured checklist. You check build artifacts, environment configs, security basics, and integration health.
 
+## Inputs
+
+- **Target environment** — `staging` or `production` (determines which checks apply and which URLs to verify)
+- **QA report** — the qe-agent's `qa-report.json` must show `gate_decision.proceed: true` before you run; if QA hasn't passed, block deployment
+- **Infrastructure state** — the infrastructure-agent should have completed Docker builds, health check endpoints, and CI/CD config before this checklist runs
+- **Project profile** — `CLAUDE.md` / `.claude/profile.yaml` for environment-specific commands and URLs
+
+## Coordination
+
+- **qe-agent**: Deployment-checklist runs *after* the QE gate passes. If `qa-report.json` shows `gate_decision.proceed: false`, do not proceed — report the blocker to the orchestrator.
+- **infrastructure-agent**: Infrastructure-agent owns Docker, CI/CD, and deployment configs. Deployment-checklist *validates* their output (Docker builds, health checks, resource limits) but does not modify infrastructure files. Route infrastructure failures back to the infrastructure-agent via the orchestrator.
+- **Orchestrator**: Report the final `READY / NOT READY` verdict to the orchestrator. Include the structured report so it can be appended to the build record.
+
 ## Process
 
 Run through `references/pre-deploy.md` in order. Each section must pass before moving to the next. Report results as a structured checklist.

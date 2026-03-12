@@ -2,7 +2,7 @@
 
 ## README.md Template
 
-```markdown
+````markdown
 # [Project Name]
 
 [1-2 sentence description of what this project does]
@@ -83,11 +83,12 @@ See [API Documentation](docs/api.md) for full details.
 ## License
 
 [License type]
-```
+
+````
 
 ## API Endpoint Documentation Template
 
-```markdown
+````markdown
 ### [METHOD] [path]
 
 [One-line description]
@@ -100,6 +101,7 @@ curl -X [METHOD] http://localhost:8000[path] \
 ```
 
 **Response (success):**
+
 ```json
 {
   "id": "uuid",
@@ -109,6 +111,7 @@ curl -X [METHOD] http://localhost:8000[path] \
 ```
 
 **Response (error):**
+
 ```json
 {
   "error": "Description",
@@ -122,7 +125,8 @@ curl -X [METHOD] http://localhost:8000[path] \
 | 201 | Created successfully |
 | 422 | Validation error |
 | 404 | Not found |
-```
+
+````
 
 ## Documentation Quality Checklist
 

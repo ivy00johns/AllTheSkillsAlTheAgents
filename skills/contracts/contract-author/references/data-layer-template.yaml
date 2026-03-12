@@ -1,0 +1,150 @@
+# Data Layer Contract Template
+# Defines the interface between API handlers and the persistence layer.
+# The backend-agent implements these function signatures; the db-migration-agent
+# creates the underlying schema and migrations.
+#
+# Usage: Copy this template, replace the example entities with your project's
+# actual entities from the shared types file.
+
+version: "1.0.0"
+
+storage:
+  engine: "postgres"                    # postgres | sqlite | mongodb | mysql | redis
+  id_strategy: "uuid-v4"               # uuid-v4 | nanoid | auto-increment | cuid2
+  timestamp_owner: "data-layer"         # data-layer | caller | database-default
+  connection_env_var: "DATABASE_URL"    # env var name for connection string
+
+# Each function maps to a data operation the API layer can call.
+# The backend-agent implements these with exact signatures.
+functions:
+
+  # ── Sessions ───────────────────────────────────────────────
+
+  - name: createSession
+    description: "Create a new session"
+    params:
+      - name: title
+        type: string
+        constraints: "min_length=1, max_length=200"
+    returns: Session
+    side_effects:
+      - "inserts sessions row"
+      - "sets created_at and updated_at to now()"
+    errors:
+      - condition: "title is empty or exceeds max_length"
+        raises: "ValidationError"
+
+  - name: getSession
+    description: "Retrieve a session by ID"
+    params:
+      - name: sessionId
+        type: UUID
+    returns: "Session | null"
+    side_effects: []
+    errors: []
+
+  - name: listSessions
+    description: "List sessions with pagination"
+    params:
+      - name: offset
+        type: integer
+        default: 0
+      - name: limit
+        type: integer
+        default: 50
+        constraints: "max=100"
+    returns: "{ items: Session[], total: integer }"
+    side_effects: []
+    errors: []
+
+  - name: deleteSession
+    description: "Delete a session and all associated data"
+    params:
+      - name: sessionId
+        type: UUID
+    returns: void
+    cascade:
+      - "deletes all messages where session_id = sessionId"
+    errors:
+      - condition: "session does not exist"
+        raises: "NotFoundError"
+
+  # ── Messages ───────────────────────────────────────────────
+
+  - name: createMessage
+    description: "Create a message within a session"
+    params:
+      - name: sessionId
+        type: UUID
+      - name: role
+        type: "MessageRole enum"
+      - name: content
+        type: string
+    returns: Message
+    side_effects:
+      - "inserts messages row"
+      - "sets created_at to now()"
+      - "updates parent session's updated_at"
+    errors:
+      - condition: "session does not exist"
+        raises: "NotFoundError"
+
+  - name: listMessages
+    description: "List messages for a session with pagination"
+    params:
+      - name: sessionId
+        type: UUID
+      - name: offset
+        type: integer
+        default: 0
+      - name: limit
+        type: integer
+        default: 50
+    returns: "{ items: Message[], total: integer }"
+    side_effects: []
+    errors:
+      - condition: "session does not exist"
+        raises: "NotFoundError"
+
+  # ── Streaming ──────────────────────────────────────────────
+  # For endpoints that stream responses (e.g., AI chat), the data layer
+  # accumulates streamed chunks into a single stored message.
+
+  - name: createStreamedMessage
+    description: "Create a message from accumulated stream chunks"
+    params:
+      - name: sessionId
+        type: UUID
+      - name: role
+        type: "MessageRole enum"
+      - name: fullContent
+        type: string
+        description: "The fully accumulated content after stream completes"
+    returns: Message
+    side_effects:
+      - "inserts one messages row with the full accumulated content"
+      - "updates parent session's updated_at"
+    storage_semantics: "accumulated"
+    notes: "Store ONE row with the complete content, not one row per chunk"
+
+# Indexes the data layer must create for query performance.
+indexes:
+  - table: sessions
+    columns: [created_at]
+    type: btree
+    purpose: "Sort sessions by creation date"
+
+  - table: messages
+    columns: [session_id, created_at]
+    type: btree
+    purpose: "List messages for a session in chronological order"
+
+# Transaction boundaries — which operations must be atomic.
+transactions:
+  - name: "deleteSession cascade"
+    operations: ["delete messages by session_id", "delete session"]
+    isolation: "read-committed"
+
+  - name: "createStreamedMessage"
+    operations: ["insert message", "update session updated_at"]
+    isolation: "read-committed"

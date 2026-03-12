@@ -55,6 +55,7 @@ Rubrics for the five dimensions in the QA report's `scores` section. Each dimens
 ## Gate Rules
 
 The orchestrator blocks the build (`gate_decision.proceed = false`) when:
+
 - Overall `status` is `FAIL` or `BLOCKED`
 - Any blocker has `severity: CRITICAL`
 - `scores.contract_conformance < 3`

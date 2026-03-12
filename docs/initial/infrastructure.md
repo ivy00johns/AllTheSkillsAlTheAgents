@@ -158,29 +158,29 @@ Create a `Makefile` or `justfile` with common commands:
 
 # Start all services (Docker)
 up:
-	docker compose up -d
+ docker compose up -d
 
 # Stop all services
 down:
-	docker compose down
+ docker compose down
 
 # Rebuild images
 build:
-	docker compose build
+ docker compose build
 
 # View logs
 logs:
-	docker compose logs -f
+ docker compose logs -f
 
 # Clean everything (including volumes)
 clean:
-	docker compose down -v
+ docker compose down -v
 
 # Development mode (without Docker — start services locally)
 dev:
-	@echo "Start services manually:"
-	@echo "  Backend:  cd backend && uvicorn main:app --port 8000 --reload"
-	@echo "  Frontend: cd frontend && npm run dev"
+ @echo "Start services manually:"
+ @echo "  Backend:  cd backend && uvicorn main:app --port 8000 --reload"
+ @echo "  Frontend: cd frontend && npm run dev"
 ```
 
 ### Step 5: CI/CD Pipeline (if plan requires)

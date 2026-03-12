@@ -9,8 +9,29 @@ info:
 servers:
   - url: http://localhost:8000/api/v1
     description: Local development
+  # Add staging/prod URLs from project profile as needed
+
+security:
+  - BearerAuth: []
 
 paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
   /sessions:
     post:
       summary: Create a new session
@@ -50,13 +71,73 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [items, total, offset, limit]
                 properties:
-                  messages:
+                  items:
                     type: array
                     items:
                       $ref: "#/components/schemas/Message"
                   total:
                     type: integer
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+        "404":
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+    post:
+      summary: Create a message in a session
+      operationId: createMessage
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageRequest"
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /sessions/{sessionId}/chat:
+    post:
+      summary: Send message and stream AI response via SSE
+      operationId: streamChat
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageRequest"
+      responses:
+        "200":
+          description: SSE stream of response chunks
+          content:
+            text/event-stream:
+              schema:
+                description: |
+                  Server-Sent Events stream. Event types:
+                  - "chunk": { "content": "string" }
+                  - "done":  { "messageId": "uuid", "fullContent": "string" }
+                  - "error": { "error": "string", "code": "string" }
         "404":
           description: Session not found
           content:
@@ -131,6 +212,17 @@ components:
           type: string
           minLength: 1
           maxLength: 200
+
+    CreateMessageRequest:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          minLength: 1
 
     ApiError:
       type: object

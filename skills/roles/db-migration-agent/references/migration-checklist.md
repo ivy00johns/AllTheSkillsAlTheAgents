@@ -1,6 +1,7 @@
 # Migration Checklist
 
 ## Pre-Migration
+
 - [ ] Schema changes match the data layer contract
 - [ ] Migration is reversible (has down/rollback)
 - [ ] Migration is idempotent
@@ -9,6 +10,7 @@
 ## By Stack
 
 ### SQLAlchemy / Alembic (Python)
+
 ```bash
 # Generate migration
 alembic revision --autogenerate -m "description"
@@ -27,6 +29,7 @@ python -c "from database import engine; print(engine.table_names())"
 ```
 
 ### Prisma (Node.js)
+
 ```bash
 # Generate migration
 npx prisma migrate dev --name description
@@ -42,6 +45,7 @@ npx prisma db pull  # Should match schema.prisma
 ```
 
 ### Django
+
 ```bash
 # Generate migration
 python manage.py makemigrations
@@ -58,6 +62,7 @@ python manage.py migrate app_name 0001_previous
 ```
 
 ### Knex (Node.js)
+
 ```bash
 # Generate migration
 npx knex migrate:make description
@@ -73,6 +78,7 @@ npx knex seed:run
 ```
 
 ### Raw SQL
+
 ```bash
 # Apply
 psql -U postgres -d dbname -f migrations/001_create_tables.sql
@@ -83,6 +89,7 @@ psql -U postgres -d dbname -c "\d+ table_name"
 ```
 
 ## Post-Migration Verification
+
 - [ ] All tables/collections created
 - [ ] Column types match contract
 - [ ] Foreign keys enforced (test cascade delete)
@@ -91,6 +98,7 @@ psql -U postgres -d dbname -c "\d+ table_name"
 - [ ] Application can connect and query successfully
 
 ## Common Mistakes
+
 | Mistake | Prevention |
 |---------|------------|
 | Missing foreign key ON DELETE | Always specify CASCADE or SET NULL per contract |

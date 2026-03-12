@@ -2,6 +2,14 @@
 
 When an agent approaches context limits (~80% usage), it writes a structured handoff file and signals the orchestrator.
 
+## Roles
+
+- **Agent** — detects context usage approaching ~80%, drafts the handoff file content
+- **Context-manager** — owns `.claude/handoffs/`, validates handoff quality, assists with compaction strategy
+- **Orchestrator** — reads completed handoff files, spawns continuation agents with the handoff as context
+
+Signaling varies by runtime: in Agent Teams, signal via inbox/TeammateTool. In subagent mode, the agent exits and the orchestrator reads the handoff file from `.claude/handoffs/`. In sequential mode, the user relays.
+
 ## Handoff File Format
 
 Location: `.claude/handoffs/{agent-role}-{timestamp}.yaml`
@@ -62,15 +70,18 @@ suggested_first_action: string      # Exact next step for continuation agent
 ## Continuation Agent Startup Sequence
 
 The continuation agent should:
+
 1. Read the handoff file
-2. Read all files in `files_modified` and `files_created`
-3. Read the relevant contracts in `contracts_consumed`
-4. Execute `suggested_first_action`
-5. Continue with `remaining_subtasks`
+2. Read the agent's role skill (provided in spawn context by the orchestrator)
+3. Read all files in `files_modified` and `files_created`
+4. Read the relevant contracts in `contracts_consumed`
+5. Execute `suggested_first_action`
+6. Continue with `remaining_subtasks`
 
 ## Handoff Quality Checklist
 
 A good handoff includes:
+
 - [ ] Honest completion percentage (not inflated)
 - [ ] All modified files listed (so continuation agent knows current state)
 - [ ] Key decisions documented with rationale
@@ -91,6 +102,7 @@ A good handoff includes:
 ## Multiple Handoffs
 
 For long-running tasks, an agent may need multiple handoffs (Agent A → Agent B → Agent C). Each handoff file is independent and self-contained. The continuation agent should:
+
 1. Read the **latest** handoff file
 2. Check for **previous** handoff files to understand the full history
 3. Not assume the previous agent's context is available

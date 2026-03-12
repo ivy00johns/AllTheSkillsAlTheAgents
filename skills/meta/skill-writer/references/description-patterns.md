@@ -9,6 +9,7 @@ A description like "Helps with backend development" won't trigger because it's t
 ## The Solution
 
 Write descriptions that:
+
 1. **Start with an action verb** — what the skill DOES
 2. **Name specific trigger contexts** — when to use it
 3. **Include keyword variants** — different ways users phrase the need
@@ -18,7 +19,7 @@ Write descriptions that:
 
 ### Agent Role Skills
 
-```
+```text
 [Verb] [what it builds] for multi-agent builds. Use this skill when
 spawning a [role] agent, [specific task 1], [specific task 2], or
 [specific task 3]. Trigger for any [domain] task within an orchestrated build.
@@ -26,7 +27,7 @@ spawning a [role] agent, [specific task 1], [specific task 2], or
 
 ### Workflow Skills
 
-```
+```text
 [Verb] [what process it manages] for [context]. Use this skill when
 [trigger 1], [trigger 2], or [trigger 3]. Trigger when someone says
 "[phrase 1]", "[phrase 2]", or [condition].
@@ -34,7 +35,7 @@ spawning a [role] agent, [specific task 1], [specific task 2], or
 
 ### Meta Skills
 
-```
+```text
 [Verb] [what it produces] for the skill ecosystem. Use this skill when
 [trigger 1], [trigger 2], or [trigger 3]. Also use when [non-obvious trigger].
 ```

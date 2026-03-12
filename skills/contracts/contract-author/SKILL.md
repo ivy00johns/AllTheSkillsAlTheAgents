@@ -11,7 +11,7 @@ owns:
   patterns: ["openapi.yaml", "asyncapi.yaml"]
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
-composes_with: ["backend-agent", "frontend-agent", "contract-auditor"]
+composes_with: ["backend-agent", "frontend-agent", "contract-auditor", "qe-agent"]
 spawned_by: ["orchestrator"]
 license: MIT
 author: john-ladwig
@@ -36,6 +36,7 @@ Without contracts, agents independently invent their own endpoint URLs, response
 Always create the shared types file first — everything else references it.
 
 Pick the format that matches the project's primary language:
+
 - TypeScript → `references/typescript-template.ts`
 - Python → `references/pydantic-template.py`
 - Multi-language → `references/json-schema-template.json`
@@ -53,13 +54,15 @@ Use `references/openapi-template.yaml` as the starting point. For every endpoint
 - **SSE/Streaming events** (if applicable, with exact event shapes)
 
 Required sections (non-negotiable):
+
 - Conventions (base URL, trailing slashes, Content-Type, date format, ID format)
 - Error envelope (standard shape for all errors)
 - CORS (allowed origin for browser consumers)
 
 ### 3. Author Data Layer Contract
 
-Define function signatures, return types, storage semantics:
+Use `references/data-layer-template.yaml` as the starting point. Define function signatures, return types, storage semantics:
+
 - Streaming/chunked data handling (accumulated vs per-chunk)
 - Cascade delete behavior
 - Timestamp ownership (caller vs data layer vs DB)
@@ -69,6 +72,7 @@ Define function signatures, return types, storage semantics:
 ### 4. Author Event Contract (if applicable)
 
 For event-driven systems, use `references/asyncapi-template.yaml`:
+
 - Channel/topic names
 - Message schemas
 - Delivery guarantees
@@ -77,6 +81,7 @@ For event-driven systems, use `references/asyncapi-template.yaml`:
 ### 5. Assign Cross-Cutting Concerns
 
 Explicitly assign each concern to exactly one agent:
+
 - URL conventions → backend
 - Response envelope → backend
 - Error format → backend
@@ -87,6 +92,7 @@ Explicitly assign each concern to exactly one agent:
 ### 6. Quality Checklist
 
 Before handing contracts to the orchestrator:
+
 - [ ] URLs are exact (method + path, no ambiguity)
 - [ ] Response shapes are explicit JSON, not prose
 - [ ] All status codes specified (success AND error)
@@ -102,6 +108,7 @@ Before handing contracts to the orchestrator:
 ## Contract Versioning
 
 All contracts start at v1. When changes are needed during the build:
+
 1. Increment version (v1 → v2)
 2. Write the full updated contract (not just a diff)
 3. Notify all affected agents with explicit change description
@@ -109,8 +116,16 @@ All contracts start at v1. When changes are needed during the build:
 
 ## Output
 
-Your deliverables:
+Your deliverables (machine-readable formats — not markdown narratives):
+
 - `contracts/types.[ts|py|json]` — shared type definitions
-- `contracts/api-contract.md` — API contract with all endpoints
-- `contracts/data-layer-contract.md` — data layer interface
-- `contracts/event-contract.md` — event-driven interface (if applicable)
+- `contracts/openapi.yaml` — API contract (OpenAPI 3.1 spec)
+- `contracts/data-layer.yaml` — data layer interface (use `references/data-layer-template.yaml`)
+- `contracts/asyncapi.yaml` — event-driven interface (if applicable)
+- `contracts/README.md` — human-readable summary: conventions, cross-cutting assignments, naming transforms, quick reference
+
+The `schemas/` directory is for standalone JSON Schema files when the project uses schema-based validation outside the API context (e.g., config file validation, message queue payloads).
+
+## Naming Convention Rule
+
+When the API uses camelCase (OpenAPI/TypeScript) but the backend uses snake_case (Python), document the transform explicitly in `contracts/README.md`. The Pydantic template includes `alias_generator=to_camel` for this — both sides must agree on the wire format.

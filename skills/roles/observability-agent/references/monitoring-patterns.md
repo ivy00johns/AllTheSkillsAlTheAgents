@@ -3,6 +3,7 @@
 ## Python / FastAPI
 
 ### Structured Logging
+
 ```python
 import logging
 import json
@@ -25,6 +26,7 @@ class JSONFormatter(logging.Formatter):
 ```
 
 ### Health Check Endpoint
+
 ```python
 @app.get("/health")
 async def health():
@@ -43,6 +45,7 @@ async def readiness():
 ```
 
 ### Request Middleware
+
 ```python
 import time
 import uuid
@@ -68,6 +71,7 @@ async def observability_middleware(request, call_next):
 ## Node.js / Express
 
 ### Structured Logging (pino)
+
 ```typescript
 import pino from 'pino';
 
@@ -81,6 +85,7 @@ const logger = pino({
 ```
 
 ### Health Check
+
 ```typescript
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -97,6 +102,7 @@ app.get('/health/ready', async (req, res) => {
 ```
 
 ### Request Logging Middleware
+
 ```typescript
 import { v4 as uuidv4 } from 'uuid';
 

@@ -45,7 +45,7 @@ Scaffold based on the tech stack:
 
 Create the directory structure. Typical layout:
 
-```
+```text
 backend/
 ├── main.py / server.ts / main.go    (entry point)
 ├── routes/ or api/                   (endpoint handlers)
@@ -218,6 +218,7 @@ LOG_LEVEL=info
 ```
 
 **Rules:**
+
 - Every config value comes from environment variables, not hardcoded
 - `.env.example` is committed with placeholder values (documentation)
 - `.env` is in `.gitignore` (secrets)

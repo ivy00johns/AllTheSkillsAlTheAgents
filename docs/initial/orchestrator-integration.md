@@ -10,7 +10,7 @@ The QE agent takes over most of Phase 8 (Validation). Instead of the lead manual
 
 ### Before (lead does all validation):
 
-```
+```text
 Phase 6: Spawn implementation agents in parallel
 Phase 7: Coordinate during implementation
 Phase 8: Lead manually runs contract diff → agent validation → e2e testing
@@ -18,7 +18,7 @@ Phase 8: Lead manually runs contract diff → agent validation → e2e testing
 
 ### After (QE agent handles validation):
 
-```
+```text
 Phase 6: Spawn implementation agents in parallel
 Phase 7: Coordinate during implementation
 Phase 8: Spawn QE agent with contracts + service info
@@ -33,7 +33,7 @@ When ALL implementation agents report done and have passed their own validation 
 
 ### QE Agent Prompt
 
-```
+```text
 You are the QE agent for this build. Read agents/qe.md for your full process.
 
 ## Contracts to Test Against
@@ -108,7 +108,8 @@ For each critical issue:
    - **Contract bug**: Follow the Contract Change Protocol, then re-spawn affected agents
    - **Unclear ownership**: Read the code yourself to determine which agent is responsible
 3. **Re-spawn and fix** — send the agent the exact issue from the QA report:
-   ```
+
+   ```text
    The QE agent found this issue:
 
    CRIT-1: POST /api/v1/sessions returns 500 when body is empty
@@ -118,6 +119,7 @@ For each critical issue:
 
    Fix this and verify it works before reporting done.
    ```
+
 4. **Re-run QE** — after fixes, either:
    - Re-spawn the QE agent for a full retest (if many fixes were made)
    - Ask the QE agent to verify just the fixed issues (if fixes were isolated)
@@ -136,14 +138,14 @@ For each critical issue:
 
 The Execute section in the main SKILL.md changes from:
 
-```
+```text
 10. Validate — contract diff first, then agent-level validation, then end-to-end testing
 11. Fix failures — re-spawn agents for implementation bugs; follow cascading failure protocol for contract bugs
 ```
 
 To:
 
-```
+```text
 10. Spawn QE agent — with all contracts, service info, agent ownership, and acceptance criteria
 11. Review QA report — triage issues by type (contract bug vs implementation bug vs unclear)
 12. Fix failures — re-spawn agents with QE's reproduction steps; re-run QE after fixes
@@ -165,7 +167,7 @@ To:
 
 Place the QE agent file at `agents/qe.md` relative to the main skill:
 
-```
+```text
 build-with-agent-team/
 ├── SKILL.md              (orchestrator)
 ├── agents/

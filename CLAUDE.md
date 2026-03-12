@@ -19,7 +19,8 @@ cp -R ~/.claude/skills/orchestrator ~/.claude/skills/roles ~/.claude/skills/cont
 ## Skill Anatomy
 
 Every skill follows this structure:
-```
+
+```text
 skill-name/
 ├── SKILL.md              # YAML frontmatter + markdown instructions (<500 lines)
 └── references/           # On-demand reference files (unlimited size)
@@ -46,6 +47,7 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 ## Editing Skills
 
 When modifying a skill:
+
 - Keep SKILL.md body under 500 lines; move detail to `references/`
 - Description field is the primary trigger mechanism — include action verbs, specific contexts, and keyword variations
 - `owns.directories` must not overlap with other agent roles

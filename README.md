@@ -27,7 +27,7 @@ cp -R skills/* ~/.claude/skills/
 
 Tell Claude Code to build something with multiple agents:
 
-```
+```text
 "Build a chat app with React frontend and FastAPI backend — use an agent team"
 ```
 
@@ -37,7 +37,7 @@ The **orchestrator** skill triggers automatically. It reads your plan, sizes the
 
 Each agent role skill works on its own without the orchestrator:
 
-```
+```text
 "Review this code for security vulnerabilities"     → security-agent
 "Set up Docker and CI/CD for this project"           → infrastructure-agent
 "Write performance tests with k6"                    → performance-agent
@@ -48,7 +48,7 @@ Each agent role skill works on its own without the orchestrator:
 
 See **[docs/architecture.md](docs/architecture.md)** for full mermaid diagrams covering system overview, build phase sequence, file ownership map, skill inventory, and runtime degradation.
 
-```
+```text
 skills/
 ├── orchestrator/              # Lead coordinator — the entry point
 │   ├── SKILL.md               # 14-phase build playbook, runtime detection
@@ -101,6 +101,7 @@ The QE agent outputs a structured JSON report (see `roles/qe-agent/references/qa
 ### Two-Runtime Strategy
 
 Skills detect their runtime environment and degrade gracefully:
+
 - **Agent Teams available** → native tmux split panes, parallel agents
 - **Claude Code CLI only** → subagents via Task/Agent tool
 - **claude.ai** → sequential mode, user coordinates
@@ -108,13 +109,14 @@ Skills detect their runtime environment and degrade gracefully:
 ### Progressive Disclosure
 
 Skills use three loading levels to manage context efficiently:
+
 1. **Metadata** (name + description) — always in context (~100 tokens)
 2. **SKILL.md body** — loaded when skill triggers (<500 lines)
 3. **References** — loaded on demand (unlimited)
 
 ## Repo Structure
 
-```
+```text
 .
 ├── README.md                          # This file
 ├── skill-ecosystem-design-spec.md     # Design specification (the blueprint)

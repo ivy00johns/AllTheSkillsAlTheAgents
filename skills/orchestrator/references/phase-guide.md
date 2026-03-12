@@ -3,6 +3,7 @@
 ## Phase 1: Read and Analyze the Plan
 
 Read the plan document. Extract:
+
 - **What** are we building? (product, features, acceptance criteria)
 - **Components**: Major layers (frontend, backend, database, infra, workers)
 - **Technologies**: Languages, frameworks, tools
@@ -15,6 +16,7 @@ Read the plan document. Extract:
 See `references/team-sizing.md` for the full decision framework.
 
 **Default to 2 agents.** Only add more when:
+
 - Additional agents do meaningful parallel work
 - They don't share files or data models
 - The coordination cost is justified
@@ -22,6 +24,7 @@ See `references/team-sizing.md` for the full decision framework.
 ## Phase 3: Define Agents
 
 For each agent:
+
 1. Name (short, descriptive)
 2. Exact file/directory ownership
 3. Off-limits boundaries
@@ -35,6 +38,7 @@ Assign every shared infrastructure file to exactly one agent.
 **This is the most critical phase.** Contracts prevent the ~42% of multi-agent failures caused by specification problems.
 
 Order:
+
 1. **Shared types first** — single source of truth for all entities
 2. **API contract** — URLs, methods, request/response shapes, status codes, SSE events
 3. **Data layer contract** — function signatures, storage semantics, indexes
@@ -43,6 +47,7 @@ Order:
 Use the contract-author skill and templates in `contracts/contract-author/references/`.
 
 Quality checklist (all must pass):
+
 - URLs are exact (method + path)
 - Response shapes are explicit JSON
 - All status codes specified (success AND error)
@@ -54,6 +59,7 @@ Quality checklist (all must pass):
 ## Phase 5: Distill Agent Prompts
 
 **Do NOT paste the full plan into every agent's prompt.** Each agent receives only:
+
 1. Their ownership scope and boundaries
 2. Shared types file (or path)
 3. Contracts they produce (implement exactly)
@@ -63,16 +69,17 @@ Quality checklist (all must pass):
 7. Validation checklist
 8. Coordination rules
 
-## Phase 6: Pre-Create Lead-Owned Files
+## Phase 6: Pre-Create Scaffolding
 
-Before spawning agents:
-- `.gitignore`
-- `contracts/` directory with shared types and contracts
-- Any skeleton files needed for agent orientation
+Before spawning implementation agents:
+
+- Create `.gitignore` (orchestrator-owned)
+- Invoke `contract-author` skill to create `contracts/` with shared types and integration contracts — contract-author owns this directory
+- Create any skeleton files needed for agent orientation (assign ownership per the canonical table in the design spec §6)
 
 ## Phase 7: Detect Runtime and Spawn
 
-```
+```text
 Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS set?
   YES → Use native Agent Teams (tmux split panes)
   NO → Is bash tool available?
@@ -85,6 +92,7 @@ Spawn all implementation agents simultaneously with their distilled prompts.
 ## Phase 8: Active Coordination
 
 While agents work:
+
 - Relay inter-agent messages (agents can't talk directly)
 - Manage contract change requests (pause → update → version → notify → confirm)
 - Handle shared file change requests
@@ -92,6 +100,7 @@ While agents work:
 - Apply circuit breaker if needed (see `references/circuit-breaker.md`)
 
 ### Contract Change Protocol
+
 1. Tell requesting agent to STOP work on affected interface
 2. Evaluate the change and which agents it affects
 3. Write updated contract with incremented version (v1 → v2)
@@ -102,6 +111,7 @@ While agents work:
 ## Phase 9: Contract Diff
 
 Before any agent reports "done":
+
 1. Get backend's exact curl commands for each endpoint
 2. Get frontend's exact API call URLs/methods/bodies
 3. Compare line by line — URLs, request bodies, response shapes, error handling
@@ -110,6 +120,7 @@ Before any agent reports "done":
 ## Phase 10: Agent Validation
 
 Each agent runs their domain-specific validation checklist:
+
 - Backend: server starts, endpoints respond correctly, CORS headers present
 - Frontend: TypeScript compiles, build succeeds, dev server loads, zero CORS errors
 - Infrastructure: Docker builds, services healthy
@@ -118,6 +129,7 @@ Each agent runs their domain-specific validation checklist:
 ## Phase 11: End-to-End Testing
 
 You (the orchestrator) run this yourself:
+
 1. **Startup**: All services start, connect, no errors
 2. **Happy path**: Primary user flow works end-to-end
 3. **Data flow**: Frontend → Backend → Database → Backend → Frontend
@@ -135,13 +147,14 @@ You (the orchestrator) run this yourself:
 Spawn the QE agent for final verification. QE outputs `qa-report.json` per the schema in `roles/qe-agent/references/qa-report-schema.json`.
 
 Gate rules:
+
 - `gate_decision.proceed = false` blocks the build
 - Blocked when: any CRITICAL blocker, `contract_conformance < 3`, `security < 3`
 - The orchestrator does NOT override the QE gate
 
 ## Phase 14: Post-Build
 
-1. Write README.md (the orchestrator has full-system context)
+1. Spawn docs-agent to write README.md — provide full-system context (architecture summary, how to run, directory map). Docs-agent owns README.md.
 2. Clean up any temporary files
 3. Verify the plan's acceptance criteria are met
 4. Produce final status report
@@ -149,6 +162,7 @@ Gate rules:
 ## Definition of Done
 
 ALL of the following must be true:
+
 1. Every agent passed their validation checklist
 2. Contract diff — zero mismatches
 3. End-to-end validation — startup, happy path, edge cases pass

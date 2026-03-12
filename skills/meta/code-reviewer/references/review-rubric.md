@@ -3,6 +3,7 @@
 ## Scoring Guide
 
 Each dimension is scored 1-5:
+
 - **5**: Excellent — exemplary, no issues
 - **4**: Good — minor issues only, production-ready
 - **3**: Acceptable — some issues but functional

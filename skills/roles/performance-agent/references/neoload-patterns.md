@@ -5,6 +5,7 @@ NeoLoad is Tricentis's enterprise performance testing platform. These patterns a
 ## NeoLoad as-Code (YAML)
 
 ### Basic Test Definition
+
 ```yaml
 name: api-load-test
 scenarios:
@@ -57,6 +58,7 @@ populations:
 ```
 
 ### SLA Definitions
+
 ```yaml
 sla_profiles:
   - name: standard-sla
@@ -73,6 +75,7 @@ sla_profiles:
 ## NeoLoad Web Integration
 
 ### Running via CLI
+
 ```bash
 # Run test with NeoLoad Web
 neoload run \
@@ -87,6 +90,7 @@ neoload results --junit-report results.xml
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # GitHub Actions
 - name: Run NeoLoad Test
@@ -100,7 +104,9 @@ neoload results --junit-report results.xml
 ## Test Scenario Types
 
 ### Capacity Test
+
 Determine maximum throughput:
+
 ```yaml
 scenarios:
   - name: capacity
@@ -115,7 +121,9 @@ scenarios:
 ```
 
 ### Endurance Test
+
 Detect memory leaks and resource exhaustion:
+
 ```yaml
 scenarios:
   - name: endurance
@@ -127,7 +135,9 @@ scenarios:
 ```
 
 ### Spike Test
+
 Test sudden traffic bursts:
+
 ```yaml
 scenarios:
   - name: spike
@@ -145,6 +155,7 @@ scenarios:
 ## Results Analysis
 
 Key metrics from NeoLoad reports:
+
 | Metric | Where to Find | Target |
 |--------|--------------|--------|
 | Avg Response Time | Summary dashboard | < 200ms |
@@ -156,6 +167,7 @@ Key metrics from NeoLoad reports:
 ## NeoLoad + TAIS Integration Notes
 
 When working with Tricentis AI-Hub (TAIS):
+
 - Use NeoLoad Web API for programmatic test execution
 - Integrate with Tosca for functional + performance coverage
 - Store test assets in the TAIS-connected repository
