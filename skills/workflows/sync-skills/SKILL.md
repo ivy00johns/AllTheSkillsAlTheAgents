@@ -1,88 +1,121 @@
 ---
 name: sync-skills
-description: Sync agent skills between the TAIS mono-repo and global locations for Cursor and Claude Code. Use when the user wants to copy, publish, push, or sync skills to other tools, make mono-repo skills available globally, pull skills from Claude Code or Cursor into the repo, check what skills exist across locations, or mentions using skills from this repo in another workspace or project.
+version: 2.0.0
+description: |
+  Sync skills between this repo and global locations for Claude Code and Cursor using symlinks (default) or copies. Use when the user wants to link, sync, publish, push, or copy skills to Claude Code or Cursor, make repo skills available globally, check sync status, see what's linked vs copied, unlink skills, or mentions "sync skills", "link skills", "publish skills", "skill status", or wants to use repo skills from another project.
+requires_agent_teams: false
+requires_claude_code: true
+min_plan: starter
+owns:
+  directories: ["skills/workflows/sync-skills/"]
+  patterns: []
+  shared_read: ["skills/"]
+allowed_tools: ["Read", "Bash"]
+composes_with: ["skill-updater", "skill-audit"]
+spawned_by: []
 ---
 
-# Sync Skills Between Mono-Repo and Global Locations
+# Sync Skills Between Repo and Global Locations
 
-This skill copies agent skills between the TAIS mono-repo (`.agents/skills/`) and the global skill directories that Cursor and Claude Code read from. This lets you use skills authored in this repo from any workspace -- even repos that have nothing to do with the mono-repo.
+Link or copy skills between this repo and the global skill directories that Claude Code and Cursor read from. Symlinks are the default — edits in the repo are instantly available everywhere without copying.
 
 ## Skill Locations
 
 | Location | Path | Used by |
 | -------- | ---- | ------- |
-| Mono-repo | `.agents/skills/` | This workspace only |
+| Repo (source of truth) | `skills/` | This workspace |
+| Claude Code (global) | `~/.claude/skills/` | All Claude Code projects |
 | Cursor (global) | `~/.cursor/skills-cursor/` | All Cursor workspaces |
-| Claude Code (global) | `~/.claude/skills/tais/` | All Claude Code projects |
 
-Mono-repo skills land under a `tais/` category in Claude Code to stay organized alongside other skills you have there (contracts, roles, orchestrator, etc.).
+The repo organizes skills into category directories (`contracts/`, `meta/`, `roles/`, `workflows/`, `orchestrator/`). For Claude Code, symlinks are **flattened** — each individual skill is linked directly under `~/.claude/skills/` (no category subdirs) because Claude Code only discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`. For Cursor, symlinks are created at the category level.
 
 ## Quick Reference
 
 ```bash
-SCRIPT=".agents/skills/sync-skills/scripts/sync-skills.sh"
+SCRIPT="skills/workflows/sync-skills/scripts/sync-skills.sh"
 
-# See what skills exist everywhere
-$SCRIPT --list
+# Link all repo skill categories to both Claude Code and Cursor
+$SCRIPT --link --to-all
 
-# Push all mono-repo skills to both Cursor and Claude Code
-$SCRIPT --to-all
+# Check what's linked, copied, or missing
+$SCRIPT --status
 
-# Push just one skill to Cursor
-$SCRIPT --to-cursor cross-service-changes
+# Link just one category to Claude Code
+$SCRIPT --link --to-claude meta
 
-# Pull a Claude Code skill into the mono-repo
-$SCRIPT --from-claude orchestrator
+# Copy instead of link (for machines without repo access)
+$SCRIPT --copy --to-all
 
-# Preview what would happen without changing anything
-$SCRIPT --dry-run --to-all
+# Remove symlinks (restore independence)
+$SCRIPT --unlink --to-all
+
+# Pull a skill from Cursor into the repo
+$SCRIPT --from-cursor shell
+
+# Preview what would happen
+$SCRIPT --dry-run --link --to-all
 ```
 
-## When to Use This
+## Modes
 
-**Push skills out** (`--to-cursor`, `--to-claude`, `--to-all`) after:
+### Link Mode (default for `--to-*`)
 
-- Creating or updating a skill in `.agents/skills/`
-- Wanting to use a mono-repo skill from a different project
+Creates symlinks from global locations pointing to repo directories. This is the development workflow — edit skills in the repo and they're instantly live in Claude Code and Cursor.
 
-**Pull skills in** (`--from-cursor`, `--from-claude`, `--from-all`) when:
+- **Claude Code**: Skills are **flattened** — each individual skill gets its own symlink directly under `~/.claude/skills/` (e.g., `~/.claude/skills/skill-audit` → `repo/skills/meta/skill-audit`). This is required because Claude Code only discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`.
+- **Cursor**: Symlinks are created at the **category level** (e.g., `~/.cursor/skills-cursor/meta` → `repo/skills/meta`)
+- Non-repo skills in global locations (e.g., `~/.claude/skills/builtWithAgent/`) are untouched
+- If a copy already exists where a symlink would go, the script warns and asks before replacing
 
-- You've created or modified a skill in Claude Code / Cursor and want it in the mono-repo
-- You want to version-control a global skill by bringing it into Git
+### Copy Mode (`--copy`)
 
-**Check status** (`--list`) to see what's available where and spot skills that might be out of sync.
+Copies skill directories instead of symlinking. Use this when:
+- Deploying skills to a machine that doesn't have the repo cloned
+- You need a frozen snapshot that won't change with repo edits
+- The target location is on a different filesystem that doesn't support symlinks
+
+### Pull Mode (`--from-cursor`, `--from-claude`)
+
+Copies skills FROM global locations INTO the repo. Always copies (not symlinks) since the repo is the destination. Useful for importing skills created outside this repo.
 
 ## Script Flags
 
 | Flag | Purpose |
 | ---- | ------- |
-| `--to-cursor` | Copy mono-repo skills to `~/.cursor/skills-cursor/` |
-| `--to-claude` | Copy mono-repo skills to `~/.claude/skills/tais/` |
-| `--from-cursor` | Copy Cursor skills into `.agents/skills/` |
-| `--from-claude` | Copy Claude Code `tais/` skills into `.agents/skills/` |
-| `--to-all` | Shorthand: `--to-cursor --to-claude` |
-| `--from-all` | Shorthand: `--from-cursor --from-claude` |
-| `--dry-run` | Show what would be copied, don't actually copy |
-| `--list` | Show skills in all three locations |
-| `--all` | Sync every skill (this is the default when no names are given) |
+| `--link` | Create symlinks (default for `--to-*` operations) |
+| `--copy` | Copy files instead of symlinking |
+| `--unlink` | Remove symlinks to repo (restores global locations to independent state) |
+| `--to-cursor` | Target `~/.cursor/skills-cursor/` |
+| `--to-claude` | Target `~/.claude/skills/` |
+| `--to-all` | Target both Claude Code and Cursor |
+| `--from-cursor` | Pull from Cursor into repo |
+| `--from-claude` | Pull from Claude Code into repo |
+| `--from-all` | Pull from both |
+| `--status` | Show what's linked, copied, or missing across all locations |
+| `--dry-run` | Preview what would happen without making changes |
+| `-h, --help` | Show help |
 
-Append skill names after the flags to sync only specific ones:
+Append category or skill names after flags to target specific ones:
 
 ```bash
-$SCRIPT --to-all cross-service-changes sync-skills
+$SCRIPT --link --to-claude meta roles    # Link only meta/ and roles/
+$SCRIPT --from-cursor shell              # Pull only the shell skill
 ```
 
 ## How It Works
 
-The script uses `rsync` (with `--delete` to keep directories clean) when available, falling back to `cp -R`. Each skill directory is copied whole -- `SKILL.md` plus any bundled resources (`scripts/`, `references/`, `assets/`).
+**Linking:** For Claude Code, discovers every individual skill within category directories and creates a flattened symlink for each (e.g., `~/.claude/skills/skill-audit` → `repo/skills/meta/skill-audit`). For Cursor, creates category-level symlinks. If the target already exists as a real directory, warns before replacing.
 
-The `sync-skills` skill itself is excluded from `--to-*` operations to avoid copying the sync machinery to places where it doesn't make sense.
+**Status detection:** Checks each expected location and reports whether it's a symlink (and where it points), a copy, or missing. Also detects broken symlinks.
 
-## After Syncing
+**Non-repo skills are safe:** The script only manages categories that exist in this repo. Skills like `~/.claude/skills/builtWithAgent/` or Cursor's native skills are never touched.
 
-Once skills are in the global locations, they'll be available automatically:
+## After Linking
 
-- **Cursor**: Skills in `~/.cursor/skills-cursor/` appear in all workspaces. No restart needed.
-- **Claude Code**: Skills in `~/.claude/skills/` are picked up by new sessions.
+Once linked, skills are available automatically:
+- **Claude Code**: Skills in `~/.claude/skills/` are picked up by new sessions
+- **Cursor**: Skills in `~/.cursor/skills-cursor/` appear in all workspaces
 
-If a skill isn't triggering, check that its `description` field in the YAML frontmatter covers the phrases and contexts where you'd expect it to activate.
+Edit any skill in the repo and the change is live immediately — no sync step needed.
+
+To verify: `$SCRIPT --status`
