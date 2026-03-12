@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "qe-agent", "infrastructure-agent", "contract-author"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Frontend Agent

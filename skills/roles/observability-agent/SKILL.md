@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "infrastructure-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Observability Agent

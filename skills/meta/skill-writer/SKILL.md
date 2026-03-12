@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["project-profiler", "orchestrator"]
 spawned_by: []
-license: MIT
-author: john-ladwig
 ---
 
 # Skill Writer

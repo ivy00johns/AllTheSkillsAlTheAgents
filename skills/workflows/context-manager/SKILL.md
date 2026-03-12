@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob"]
 composes_with: ["orchestrator"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Context Manager

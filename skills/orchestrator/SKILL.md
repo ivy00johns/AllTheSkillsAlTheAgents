@@ -18,8 +18,6 @@ composes_with: [
   "context-manager", "deployment-checklist", "code-reviewer", "project-profiler"
 ]
 spawned_by: []
-license: MIT
-author: john-ladwig
 ---
 
 # Orchestrator

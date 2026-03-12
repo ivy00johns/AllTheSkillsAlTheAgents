@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Docs Agent

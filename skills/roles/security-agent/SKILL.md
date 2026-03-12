@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Grep", "Glob", "Bash"]
 composes_with: ["backend-agent", "frontend-agent", "qe-agent", "code-reviewer"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Security Agent

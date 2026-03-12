@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Bash", "Glob", "Grep"]
 composes_with: ["infrastructure-agent", "qe-agent"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Deployment Checklist

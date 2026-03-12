@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Grep", "Glob"]
 composes_with: ["qe-agent", "security-agent"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Code Reviewer

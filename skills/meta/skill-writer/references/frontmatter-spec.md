@@ -84,16 +84,6 @@ Canonical reference for all SKILL.md frontmatter fields in the skill ecosystem.
 - **Type:** string[]
 - **Purpose:** Which skills spawn this one
 
-### license
-
-- **Type:** string
-- **Default:** `MIT`
-
-### author
-
-- **Type:** string
-- **Format:** GitHub handle
-
 ## Field Decisions
 
 | Field | Decision | Rationale |

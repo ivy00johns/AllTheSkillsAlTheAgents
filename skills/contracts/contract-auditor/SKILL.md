@@ -13,8 +13,6 @@ owns:
 allowed_tools: ["Read", "Grep", "Glob", "Bash"]
 composes_with: ["contract-author", "qe-agent", "backend-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
-license: MIT
-author: john-ladwig
 ---
 
 # Contract Auditor
