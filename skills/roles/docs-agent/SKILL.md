@@ -1,6 +1,6 @@
 ---
 name: docs-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Generate project documentation, API docs, READMEs, and changelogs for multi-agent builds. Use this skill when spawning a docs agent, writing technical documentation, generating API reference docs, or creating onboarding guides. Trigger for any documentation task within an orchestrated build.
 requires_agent_teams: false
@@ -99,4 +99,4 @@ Before reporting completion:
 - [ ] CHANGELOG follows Keep a Changelog format
 - [ ] No broken internal links
 
-The **qe-agent** validates documentation quality as part of the QA report. `qa-report.json` includes a `documentation` score — CRITICAL blockers or a score < 3 will block the build. Do not report done until your docs would pass that gate.
+The **qe-agent** validates documentation quality as part of the QA report. `qa-report.json` includes `completeness` and `code_quality` scores which cover documentation adequacy. CRITICAL blockers or scores < 3 block the build.

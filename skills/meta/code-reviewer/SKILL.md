@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-version: 1.0.0
+version: 1.1.0
 description: |
   Review code for quality, correctness, security, and adherence to project conventions in multi-agent builds. Use this skill when performing code reviews, checking implementation quality, validating coding standards, or reviewing pull requests. Trigger for any code review task within an orchestrated build or standalone review context.
 requires_agent_teams: false
@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Grep", "Glob"]
+allowed_tools: ["Read", "Write", "Grep", "Glob"]
 composes_with: ["qe-agent", "security-agent"]
 spawned_by: ["orchestrator"]
 ---

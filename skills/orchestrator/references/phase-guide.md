@@ -15,11 +15,11 @@ Read the plan document. Extract:
 
 See `references/team-sizing.md` for the full decision framework.
 
-**Default to 2 agents.** Only add more when:
+**Size the team based on the work.** Consider:
 
-- Additional agents do meaningful parallel work
-- They don't share files or data models
-- The coordination cost is justified
+- How many components can be built in parallel?
+- Do they have clear ownership boundaries (no shared files)?
+- Can the orchestrator manage context for this many agents? (Use handoffs and phased spawning for larger teams)
 
 ## Phase 3: Define Agents
 
@@ -73,6 +73,7 @@ Quality checklist (all must pass):
 
 Before spawning implementation agents:
 
+- **Create a feature branch** — `git checkout -b build/<project-name>`. All work happens here, never on main. Do not merge to main unless the user explicitly requests it.
 - Create `.gitignore` (orchestrator-owned)
 - Invoke `contract-author` skill to create `contracts/` with shared types and integration contracts — contract-author owns this directory
 - Create any skeleton files needed for agent orientation (assign ownership per the canonical table in the design spec §6)
@@ -126,15 +127,15 @@ Each agent runs their domain-specific validation checklist:
 - Infrastructure: Docker builds, services healthy
 - Data layer: schema correct, CRUD works, cascades work
 
-## Phase 11: End-to-End Testing
+## Phase 11: Smoke Testing (Orchestrator)
 
-You (the orchestrator) run this yourself:
+You (the orchestrator) run quick smoke tests to verify integration before spawning QE. This is a fast sanity check, NOT a thorough test suite:
 
 1. **Startup**: All services start, connect, no errors
-2. **Happy path**: Primary user flow works end-to-end
-3. **Data flow**: Frontend → Backend → Database → Backend → Frontend
-4. **Persistence**: Data survives service restart
-5. **Edge cases**: Empty states, error states, loading states
+2. **Happy path**: One primary flow works end-to-end
+3. **Data flow**: Verify one write is visible via read (Frontend → Backend → Database → Backend → Frontend)
+
+If smoke tests fail, fix integration issues before wasting QE agent context on a broken build. If they pass, spawn QE for thorough verification.
 
 ## Phase 12: Fix Failures
 
@@ -144,12 +145,14 @@ You (the orchestrator) run this yourself:
 
 ## Phase 13: QA Gate
 
-Spawn the QE agent for final verification. QE outputs `qa-report.json` per the schema in `roles/qe-agent/references/qa-report-schema.json`.
+Spawn the QE agent for thorough verification. QE handles contract conformance, integration testing, adversarial probing, and produces `qa-report.json` per the schema in `roles/qe-agent/references/qa-report-schema.json`.
+
+Before parsing scores, validate the report conforms to the schema (scores are `{score, notes}` objects, all required fields present). Send non-conformant reports back to QE for correction.
 
 Gate rules:
 
 - `gate_decision.proceed = false` blocks the build
-- Blocked when: any CRITICAL blocker, `contract_conformance < 3`, `security < 3`
+- Blocked when: any CRITICAL blocker, `contract_conformance.score < 3`, `security.score < 3`
 - The orchestrator does NOT override the QE gate
 
 ## Phase 14: Post-Build

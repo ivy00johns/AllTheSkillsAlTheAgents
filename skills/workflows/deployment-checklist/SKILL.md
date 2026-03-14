@@ -1,6 +1,6 @@
 ---
 name: deployment-checklist
-version: 1.0.0
+version: 1.1.0
 description: |
   Run pre-deployment verification checklists before pushing to staging or production. Use this skill when preparing for deployment, running pre-deploy checks, verifying environment configs, or validating build artifacts. Trigger for any deployment preparation or release readiness task.
 requires_agent_teams: false
@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Bash", "Glob", "Grep"]
+allowed_tools: ["Read", "Write", "Bash", "Glob", "Grep"]
 composes_with: ["infrastructure-agent", "qe-agent"]
 spawned_by: ["orchestrator"]
 ---

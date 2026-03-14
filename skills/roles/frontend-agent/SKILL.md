@@ -1,6 +1,6 @@
 ---
 name: frontend-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Build user interfaces, client-side state, and presentation layers for multi-agent builds. Use this skill when spawning a frontend agent, implementing React/Vue/Svelte UIs, setting up client-side routing, or handling browser-side logic. Trigger for any frontend implementation within an orchestrated build.
 requires_agent_teams: false
@@ -37,16 +37,30 @@ You receive from the lead:
 
 ## Your Ownership
 
-- **Own:** `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/` (directory names adapt to project conventions — frontmatter `owns.directories` is canonical)
+- **Own:** `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/` for framework projects; `static/`, `templates/` for vanilla JS/server-rendered projects. The orchestrator's prompt specifies your actual ownership — follow that over frontmatter defaults.
 - **Conditionally own:** root `tsconfig.json`, root `package.json`, `vite.config.ts` (confirm with lead if not already assigned)
 - **Read-only:** `contracts/`, `shared/`, `src/types/`
 - **Off-limits:** `src/api/`, `src/services/` (backend), `src/telemetry/` (observability), all other agents' directories
 
 ## Process
 
+### 0. Read Contracts and Domain Rules
+
+Before writing any code, read all contract files:
+
+- **API contract** — your endpoints, the shapes you send and receive
+- **Shared types** — mirror or import these for type safety
+- **README domain rules** — business logic the frontend must respect (e.g., tag case-normalization, state machine transitions)
+- **README implementation notes** — frontend-specific guidance (libraries, patterns, type generation)
+
 ### 1. Scaffold the Project
 
-Use standard tooling (Vite, Next.js, Vue CLI, SvelteKit).
+Right-size to the tech stack:
+
+- **React/Vue/Svelte** → Use standard tooling (Vite, Next.js, Vue CLI, SvelteKit)
+- **Vanilla JS** → No build tooling needed. Create `templates/index.html`, `static/css/style.css`, `static/js/app.js`. Served by the backend (Flask templates, Express static).
+
+Don't force React onto a vanilla JS project or vice versa — match what the plan and orchestrator specify.
 
 ### 2. Set Up API Client
 
@@ -92,6 +106,8 @@ Focus indicators, labels on inputs, descriptive button text, alt text, keyboard 
 | Fetch without error handling | Every fetch checks res.ok |
 | Missing loading/empty states | Handle for every async op |
 | Types diverge from contract | Mirror contracts/types |
+| Using innerHTML for rendering | Use createElement + textContent to prevent XSS |
+| Over-engineering vanilla JS | No build tools, no frameworks for simple projects |
 
 ## Validation
 

@@ -1,6 +1,6 @@
 ---
 name: qe-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Verify implementations match contracts, integrations connect, and edge cases are handled for multi-agent builds. Use this skill when spawning a QE agent, running contract conformance checks, integration verification, or adversarial testing. Trigger for any quality engineering or test verification task within an orchestrated build.
 requires_agent_teams: false
@@ -152,12 +152,15 @@ For each finding:
 
 ### 4b. Score Dimensions
 
-Rate each dimension 1-5 per `references/llm-judge-rubrics.md`:
+Rate each dimension 1-5 per `references/llm-judge-rubrics.md`. These must match the `qa-report-schema.json` field names exactly:
 
-- **contract_conformance** — do implementations match contracts?
-- **integration** — do services connect end-to-end?
-- **edge_cases** — are adversarial scenarios handled?
-- **security** — are basic security practices followed? (Coordinate with security-agent if present — avoid duplicating their deeper audit)
+- **correctness** — does it work? Do endpoints return correct responses?
+- **completeness** — is everything there? Are all contracted endpoints implemented?
+- **code_quality** — is it well-built? Clean separation, consistent patterns, error handling?
+- **security** — is it safe? Input validated, no injection, CORS correct? (Coordinate with security-agent if present — avoid duplicating their deeper audit)
+- **contract_conformance** — does it match the spec? URLs, methods, request/response shapes, status codes?
+
+Each score is an object: `{"score": 1-5, "notes": "explanation"}` — not a bare integer.
 
 ### 4c. Write Reports
 
@@ -168,13 +171,26 @@ Save both:
 
 Read `references/validation-checklist.md` for the full report structure and quality checklist before finalizing.
 
+## Static Analysis Mode
+
+When you cannot start services (no Docker, missing dependencies, sandboxed environment), perform contract conformance through code analysis:
+
+1. Read every route handler and compare field names, status codes, and response shapes against the OpenAPI spec
+2. Check for CORS middleware/configuration
+3. Verify error handlers return the contracted error envelope
+4. Check that shared types are actually used (not manually constructed dicts that can drift)
+5. Verify all contracted endpoints have corresponding route registrations
+
+Static analysis catches the majority of contract violations — field naming mismatches, missing error envelopes, and missing endpoints are all detectable without running the server.
+
 ## Coordination Rules
 
 - **Report, don't fix** — you do not write production code
 - **Contract is ground truth** — if implementation disagrees with contract, implementation is wrong
 - **Test in dependency order** — contract conformance → integration → edge cases
-- **Be specific in failures** — include exact commands, expected vs actual
+- **Be specific in failures** — include exact commands, expected vs actual, file:line references
 - **Credit what works** — the passed tests section matters
+- **Schema conformance is mandatory** — your qa-report.json MUST conform to `references/qa-report-schema.json`. The orchestrator parses this programmatically to gate the build. A non-conformant report is as bad as no report.
 
 ## When to Message the Lead Immediately
 

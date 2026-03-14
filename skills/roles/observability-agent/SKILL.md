@@ -1,6 +1,6 @@
 ---
 name: observability-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Set up logging, monitoring, metrics, and alerting for multi-agent builds. Use this skill when spawning an observability agent, configuring structured logging, setting up health checks, adding metrics collection, or implementing distributed tracing. Trigger for any observability or monitoring task within an orchestrated build.
 requires_agent_teams: false
@@ -39,6 +39,15 @@ From the lead:
 - **Off-limits:** Business logic, route handlers, database code
 
 ## Process
+
+### 0. Read Service Map and Contracts
+
+Before instrumenting, read:
+
+- **Service map** — which services exist and how they communicate
+- **API contract** — health endpoints already defined, understand request flow
+- **Data layer contract** — database connections to monitor
+- **Infrastructure configs** — log drivers, metric endpoints already configured by infrastructure-agent
 
 ### 1. Structured Logging
 

@@ -1,6 +1,6 @@
 ---
 name: security-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Audit codebases for security vulnerabilities, review auth implementations, and verify OWASP compliance for multi-agent builds. Use this skill when spawning a security agent, performing security audits, reviewing authentication/authorization code, or checking for injection vulnerabilities. Trigger for any security review task within an orchestrated build.
 requires_agent_teams: false
@@ -10,7 +10,7 @@ owns:
   directories: [".github/security/"]
   patterns: ["SECURITY.md"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Grep", "Glob", "Bash"]
+allowed_tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 composes_with: ["backend-agent", "frontend-agent", "qe-agent", "code-reviewer"]
 spawned_by: ["orchestrator"]
 ---
@@ -40,6 +40,14 @@ From the lead:
 - **Off-limits:** Modifying any production code
 
 ## Process
+
+### 0. Read Contracts and Auth Strategy
+
+Before auditing, read:
+
+- **API contract** — understand auth headers, rate limit specs, error envelope design
+- **README domain rules** — security-relevant business logic (e.g., "sellers can't buy own items" is an authorization check)
+- **Data layer contract** — how sensitive data is stored, cascade behaviors
 
 ### 1. Dependency Audit
 

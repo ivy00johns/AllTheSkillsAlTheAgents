@@ -1,6 +1,6 @@
 ---
 name: contract-auditor
-version: 1.0.0
+version: 1.1.0
 description: |
   Audit implementations against integration contracts to find mismatches before integration testing. Use this skill when verifying API implementations match their contracts, checking frontend API calls match backend endpoints, or validating data layer conformance. Trigger for any contract compliance verification task within an orchestrated build.
 requires_agent_teams: false
@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Grep", "Glob", "Bash"]
+allowed_tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 composes_with: ["contract-author", "qe-agent", "backend-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
 ---
@@ -99,8 +99,29 @@ For each endpoint, compare:
 - Frontend types match `contracts/types`
 - No camelCase vs snake_case mismatches (unless documented transform exists)
 - Enum values identical on both sides
+- **Are shared types actually imported and used?** If the contract provides Pydantic models or TypeScript interfaces as "single source of truth," verify the implementation imports them for validation and serialization rather than manually constructing dicts. Manual construction is the #1 cause of field-naming drift.
 
-### 6. Generate Audit Report
+### 6. Domain Rules Conformance
+
+Check `contracts/README.md` for domain business rules and verify the implementation enforces them:
+
+- Invariants (e.g., "sellers can't buy their own listings") — is the check in the code?
+- Null handling — can nullable fields be set to null via PATCH? (common bug: conflating absent keys with explicit null)
+- Transaction semantics — are atomic operations actually wrapped in transactions?
+- Idempotency — do idempotent endpoints handle duplicates correctly?
+
+### 7. Contract Internal Consistency
+
+Check the contracts themselves for contradictions — this is unique value the auditor provides that the qe-agent cannot:
+
+- Does the README contradict the shared types file? (e.g., types say "use these models" but README says "don't import Pydantic")
+- Do the OpenAPI response shapes match the shared types definitions?
+- Are there endpoints in the OpenAPI spec that aren't covered by the data layer contract?
+- Are there error codes used in the implementation that aren't defined in the contract?
+
+Flag contradictions to the lead — don't assume the implementation is wrong when the contract is unclear.
+
+### 8. Generate Audit Report
 
 ```markdown
 # Contract Audit Report
@@ -124,6 +145,13 @@ Generated: [timestamp]
 ## Verified Matches
 [List of everything that matched, for completeness]
 ```
+
+### Severity Guidelines
+
+- **CRITICAL** — will cause runtime integration failure (wrong field names on wire, missing endpoints, broken error envelope)
+- **HIGH** — will cause edge-case failures (null handling bugs, error ordering, missing validation)
+- **MEDIUM** — contract drift risk (shared types not imported, undocumented behavior)
+- **LOW** — style or naming inconsistency with no functional impact
 
 ## Pact Testing (Optional)
 

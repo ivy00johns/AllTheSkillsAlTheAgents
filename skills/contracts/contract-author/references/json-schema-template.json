@@ -45,15 +45,17 @@
       }
     },
 
-    "MessageListResponse": {
+    "PaginatedResponse": {
       "type": "object",
-      "required": ["messages", "total"],
+      "required": ["items", "total", "offset", "limit"],
       "properties": {
-        "messages": {
+        "items": {
           "type": "array",
-          "items": { "$ref": "#/$defs/Message" }
+          "description": "Override with specific entity type in usage"
         },
-        "total": { "type": "integer", "minimum": 0 }
+        "total": { "type": "integer", "minimum": 0 },
+        "offset": { "type": "integer", "minimum": 0 },
+        "limit": { "type": "integer", "minimum": 1 }
       }
     },
 

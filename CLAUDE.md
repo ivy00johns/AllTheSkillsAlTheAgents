@@ -4,16 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 17 skills (44 files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are installed by copying to `~/.claude/skills/`.
+A multi-agent orchestration toolkit for Claude Code — 17 skills (44 files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are symlinked to `~/.claude/skills/` for global availability.
 
 ## Install / Sync
 
-```bash
-# Install skills globally
-cp -R skills/* ~/.claude/skills/
+Use the `/sync-skills` command to create symlinks from `~/.claude/skills/` back to this repo. This keeps skills always in sync — edits in either location are reflected immediately.
 
-# After editing, sync back to repo
-cp -R ~/.claude/skills/orchestrator ~/.claude/skills/roles ~/.claude/skills/contracts ~/.claude/skills/meta ~/.claude/skills/workflows skills/
+```bash
+# Via slash command (recommended)
+/sync-skills
+
+# Manual: create category symlinks + flattened discovery symlinks
+# See skills/workflows/sync-skills/SKILL.md for details
 ```
 
 ## Skill Anatomy
@@ -52,7 +54,7 @@ When modifying a skill:
 - Description field is the primary trigger mechanism — include action verbs, specific contexts, and keyword variations
 - `owns.directories` must not overlap with other agent roles
 - Maintain the frontmatter convention (see `skills/meta/skill-writer/references/frontmatter-spec.md`)
-- After editing, sync both directions: repo ↔ `~/.claude/skills/`
+- If using symlinks (default), edits are automatically reflected in both locations
 
 ## Source Material
 

@@ -1,17 +1,17 @@
 # Team Sizing Guide
 
-## The Coordination Cost Rule
+## The Context Quality Rule
 
-Each agent pair creates an integration surface. Coordination cost grows quadratically with agent count while throughput grows linearly.
+Each agent pair creates an integration surface that the orchestrator must track in its own context window. The primary constraint on team size is **context management quality** — as agent count grows, the orchestrator spends more context on coordination messages, status tracking, and contract change relay, leaving less room for deep validation. Cost is secondary.
 
-| Agents | Integration Pairs | Best For |
-|--------|-------------------|----------|
-| 2 | 1 | Most projects. Clear frontend/backend split. Backend owns data layer — rarely justifies a separate agent. |
-| 3 | 3 | Full-stack apps with a genuinely separate service (auth, background worker, search, ML pipeline) that has its own runtime and API surface. NOT for splitting backend from database. |
-| 4 | 6 | Complex systems with 2+ truly independent services. Rare. |
-| 5+ | 10+ | Large systems with many isolated modules. Very rare. Coordination overhead usually exceeds gains. |
+| Agents | Integration Pairs | Context Pressure | Best For |
+|--------|-------------------|-----------------|----------|
+| 2 | 1 | Low — orchestrator easily tracks both | Clear frontend/backend split. Most straightforward projects. |
+| 3 | 3 | Moderate — orchestrator can manage with discipline | Full-stack apps with a genuinely separate service (auth, background worker, search, ML pipeline) that has its own runtime and API surface. |
+| 4 | 6 | High — orchestrator should use handoff protocol proactively | Complex systems with 2+ truly independent services. Plan for orchestrator context management. |
+| 5+ | 10+ | Very high — orchestrator context handoffs likely needed | Large systems with many isolated modules. Consider phased spawning (batch 1 completes, then batch 2) to manage context. |
 
-**Default to 2 agents. Only scale up when additional agents do meaningful parallel work without sharing files or data models.**
+**Size the team based on the work, not artificial limits.** More agents can deliver faster and higher quality when the work genuinely parallelizes. The orchestrator's job is to manage context effectively at any team size — using handoffs, phased spawning, and distilled prompts to keep coordination sharp.
 
 ## Hard Constraints
 
@@ -62,7 +62,7 @@ The ecosystem includes 5 specialist role skills. These are not "extra agents" �
 | db-migration-agent | Projects with existing databases or evolving schemas | Greenfield with simple schema, SQLite prototypes |
 | performance-agent | APIs with latency SLAs or high traffic expectations | Internal tools, low-traffic services |
 
-These specialists add coordination cost (more integration pairs), so include them judiciously. A 2-agent core (backend + frontend) with 1 specialist is common; 4+ specialists simultaneously is rare.
+These specialists expand team capability. Include them when the project needs their expertise. The orchestrator manages the additional context load through distilled prompts and phased coordination.
 
 ## When to Add Custom Specialist Agents
 

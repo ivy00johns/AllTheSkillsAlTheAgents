@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.0.0
+version: 1.2.0
 description: |
   Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. IMPORTANT: This skill MUST take priority over brainstorming, writing-plans, and other design skills when the user requests an agent team build. It handles its own design phase (plan analysis, contract authoring, team sizing) internally. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", or wants to split work across multiple Claude sessions. Also trigger when the user provides a plan document and wants it built with maximum parallelism. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build and should not be preempted by brainstorming or planning skills.
 requires_agent_teams: false
@@ -26,14 +26,27 @@ You are the **lead coordinator** for a Claude Code Agent Team build. Your role i
 
 **Core philosophy**: 50% effort on design (architecture, contracts, file ownership), 20% on parallel implementation, 30% on QA/review/integration. Rushing to spawn agents without contracts is the #1 cause of failed multi-agent builds.
 
+## Git Branching Policy
+
+All orchestrated builds work on a **feature branch**, never directly on main.
+
+1. **Before any work begins**, create a new branch: `git checkout -b <descriptive-branch-name>` (e.g., `build/save-act-website`, `feature/habit-tracker`). If a worktree is already active, use its branch.
+2. **Commit frequently** — after scaffolding, after each agent completes, after integration fixes. Small commits make rollback easy.
+3. **Do not merge to main.** Do not push to main. Do not fast-forward main. The build branch stays separate until the user explicitly asks to merge or create a PR. This protects the user's main branch from incomplete or broken builds.
+4. **Do not ask "should I merge?"** — the user will tell you when they're ready. Your job ends at "build complete on branch X."
+
+If the user says "merge it", "push to main", or "create a PR" — then and only then proceed with that action. Absent explicit instruction, the branch stays as-is.
+
 ## Quick Start
 
-1. Read the plan
-2. Size the team (default: 2 agents) — see `references/team-sizing.md`
-3. Author contracts (the critical phase) — invoke the `contract-author` skill
-4. Spawn agents in parallel with distilled prompts
-5. Coordinate and validate
-6. Gate on QA report
+1. Create a feature branch (see Git Branching Policy above)
+2. Read the plan
+3. Size the team based on the work — see `references/team-sizing.md`
+4. Author contracts (the critical phase) — invoke the `contract-author` skill
+5. Spawn agents in parallel with distilled prompts
+6. **Spawn QE agent for testing** — this is mandatory, not optional (see below)
+7. Coordinate and validate
+8. Gate on QA report
 
 For the full 14-phase playbook, read `references/phase-guide.md`.
 
@@ -100,9 +113,17 @@ You are the [ROLE] agent for this build.
 ### Contract You Consume (v1)
 [The contract this agent depends on]
 
+## Domain Rules
+[Relevant business rules from contracts/README.md that this agent must enforce]
+
+## Implementation Notes
+[Per-agent guidance from contracts/README.md — libraries, patterns, framework specifics]
+
 ## Before Reporting Done
 [Specific validation commands]
 ```
+
+**Agent spawn permissions:** When spawning agents via the Agent tool, use `mode: "auto"` to ensure agents can write files without permission blocks. Agents that cannot write files will waste their entire context asking for permissions instead of building.
 
 ## Coordination Rules
 
@@ -112,21 +133,28 @@ You are the [ROLE] agent for this build.
 - **Shared file changes go through you** — relay to the owning agent
 - **Circuit breaker at 3 failures** — see `references/circuit-breaker.md`
 
+## QE Agent Is Mandatory
+
+Every orchestrated build **must** spawn a QE agent. Testing is not optional. Even if the plan document does not mention testing, you are responsible for spawning a QE agent that writes and runs tests covering the built code. The QE agent should be spawned after implementation agents complete (or in parallel if contracts are sufficient to write tests against). A build without tests is an incomplete build — the Definition of Done cannot be satisfied without a passing QA gate.
+
 ## Validation Sequence
 
 1. **Contract diff** — curl commands vs fetch calls, line by line
 2. **Agent validation** — each agent runs their checklist
-3. **End-to-end testing** — you run this: startup, happy path, persistence, edge cases
-4. **QA gate** — QE agent's `qa-report.json` must pass gate rules
+3. **QE agent testing** — the QE agent writes and runs tests, produces `qa-report.json`
+4. **End-to-end testing** — you run this: startup, happy path, persistence, edge cases
+5. **QA gate** — QE agent's `qa-report.json` must pass gate rules
 
 ## QA Gate Rules
 
-The QE agent outputs structured JSON per `roles/qe-agent/references/qa-report-schema.json`. Build is blocked when:
+The QE agent outputs structured JSON per `roles/qe-agent/references/qa-report-schema.json`. Before reading scores, **validate the report conforms to the schema** — check that `scores` contains objects with `score` and `notes` fields (not bare integers), that all required top-level fields exist (`schema_version`, `status`, `scores`, `test_results`, `blockers`, `issues`, `gate_decision`), and that `gate_decision` has `proceed` and `reason`. A non-conformant report should be sent back to the QE agent for correction.
+
+Build is blocked when:
 
 - `gate_decision.proceed = false`
 - Any blocker with `severity: CRITICAL`
-- `scores.contract_conformance < 3`
-- `scores.security < 3`
+- `scores.contract_conformance.score < 3`
+- `scores.security.score < 3`
 
 **You do NOT override the QE gate.** Fix the issues and re-run.
 
@@ -137,10 +165,12 @@ The QE agent outputs structured JSON per `roles/qe-agent/references/qa-report-sc
 | Spawning without contracts | Never spawn until contracts pass quality checklist |
 | Pasting full plan to all agents | Distill: each agent gets only their sections + contracts |
 | Lead starts coding | Stay in coordination mode. Your job is orchestration. |
-| Too many agents | Default to 2. Coordination cost is quadratic. |
+| Too many agents without context management | Size teams to the work but manage orchestrator context proactively — use handoffs, phased spawning, and distilled prompts. |
 | Shared file editing | Strict file ownership. No exceptions without lead approval. |
 | Verbal contract changes | Always write full updated contract, version it, get acknowledgments |
 | Skipping contract diff | Always compare curl vs fetch before integration testing |
+| Skipping QE agent | QE agent is mandatory. Always spawn one, even if the plan doesn't mention tests. |
+| Committing to main | All work on a feature branch. Never merge/push to main unless user explicitly requests it. |
 
 ## Context Management
 
@@ -156,4 +186,4 @@ ALL must be true:
 4. All integration issues fixed and re-validated
 5. Plan's acceptance criteria met
 6. Contract changelog clean
-7. QA gate passed (if QE agent spawned)
+7. QA gate passed — QE agent tests written, executed, and passing

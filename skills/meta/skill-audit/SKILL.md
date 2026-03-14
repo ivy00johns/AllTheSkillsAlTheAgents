@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-version: 1.0.0
+version: 1.1.0
 description: |
   Scan all skills (or a filtered subset) for consistency, quality issues, gaps, and ownership conflicts in bulk. Use this skill when auditing the full skill ecosystem, running a broad quality scan, checking for ownership overlaps across agents, finding inconsistencies between skills, doing a "health check" on all skills, or when someone says "audit skills", "scan all skills", "skill ecosystem health", "bulk review", or "what needs fixing". Not for single-skill deep dives — use skill-deep-review for that.
 requires_agent_teams: false

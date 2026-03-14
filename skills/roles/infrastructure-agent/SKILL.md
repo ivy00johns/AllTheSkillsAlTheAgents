@@ -1,6 +1,6 @@
 ---
 name: infrastructure-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Build containerization, orchestration, CI/CD, and deployment configuration for multi-agent builds. Use this skill when spawning an infrastructure agent, creating Dockerfiles, docker-compose configs, CI/CD pipelines, or deployment scripts. Trigger for any DevOps/infrastructure task within an orchestrated build.
 requires_agent_teams: false
@@ -41,6 +41,15 @@ From the lead:
 - **Off-limits:** application code inside `frontend/`, `backend/`, or any agent-owned `src/` directory
 
 ## Process
+
+### 0. Read Contracts and Service Map
+
+Before writing any infrastructure config, read:
+
+- **Service map** — which services exist, their ports, dependencies
+- **API contract** — understand health endpoints and inter-service communication
+- **README domain rules** — any infrastructure-relevant constraints (e.g., "checkout uses serializable isolation" means DB needs appropriate config)
+- **Data layer contract** — database engine, connection requirements
 
 ### 1. Docker Configuration
 

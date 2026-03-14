@@ -1,6 +1,6 @@
 ---
 name: project-profiler
-version: 1.0.0
+version: 1.1.0
 description: |
   Analyze a codebase and generate a project profile (CLAUDE.md + profile.yaml) for multi-agent builds. Use this skill when onboarding a new project, generating project documentation for agents, creating CLAUDE.md files, or profiling a codebase's tech stack and conventions. Trigger for any project analysis or profile generation task.
 requires_agent_teams: false

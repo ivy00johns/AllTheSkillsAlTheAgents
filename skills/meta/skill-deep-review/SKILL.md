@@ -1,6 +1,6 @@
 ---
 name: skill-deep-review
-version: 1.0.0
+version: 1.1.0
 description: |
   Perform a thorough, single-skill deep dive reviewing structure, description quality, instruction clarity, progressive disclosure, anti-patterns, and frontmatter compliance — then run test prompts via /skill-creator to validate triggering and output quality. Use this skill when deeply reviewing one skill, auditing a specific skill's quality, checking if a skill triggers correctly, doing a "deep dive" on a skill, or when someone says "review this skill", "is this skill good", "check skill quality", or "deep review". Not for broad multi-skill scans — use skill-audit for that.
 requires_agent_teams: false

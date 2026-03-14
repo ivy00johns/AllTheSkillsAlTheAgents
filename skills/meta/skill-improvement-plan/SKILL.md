@@ -1,6 +1,6 @@
 ---
 name: skill-improvement-plan
-version: 1.0.0
+version: 1.1.0
 description: |
   Consume review reports from skill-deep-review or skill-audit and produce a prioritized, actionable improvement plan with specific edits per skill. Use this skill when you have review feedback to act on, need to plan skill improvements, want to turn audit results into a fix plan, or when someone says "plan the fixes", "what should we improve", "make a plan from this review", "improvement plan", or "prioritize the changes". Also trigger when a deep-review or audit report exists and the user wants next steps.
 requires_agent_teams: false

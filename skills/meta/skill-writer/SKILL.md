@@ -1,6 +1,6 @@
 ---
 name: skill-writer
-version: 1.0.0
+version: 1.1.0
 description: |
   Generate new SKILL.md files conforming to the ecosystem's frontmatter spec and structure conventions. Use this skill when creating any new skill, agent role definition, or workflow skill. Trigger whenever someone says "create a skill", "new agent", "write a SKILL.md", or needs to add a role to the skill ecosystem. Also use when reviewing existing skills for spec compliance.
 requires_agent_teams: false
@@ -82,8 +82,10 @@ Structure the body around:
 
 For agent role skills, also include:
 
-- **Ownership** — directories/files owned exclusively
+- **Step 0: Read Contracts** — every role skill should start by reading contracts and domain rules before any implementation
+- **Ownership** — directories/files owned exclusively, with note that orchestrator prompt takes precedence over frontmatter defaults
 - **Off-limits** — what this agent must never touch
+- **Right-sizing** — guidance on adapting to project complexity
 - **Validation** — link to `references/validation-checklist.md`
 
 ### Step 4: Create Reference Files

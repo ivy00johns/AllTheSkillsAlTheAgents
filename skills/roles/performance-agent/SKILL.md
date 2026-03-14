@@ -1,6 +1,6 @@
 ---
 name: performance-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Design and execute performance tests, load tests, and benchmarks for multi-agent builds. Use this skill when spawning a performance agent, creating load test scripts, running k6 or NeoLoad tests, establishing performance baselines, or analyzing response time metrics. Trigger for any performance testing or load testing task within an orchestrated build.
 requires_agent_teams: false
@@ -40,6 +40,14 @@ From the lead:
 - **Off-limits:** Application source code, infrastructure configs
 
 ## Process
+
+### 0. Read API Contract and Performance Targets
+
+Before designing tests, read:
+
+- **API contract** — endpoints to test, expected request/response shapes for building realistic test payloads
+- **Performance targets** — SLA requirements from the plan (p95 latency, throughput floor, error rate ceiling)
+- **README domain rules** — understand which operations are expected to be heavy (e.g., search with full-text indexing, checkout with serializable transactions)
 
 ### 1. Test Scenario Design
 

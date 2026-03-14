@@ -1,6 +1,6 @@
 ---
 name: skill-updater
-version: 1.0.0
+version: 1.1.0
 description: |
   Execute skill improvement plans by making edits to SKILL.md files and references, validating changes, and optionally syncing to global skill locations. Use this skill when implementing planned skill changes, applying fixes from a review, executing an improvement plan, batch-editing skills, or when someone says "apply the plan", "fix the skills", "implement the changes", "update the skills", "execute the improvement plan", or "make those edits". Also trigger after skill-improvement-plan produces output and the user wants to proceed.
 requires_agent_teams: false

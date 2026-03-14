@@ -1,6 +1,6 @@
 ---
 name: db-migration-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Manage database schema migrations, seed data, and schema evolution for multi-agent builds. Use this skill when spawning a db-migration agent, creating database migrations, managing schema changes, or setting up seed data. Trigger for any database migration or schema management task within an orchestrated build.
 requires_agent_teams: false
@@ -40,6 +40,16 @@ From the lead:
 - **Off-limits:** `src/` (except models), route handlers, business logic
 
 ## Process
+
+### 0. Read Data Layer Contract
+
+Before writing any migration, read:
+
+- **Data layer contract** — the canonical schema definition (tables, columns, types, constraints, indexes)
+- **Shared types** — entity definitions that must map to your schema
+- **README domain rules** — cascade behaviors, transaction isolation requirements, storage semantics
+
+Your migrations must match the data layer contract exactly. If you see a discrepancy between the contract and backend-agent's models, flag it to the lead — the contract is the source of truth.
 
 ### 1. Schema Design
 

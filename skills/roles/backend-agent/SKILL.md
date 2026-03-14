@@ -1,6 +1,6 @@
 ---
 name: backend-agent
-version: 1.0.0
+version: 1.1.0
 description: |
   Build API servers, business logic, and data layers for multi-agent builds. Use this skill when spawning a backend agent, implementing REST/GraphQL APIs, setting up databases, or handling server-side logic. Trigger for any backend implementation task within an orchestrated build.
 requires_agent_teams: false
@@ -46,29 +46,41 @@ You receive from the lead:
 
 ## Process
 
-### 1. Set Up the Project
+### 1. Read Contracts and Domain Rules
 
-Scaffold based on tech stack. Create directory structure:
+Before writing any code, read all contract files thoroughly:
+
+- **Shared types** — these are the canonical data shapes. Import and use them for request validation and response serialization rather than manually constructing dicts. This prevents the #1 cause of field-naming drift (e.g., returning `created_at` when the contract specifies `createdAt`).
+- **API contract** — your endpoints must match character-for-character
+- **Data layer contract** — your database functions must match these signatures
+- **README domain rules** — business logic you must enforce (invariants, transaction semantics, idempotency)
+- **README implementation notes** — library/framework guidance specific to your role
+
+### 2. Set Up the Project
+
+Scaffold based on tech stack. Adapt directory structure to the project's conventions:
 
 ```text
-backend/
-├── main.py / server.ts / main.go
-├── routes/ or api/
-├── models/ or schemas/
-├── db/ or database/
-├── middleware/
-├── config/
-└── tests/
+# Flask/Python             # Express/Node            # Go
+app.py                     server.js                 cmd/server/main.go
+src/routes.py              src/routes/               internal/handler/
+src/database.py            src/db/                   internal/store/
+src/middleware.py           src/middleware/            internal/middleware/
+requirements.txt           package.json              go.mod
+.env.example               .env.example              .env.example
 ```
 
-### 2. Set Up the Database
+The frontmatter `owns.directories` lists the canonical ownership, but real projects vary. The orchestrator's prompt specifies your actual ownership — follow that over the frontmatter defaults.
+
+### 3. Set Up the Database
 
 - **Schema first** — tables/collections mapping to shared types
 - **Function signatures** — implement every function from data contract with exact signatures
 - **Storage semantics** — accumulated vs per-event, cascade deletes, timestamps set by data layer, indexes
 - **Connection management** — connection string from `.env`, never hardcoded
+- **Right-size** — SQLite projects use auto-increment IDs and `CREATE TABLE IF NOT EXISTS`. PostgreSQL projects use UUIDs and proper migrations. Don't over-engineer.
 
-### 3. Implement API Endpoints
+### 4. Implement API Endpoints
 
 For each contracted endpoint, implement a route handler matching the contract exactly:
 
@@ -81,14 +93,14 @@ For each contracted endpoint, implement a route handler matching the contract ex
 
 Test each endpoint with curl immediately after implementing.
 
-### 4. Implement Error Handling
+### 5. Implement Error Handling
 
 - Global error handler catches all exceptions, returns error envelope
 - Validation errors → 422 with error envelope
 - Not found → 404 with error envelope
 - Never leak stack traces to clients
 
-### 5. Implement CORS
+### 6. Implement CORS
 
 The #1 "works in dev, breaks in integration" issue. Set up immediately:
 
@@ -96,14 +108,14 @@ The #1 "works in dev, breaks in integration" issue. Set up immediately:
 - Allow all needed methods and headers
 - Verify with `curl -I -X OPTIONS` checking `Access-Control-Allow-Origin`
 
-### 6. Implement SSE/Streaming (if applicable)
+### 7. Implement SSE/Streaming (if applicable)
 
 - Use contracted event types exactly (`chunk`, `done`, `error`)
 - Data format matches contract
 - Accumulate into single DB row after stream completes
 - Handle client disconnects gracefully
 
-### 7. Environment Configuration
+### 8. Environment Configuration
 
 `.env.example` committed with placeholders, `.env` gitignored with real values. Every config from env vars.
 
@@ -127,6 +139,8 @@ The #1 "works in dev, breaks in integration" issue. Set up immediately:
 | Stack traces in errors | Global error handler, never send to client |
 | Hardcoded config | Everything from `.env` |
 | In-memory storage | Use real database from the start |
+| Manual dict construction | Import shared types for serialization — prevents field name drift |
+| Creating tests/ directory | tests/ is owned by qe-agent — don't create it |
 | Per-chunk streaming storage | Accumulate into one row |
 | Wrong status codes | Match contract exactly (201 create, 200 read, 404 not found) |
 

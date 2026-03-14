@@ -57,11 +57,6 @@ export interface CreateMessageRequest {
 // Response Shapes
 // ============================================================
 
-export interface MessageListResponse {
-  messages: Message[];
-  total: number;
-}
-
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
