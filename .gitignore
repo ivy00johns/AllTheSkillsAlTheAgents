@@ -4,4 +4,4 @@
 *.swo
 *~
 
-*-workspace/
+.workspaces/
