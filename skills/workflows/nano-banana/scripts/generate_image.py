@@ -18,18 +18,21 @@ import sys
 import urllib.request
 import urllib.error
 
-# Load .env from the skill directory (sibling to scripts/)
-_SKILL_DIR = pathlib.Path(__file__).resolve().parent.parent
-_ENV_FILE = _SKILL_DIR / ".env"
-if _ENV_FILE.exists():
-    for line in _ENV_FILE.read_text().splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            key, _, value = line.partition("=")
-            key = key.strip()
-            value = value.strip().strip("\"'")
-            if key and key not in os.environ:
-                os.environ[key] = value
+# Load .env from the skills repo root (AllTheSkillsAllTheAgents/.env)
+# Walk up from scripts/ -> nano-banana/ -> workflows/ -> skills/ -> repo root
+_SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPT_DIR.parent.parent.parent.parent
+for _candidate in [_REPO_ROOT / ".env", _SCRIPT_DIR.parent / ".env"]:
+    if _candidate.exists():
+        for line in _candidate.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip("\"'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+        break
 
 MODELS = {
     "standard": "gemini-2.5-flash-image",

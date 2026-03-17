@@ -7,5 +7,7 @@
 .workspaces/
 *-workspace/
 
-# API keys in skill directories
+# Credentials — root .env and any per-skill .env files
+# .env.example is committed as the template
+.env
 **/.env

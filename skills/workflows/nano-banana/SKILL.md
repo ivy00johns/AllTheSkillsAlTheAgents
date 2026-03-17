@@ -35,13 +35,10 @@ The bundled script uses `gemini-2.5-flash-image` — Google's current image gene
 
 ## Setup
 
-The script requires a `GEMINI_API_KEY` environment variable. If not set, direct the user to get one at https://aistudio.google.com/apikey and set it:
+The script requires a `GEMINI_API_KEY` environment variable. It reads from the AllTheSkillsAllTheAgents root `.env` file automatically. If not set, direct the user to:
 
-```bash
-export GEMINI_API_KEY="your-key-here"
-```
-
-For persistence, suggest adding it to their shell profile or Claude Code settings (`env` field in settings.json). The script also reads a `.env` file in the skill directory if present.
+1. Get a key at https://aistudio.google.com/apikey
+2. Add it to the repo root `.env` (see `.env.example` for the template)
 
 ## Generating Images
 
