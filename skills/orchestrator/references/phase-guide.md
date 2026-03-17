@@ -1,5 +1,20 @@
 # 14-Phase Build Playbook
 
+## Phase 0: External Services Audit (MANDATORY when integrating with existing services)
+
+**Before reading the plan**, if the build integrates with any existing external service (auth server, API gateway, OAuth provider, payment processor, third-party backend), do this first:
+
+1. **Read the Terraform / deployment config** for that service — not just the code, the *infrastructure*. Look for:
+   - Allowed origins / redirect URIs / CORS whitelists
+   - Environment variables set on the running service (Cloud Run, ECS, Heroku, etc.)
+   - Firewall rules, VPC config, IAM permissions
+   - Any hardcoded values that differ from `.env.example` or docs
+2. **Identify every constraint the running service imposes** on consumers — ports, domains, scopes, rate limits
+3. **Record these as hard constraints in the contracts** before any agent is spawned. These are non-negotiable facts about the real world, not design decisions.
+4. **If a constraint blocks the plan** (e.g., the auth server doesn't allow localhost callbacks), flag it to the user BEFORE writing contracts and BEFORE spawning any agents. Do not proceed around it silently.
+
+> **Why this phase exists**: The most common integration failure is building against documentation or code while the actual *running* service has different configuration. A Terraform file telling you `ALLOWED_REDIRECT_ORIGINS=https://*.example.com` with no localhost entries will break every local dev OAuth flow — and no amount of correct application code will fix it. Read the infra first.
+
 ## Phase 1: Read and Analyze the Plan
 
 Read the plan document. Extract:
@@ -53,7 +68,9 @@ Quality checklist (all must pass):
 - All status codes specified (success AND error)
 - Trailing slash convention stated
 - Error envelope defined
-- CORS origin specified
+- CORS origin specified — and verified against the **actual running Terraform/deployment config**, not just docs
+- For OAuth/auth integrations: allowed redirect origins verified in the **running** service config (not just `.env.example`)
+- Every external service constraint from Phase 0 is explicitly reflected in the contract
 - Every contract versioned as v1
 
 ## Phase 5: Distill Agent Prompts
@@ -126,6 +143,7 @@ Each agent runs their domain-specific validation checklist:
 - Frontend: TypeScript compiles, build succeeds, dev server loads, zero CORS errors
 - Infrastructure: Docker builds, services healthy
 - Data layer: schema correct, CRUD works, cascades work
+- **External service integration**: For every external service integrated, verify the running service config actually accepts requests from the app (test the actual OAuth redirect, API call, webhook, etc.) — do not assume it works because the code is correct
 
 ## Phase 11: Smoke Testing (Orchestrator)
 

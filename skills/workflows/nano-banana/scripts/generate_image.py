@@ -79,8 +79,8 @@ def generate_image(prompt: str, output_path: str, aspect_ratio: str = "3:4",
         }
     }
 
-    if resolution != "2K":
-        payload["generationConfig"]["imageConfig"]["resolution"] = resolution
+    # Note: resolution parameter is not currently supported by the API
+    # Keeping the CLI flag for future compatibility but not sending it
 
     body = json.dumps(payload).encode("utf-8")
 
@@ -136,13 +136,8 @@ def generate_image(prompt: str, output_path: str, aspect_ratio: str = "3:4",
     raw = base64.b64decode(image_data["data"])
     mime = image_data.get("mimeType", "image/png")
 
-    # Adjust file extension to match actual mime type (API returns PNG)
-    ext_map = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
-    actual_ext = ext_map.get(mime, ".png")
-    out = pathlib.Path(output_path)
-    if out.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp") and out.suffix.lower() != actual_ext:
-        output_path = str(out.with_suffix(actual_ext))
-        print(f"  Note: API returned {mime}, saving as {actual_ext} instead of {out.suffix}")
+    # Save with the requested filename regardless of mime type
+    # (API returns PNG but sites handle PNG-data in .jpg files fine)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
 

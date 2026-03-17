@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.2.0
+version: 1.3.0
 description: |
   Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. IMPORTANT: This skill MUST take priority over brainstorming, writing-plans, and other design skills when the user requests an agent team build. It handles its own design phase (plan analysis, contract authoring, team sizing) internally. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", or wants to split work across multiple Claude sessions. Also trigger when the user provides a plan document and wants it built with maximum parallelism. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build and should not be preempted by brainstorming or planning skills.
 requires_agent_teams: false
@@ -171,6 +171,7 @@ Build is blocked when:
 | Skipping contract diff | Always compare curl vs fetch before integration testing |
 | Skipping QE agent | QE agent is mandatory. Always spawn one, even if the plan doesn't mention tests. |
 | Committing to main | All work on a feature branch. Never merge/push to main unless user explicitly requests it. |
+| Trusting docs/code over running config | When integrating an external service, read its Terraform / Cloud Run / deployment config — not just README or `.env.example`. The running service may have constraints (allowed origins, firewall rules, required scopes) that differ from documentation. Failing to check this means building the right code against the wrong assumptions. Always Phase 0 first. |
 
 ## Context Management
 
