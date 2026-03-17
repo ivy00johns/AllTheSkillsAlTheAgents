@@ -5,6 +5,7 @@
 *~
 
 .workspaces/
+*-workspace/
 
 # API keys in skill directories
 **/.env
