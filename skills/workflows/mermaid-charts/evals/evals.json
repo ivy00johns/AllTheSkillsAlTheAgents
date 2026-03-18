@@ -1,0 +1,47 @@
+{
+  "skill_name": "mermaid-charts",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Diagram the three-layer architecture of the beads system. The integration layer has MCP Server (Python/FastMCP) and Claude Code Plugin (TypeScript). The CLI layer is a Cobra app with 120+ commands, a command router, lifecycle hooks (PersistentPreRunE/PostRun), and signal handling. The storage layer has DoltStore connecting via MySQL wire protocol to a dolt sql-server, with circuit breaker and retry logic, connection pooling, and transaction management. All integrations invoke the bd binary as a subprocess — the CLI is the contract. The storage layer connects down to an on-disk Dolt database which federates to DoltHub/S3/GCS via remotes.",
+      "expected_output": "A clear top-to-bottom flowchart with 3 subgraphs representing the layers, showing the integration points between layers and the key components within each",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Create a state diagram for the polecat worker lifecycle. States: spawning, working, mr_submitted, awaiting_verdict. From awaiting_verdict it can go to MERGED (then done/gone via gt done) or FIX_NEEDED (fix and resubmit, loops back to awaiting_verdict). Polecats have persistent identity but ephemeral sessions — each assignment is a fresh Claude Code session in a fresh git worktree. They follow the mol-polecat-work formula which has 10 steps from load-context through self-clean.",
+      "expected_output": "A state diagram showing the full lifecycle with the loop path clearly visible, start/end markers, and transition labels",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need a diagram showing how Gas Town's worker roles interact. There are 8 roles split into two tiers. Town-level (cross-rig): Mayor (1, persistent, coordinator), Deacon (1, persistent), Dogs (N, ephemeral tasks), Boot (1 special Dog, 5m ticks). Rig-level (per-project): Witness (1 per rig, persistent), Refinery (1 per rig, persistent, handles merge queue), Polecats (N per rig, persistent identity but ephemeral sessions, the workhorses), Crew (N per rig, persistent, user-managed). Plus the Overseer (human, role 8, has inbox, is the boss). Mayor initiates convoys, slings work to polecats. Witness monitors per-rig. Refinery processes MRs. Show who talks to who.",
+      "expected_output": "A diagram with two tier subgraphs (town-level and rig-level) plus the Overseer, showing communication flows between roles with meaningful edge labels",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Diagram the full MEOW stack (Molecular Expression of Work). This is a 5-layer system:\n\n1. Formulas (TOML source files) — highest level, define workflows with steps, variables, acceptance criteria. Three types: workflow (standard), expansion (reusable macros with {target} placeholders), aspect (cross-cutting before/after/around advice).\n\n2. Protomolecules (frozen templates) — created by 'bd cook --persist', stored in DB with IsTemplate=true, mol- prefix, can be poured multiple times.\n\n3. Molecules come in two forms:\n   - Mol (persistent, git-backed, 'liquid' phase) — created by 'bd mol pour', full child materialization, project prefix IDs\n   - Wisp (ephemeral, not in git, 'vapor' phase) — created by 'bd mol wisp', root-only by default unless pour=true, wisp prefix IDs\n\n4. Wisps can be promoted via 'bd mol squash' (vapor→liquid) or discarded via 'bd mol burn'\n\n5. At the bottom: Beads — atomic work units with ID, status, assignee, priority, type, labels, dependencies. Pinned beads (Role Beads, Agent Beads, Hook Beads) float and never close.\n\nThe whole thing maps to a chemistry metaphor: Solid (proto) → Liquid (mol) → Vapor (wisp). Show the full stack with phase transitions and the commands that trigger each transition.",
+      "expected_output": "A multi-level diagram showing the full MEOW stack with clear layering, phase transitions labeled with their CLI commands, the chemistry metaphor visible, and the two molecule variants distinguished",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Create a diagram of the beads dependency type taxonomy. There are 22 named dependency types organized into 8 categories:\n\nWorkflow types (affect ready work): blocks (hard prerequisite), parent-child (hierarchical, status propagates), conditional-blocks (runs only if target fails), waits-for (gate/fanout with metadata).\n\nAssociation types: related (soft link), discovered-from (provenance).\n\nGraph link types: replies-to (threading), relates-to (knowledge graph), duplicates (dedup), supersedes (version chain).\n\nEntity types (HOP foundation): authored-by, assigned-to, approved-by, attests (skill attestation with metadata).\n\nConvoy type: tracks (non-blocking cross-project reference).\n\nReference types: until (active until target closes), caused-by (audit trail), validates (approval).\n\nDelegation type: delegated-from (completion cascades up).\n\nThe critical distinction is that only the 4 workflow types affect ready work scheduling (via AffectsReadyWork()). The rest are informational. Any string up to 50 chars is valid but only these 22 are 'well-known'. Show this taxonomy clearly with the scheduling impact distinction prominent.",
+      "expected_output": "A classification diagram (mindmap, flowchart with subgraphs, or class diagram) showing all 22 types grouped by category with the workflow types visually distinguished as the ones that affect scheduling",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Diagram the full end-to-end convoy workflow in Gas Town, from user request to completion notification. The flow is:\n\n1. User tells Mayor what they want\n2. Mayor creates beads (bd create), creates a convoy (gt convoy create with --notify --human), and slings work (gt sling)\n3. gt sling hangs the bead on the target agent's hook, creates/updates convoy tracking, and spawns a polecat session if needed\n4. Polecat picks up work via GUPP (polling), follows mol-polecat-work formula (10 steps), works in a fresh git worktree\n5. Polecat submits a Merge Request\n6. Refinery processes MRs through batch-then-bisect (Bors-style): batch [A,B,C,D] → rebase as stack on main → test tip (D) → if PASS: fast-forward merge all 4 → if FAIL: binary bisect to find which MR broke it → test midpoint → recurse\n7. On merge: convoy tracks completion\n8. When all convoy issues land: convoy status → Landed, user gets notified\n\nAlso show the failure loop: if verdict is FIX_NEEDED, polecat fixes and resubmits, going back through the merge queue.\n\nThis should probably be a sequence diagram or a flowchart — pick whichever handles the complexity better.",
+      "expected_output": "A diagram showing the full end-to-end flow with the merge queue bisect logic visible, the failure/retry loop, and clear actor boundaries. Should handle 6+ actors and multiple parallel paths without becoming unreadable.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Map the entire AllTheSkillsAllTheAgents skill ecosystem. There are 17 skills across 5 categories:\n\nOrchestrator (skills/orchestrator/): orchestrator — 14-phase build playbook, runtime detection, contract-first coordination.\n\nRoles (skills/roles/): 9 implementation agents — backend-agent, frontend-agent, infrastructure-agent, qe-agent, security-agent, docs-agent, observability-agent, db-migration-agent, performance-agent. Each has exclusive file ownership (no overlaps).\n\nContracts (skills/contracts/): contract-author (generates from templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema) and contract-auditor (verifies implementations match contracts).\n\nMeta (skills/meta/): skill-writer (generates new skills), project-profiler (codebase → CLAUDE.md + profile.yaml), code-reviewer (structured review with rubric).\n\nWorkflows (skills/workflows/): context-manager (handoffs at ~80% context) and deployment-checklist (pre-deploy gates).\n\nKey relationships: orchestrator spawns all role agents. Contract-author runs before implementation agents. Contract-auditor runs after. QE gates the build (qa-report.json, blocks on CRITICAL or scores < 3). Context-manager handles handoffs when agents hit context limits. The system degrades across two runtimes: Agent Teams → subagents → sequential.\n\nShow the full ecosystem with categories, ownership boundaries, spawning relationships, and the build flow.",
+      "expected_output": "A comprehensive ecosystem map showing all 17 skills organized by category, with spawning relationships from orchestrator, the contract-first flow (author → implement → audit), the QE gate, and context-manager's cross-cutting role. Should handle 17+ nodes without becoming a mess.",
+      "files": []
+    }
+  ]
+}
