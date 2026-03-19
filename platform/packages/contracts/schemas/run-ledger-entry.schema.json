@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "future.run-ledger-entry",
+  "title": "RunLedgerEntry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "project_id",
+    "worker_profile_id",
+    "status",
+    "started_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "mission_id": { "type": "string" },
+    "work_item_id": { "type": "string" },
+    "worker_profile_id": { "type": "string", "minLength": 1 },
+    "runtime": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "running", "succeeded", "failed", "canceled", "rerouted"]
+    },
+    "exit_reason": { "type": "string" },
+    "cost_usd": { "type": "number", "minimum": 0 },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": "string", "format": "date-time" }
+  }
+}

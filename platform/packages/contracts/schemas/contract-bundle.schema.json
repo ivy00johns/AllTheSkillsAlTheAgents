@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "future.contract-bundle",
+  "title": "ContractBundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "project_id",
+    "version",
+    "ownership",
+    "gates",
+    "created_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "mission_id": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "ownership": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["owner", "paths"],
+        "properties": {
+          "owner": { "type": "string" },
+          "paths": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "api_contracts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "event_contracts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "gates": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

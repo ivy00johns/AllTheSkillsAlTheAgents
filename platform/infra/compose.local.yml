@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: future-platform-postgres
+    environment:
+      POSTGRES_USER: future
+      POSTGRES_PASSWORD: future
+      POSTGRES_DB: future_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: future-platform-nats
+    command: ["-js"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  minio:
+    image: minio/minio:latest
+    container_name: future-platform-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: future-platform-clickhouse
+    ports:
+      - "8123:8123"
+      - "9009:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+volumes:
+  postgres_data:
+  minio_data:
+  clickhouse_data:
