@@ -1,14 +1,18 @@
 ---
 name: mermaid-charts
-version: 1.0.0
+version: 2.0.0
 description: >
   Create expert-quality mermaid diagrams — flowcharts, sequence diagrams, architecture maps,
-  state machines, ER diagrams, Gantt charts, mindmaps, and more. Use this skill whenever
-  the user asks to visualize, diagram, chart, map, or illustrate any system, process, workflow,
-  architecture, data model, timeline, or relationship. Also trigger when documenting complex
-  systems, generating architecture diagrams, creating technical illustrations, or when another
-  skill needs a mermaid diagram embedded in its output. Even if the user doesn't say "mermaid"
-  explicitly — if they want a visual representation of something technical, this is the skill.
+  state machines, ER diagrams, Gantt charts, mindmaps, and more. Handles complex systems with
+  15-30+ nodes across multiple architectural layers without losing readability. Use this skill
+  whenever the user asks to visualize, diagram, chart, map, or illustrate any system, process,
+  workflow, architecture, data model, timeline, or relationship. Also trigger when documenting
+  complex systems, generating architecture diagrams, creating technical illustrations, mapping
+  multi-project ecosystems, comparing system architectures, or when another skill needs a
+  mermaid diagram embedded in its output. Even if the user doesn't say "mermaid" explicitly —
+  if they want a visual representation of something technical, this is the skill. Trigger for
+  "draw this", "show me how X works", "map the architecture", "diagram the flow", or any
+  request involving system visualization.
 composes_with:
   - docs-agent
   - backend-agent
@@ -144,32 +148,114 @@ Bad:   api -- "sends request to" --> auth   (obvious from the arrow)
 
 ## Managing Complexity
 
-This is where most mermaid diagrams fail. Complex systems need a strategy.
+This is where most mermaid diagrams fail. Complex systems need a strategy — and the goal is to handle complexity *within* diagrams, not just split everything into tiny pieces.
 
-### The Rule of Seven (plus or minus two)
+### Think in Layers, Not Nodes
 
-A single diagram should have 5-9 primary elements. If you have more:
+The mistake most people make is counting nodes. A diagram with 20 nodes in 4 clear subgroups is more readable than a diagram with 7 unstructured nodes. The key is **visual hierarchy** — the reader should be able to understand the diagram at three zoom levels:
 
-1. **Zoom levels** — Create a high-level overview diagram showing major components, then detailed diagrams for each component. Name them clearly: "System Overview", "Auth Subsystem Detail".
+1. **Glance** (2 seconds): What are the major groups? What's the overall flow direction?
+2. **Scan** (10 seconds): What's inside each group? How do groups connect?
+3. **Study** (30 seconds): What are the individual components? What do edge labels say?
 
-2. **Subgraph compression** — Collapse internals into a single subgraph box at the overview level. Expand only in the detail diagram.
+If your diagram works at all three levels, it can handle 15-30 nodes comfortably.
 
-3. **Split by concern** — Separate the data flow diagram from the deployment diagram from the state machine. Don't merge orthogonal concerns.
+### Subgraph Architecture for Large Systems
 
-### When to Split vs. Keep Together
+For systems with 10-30+ components, use subgraphs as the primary organizational tool:
 
-**Keep together** when the reader needs to see the interaction between all parts to understand the point. A sequence diagram showing a complex handshake between 4 services should stay as one diagram because the ordering across all 4 is the whole point.
+```mermaid
+flowchart TB
+    subgraph orchestration["Orchestration Layer"]
+        coord[Coordinator]
+        sling[Sling/Spawn]
+        merge[Merge Queue]
+    end
 
-**Split** when parts are independently understandable. An architecture with 12 microservices — show the top-level topology in one diagram, then each service's internals in its own.
+    subgraph workers["Worker Layer"]
+        subgraph scouts["Exploration"]
+            scout1[Scout]
+        end
+        subgraph builders["Implementation"]
+            builder1[Builder]
+            builder2[Builder]
+        end
+        subgraph review["Validation"]
+            reviewer1[Reviewer]
+        end
+    end
 
-### Handling Many Nodes
+    subgraph infra["Infrastructure"]
+        mail[(Mail DB)]
+        events[(Events DB)]
+        worktree[Git Worktrees]
+    end
 
-If you genuinely need 10+ nodes in one diagram:
-- Use subgraphs to create visual clusters
-- Use consistent left-to-right or top-to-bottom flow
-- Make the critical path visually distinct (thick arrows or styling)
-- Put less important connections as dotted lines
-- Consider whether a table or list would actually communicate better
+    coord --> sling --> workers
+    workers --> mail
+    merge --> infra
+    review -.-> merge
+
+    classDef layer fill:none,stroke:#666,stroke-width:2px
+    classDef db fill:#f0932b,stroke:#c27d23,color:#fff
+```
+
+**Key techniques:**
+- **Nested subgraphs** (2 levels max) group related components within a layer
+- **Edge-to-subgraph** connections (draw edges between subgraph IDs when possible — mermaid routes them cleanly)
+- **Consistent coloring per layer** so the eye can track boundaries
+- **Mixed edge styles** — solid for primary flow, dotted for secondary/optional paths, thick for critical path
+
+### The Anchor Pattern for Cross-Cutting Connections
+
+When multiple subgraphs all connect to a shared resource, avoid the "star explosion" where every node points to the same central node. Instead, use an anchor node per subgraph:
+
+```
+BAD:  A1 --> DB, A2 --> DB, A3 --> DB, B1 --> DB, B2 --> DB  (5 crossing edges)
+GOOD: subgraph_A --> DB, subgraph_B --> DB  (2 clean edges)
+```
+
+Draw the edge from the subgraph or from a representative node within it, not from every individual component.
+
+### Multi-Diagram Strategies
+
+Sometimes the best approach is multiple complementary diagrams. When you do split:
+
+- **Name each diagram with the question it answers** — not "Diagram 1" but "How Data Flows Through the System"
+- **Use consistent node IDs across diagrams** — if `mail` appears in the overview and the detail view, use the same ID both times
+- **Reference between diagrams** — "See the Worker Detail diagram below for internals"
+- **Lead with the overview** — always start with the 30,000-foot view, then zoom in
+
+**Split when** parts are independently understandable — an architecture with 12 microservices, show topology in one diagram, internals in separate ones.
+
+**Keep together when** the interaction between all parts IS the point — a sequence diagram showing a 6-actor handshake needs all 6 actors visible simultaneously.
+
+### Ecosystem Maps (10+ Interconnected Systems)
+
+For mapping entire ecosystems or comparing multiple projects:
+
+1. **Pick one organizing principle** — don't mix layers (horizontal) with data flow (vertical) with ownership (color) all at once. Choose the dimension that best answers the user's question.
+
+2. **Use a consistent visual vocabulary:**
+   - Rectangles for services/processes
+   - Cylinders for databases/storage
+   - Rounded rectangles for external/user-facing
+   - Dotted borders for optional/future components
+
+3. **Show relationships with intent:**
+   - `-->` for "calls" or "depends on"
+   - `-.->` for "optionally uses" or "async"
+   - `==>` for critical path / the thing you're trying to highlight
+   - Edge labels only when the relationship type isn't obvious
+
+4. **Color-code by concern, not by component** — all storage nodes one color, all coordination nodes another. This lets the reader immediately see "where does data live?" or "what coordinates?"
+
+### When NOT to Diagram
+
+Not everything benefits from a visual. Prefer a table when:
+- You're showing a flat list of items with attributes
+- The relationships are all the same type (e.g., "all these services use this library")
+- The structure is strictly hierarchical with no cross-links (a nested list works better)
 
 ## Styling
 
@@ -280,6 +366,58 @@ Guidelines:
 - Label relationships with verbs
 - Include key attributes (PK, FK, important fields), not every column
 - Focus on the relationships — if you need full schema detail, use a table instead
+
+## Mindmap for Taxonomies and Concept Maps
+
+Mindmaps excel at showing hierarchical classifications — dependency types, role taxonomies, feature catalogs:
+
+```mermaid
+mindmap
+  root((System))
+    Orchestration
+      Coordinator
+      Lead
+      Monitor
+    Workers
+      Scout
+      Builder
+      Reviewer
+    Infrastructure
+      Mail DB
+      Event Store
+      Worktrees
+```
+
+Guidelines:
+- Use `root(( ))` for the central concept (double-paren for circle shape)
+- Indent to show hierarchy — no explicit edge syntax needed
+- Keep labels short (1-3 words per node)
+- Use `::icon(fa fa-icon)` sparingly — only when it genuinely aids comprehension
+- Best for 3-5 branches with 2-4 leaves each; beyond that, switch to flowchart with subgraphs
+
+## Multi-System Comparison Diagrams
+
+When comparing or mapping multiple systems (e.g., how 4 different projects relate), use one of these patterns:
+
+**Pattern 1: Side-by-Side Subgraphs** — best for "what does each system own?"
+```mermaid
+flowchart LR
+    subgraph sysA["System A"]
+        a1[Component 1]
+        a2[Component 2]
+    end
+    subgraph sysB["System B"]
+        b1[Component 1]
+        b2[Component 2]
+    end
+    a2 -.-> b1
+```
+
+**Pattern 2: Layered with Shared Foundation** — best for "how do systems stack?"
+Use TB direction with shared infrastructure at the bottom and different systems as columns above it.
+
+**Pattern 3: Hub-and-Spoke** — best for "what's the central coordinator?"
+Put the orchestrator/coordinator in the center, spoke out to each subsystem.
 
 ## Output Format
 
