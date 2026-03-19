@@ -69,12 +69,14 @@ Directions (at least one required, unless --status):
 
 Options:
   --status          Show link/copy/missing status for all locations
+  --clean           Remove broken symlinks from global locations
   --dry-run         Preview without making changes
   -h, --help        Show this help
 
 Examples:
   $(basename "$0") --link --to-all                    # Symlink all categories everywhere
   $(basename "$0") --status                           # What's linked, copied, missing?
+  $(basename "$0") --clean                            # Remove broken symlinks
   $(basename "$0") --copy --to-claude meta            # Copy just meta/ to Claude Code
   $(basename "$0") --unlink --to-all                  # Remove all symlinks
   $(basename "$0") --from-cursor shell                # Pull a Cursor skill into repo
@@ -88,7 +90,7 @@ EOF
 MODE=""  # link, copy, unlink
 TO_CURSOR="" TO_CLAUDE=""
 FROM_CURSOR="" FROM_CLAUDE=""
-DRY_RUN="" STATUS_MODE=""
+DRY_RUN="" STATUS_MODE="" CLEAN_MODE=""
 TARGETS=()
 
 while [[ $# -gt 0 ]]; do
@@ -103,6 +105,7 @@ while [[ $# -gt 0 ]]; do
     --from-claude) FROM_CLAUDE="yes"; shift ;;
     --from-all)    FROM_CURSOR="yes"; FROM_CLAUDE="yes"; shift ;;
     --status)      STATUS_MODE="yes"; shift ;;
+    --clean)       CLEAN_MODE="yes"; shift ;;
     --dry-run)     DRY_RUN="yes"; shift ;;
     -h|--help)     usage ;;
     -*)            echo "Unknown option: $1" >&2; usage ;;
@@ -132,6 +135,7 @@ check_status_claude() {
   local skills
   skills=($(discover_skills))
   local skill_names=()
+  local broken=0
 
   for entry in "${skills[@]}"; do
     local cat="${entry%%/*}"
@@ -147,13 +151,13 @@ check_status_claude() {
     if [[ -L "$target" ]]; then
       local link_target
       link_target="$(readlink "$target")"
-      if [[ "$link_target" == "$expected_src" ]]; then
+      if [[ ! -e "$target" ]]; then
+        printf "  %-30s ✗ BROKEN → %s\n" "$name" "$link_target"
+        broken=$((broken + 1))
+      elif [[ "$link_target" == "$expected_src" || "$link_target" == "${expected_src}/" ]]; then
         printf "  %-30s ✓ linked → %s\n" "$name" "$display_cat"
       else
         printf "  %-30s ⚠ linked → %s (unexpected)\n" "$name" "$link_target"
-      fi
-      if [[ ! -d "$target" ]]; then
-        printf "  %-30s ✗ BROKEN symlink\n" "$name"
       fi
     elif [[ -d "$target" ]]; then
       printf "  %-30s ● copied (independent)\n" "$name"
@@ -195,6 +199,8 @@ check_status_claude() {
       printf "  %-30s · non-repo skill\n" "$name/"
     fi
   done
+
+  [[ $broken -gt 0 ]] && echo "  ($broken broken symlink(s) — run --clean to remove)"
 }
 
 # Status for Cursor (category-level)
@@ -210,19 +216,20 @@ check_status_cursor() {
 
   local categories
   categories=($(discover_categories))
+  local broken=0
 
   for cat in "${categories[@]}"; do
     local target="$global_dir/$cat"
     if [[ -L "$target" ]]; then
       local link_target
       link_target="$(readlink "$target")"
-      if [[ "$link_target" == "$REPO_SKILLS/$cat" ]]; then
+      if [[ ! -e "$target" ]]; then
+        printf "  %-20s ✗ BROKEN → %s\n" "$cat/" "$link_target"
+        broken=$((broken + 1))
+      elif [[ "$link_target" == "$REPO_SKILLS/$cat" || "$link_target" == "${REPO_SKILLS}/${cat}/" ]]; then
         printf "  %-20s ✓ linked → %s\n" "$cat/" "$link_target"
       else
         printf "  %-20s ⚠ linked → %s (different repo!)\n" "$cat/" "$link_target"
-      fi
-      if [[ ! -d "$target" ]]; then
-        printf "  %-20s ✗ BROKEN symlink\n" "$cat/"
       fi
     elif [[ -d "$target" ]]; then
       printf "  %-20s ● copied (independent)\n" "$cat/"
@@ -244,6 +251,8 @@ check_status_cursor() {
       printf "  %-20s · non-repo skill\n" "$name/"
     fi
   done
+
+  [[ $broken -gt 0 ]] && echo "  ($broken broken symlink(s) — run --clean to remove)"
 }
 
 if [[ "$STATUS_MODE" == "yes" ]]; then
@@ -254,10 +263,49 @@ if [[ "$STATUS_MODE" == "yes" ]]; then
   exit 0
 fi
 
+# --- Clean mode ---
+
+clean_broken() {
+  local global_dir="$1" label="$2"
+  echo ""
+  echo "--- Cleaning broken symlinks in $label ($global_dir) ---"
+
+  if [[ ! -d "$global_dir" ]]; then
+    echo "  (directory does not exist)"
+    return
+  fi
+
+  local cleaned=0
+  for target in "$global_dir"/*; do
+    [[ -L "$target" ]] || continue
+    if [[ ! -e "$target" ]]; then
+      local link_target
+      link_target="$(readlink "$target")"
+      if [[ "$DRY_RUN" == "yes" ]]; then
+        echo "  [dry-run] Would remove broken link: $(basename "$target") → $link_target"
+      else
+        rm "$target"
+        echo "  Removed broken link: $(basename "$target") → $link_target"
+      fi
+      cleaned=$((cleaned + 1))
+    fi
+  done
+
+  [[ $cleaned -eq 0 ]] && echo "  No broken symlinks found"
+}
+
+if [[ "$CLEAN_MODE" == "yes" ]]; then
+  clean_broken "$CLAUDE_SKILLS" "Claude Code"
+  clean_broken "$CURSOR_SKILLS" "Cursor"
+  echo ""
+  echo "Done."
+  exit 0
+fi
+
 # --- Validate args ---
 
 if [[ -z "$TO_CURSOR" && -z "$TO_CLAUDE" && -z "$FROM_CURSOR" && -z "$FROM_CLAUDE" ]]; then
-  echo "Error: specify a direction (--to-claude, --to-cursor, --to-all, --from-claude, --from-cursor, --from-all) or --status." >&2
+  echo "Error: specify a direction (--to-claude, --to-cursor, --to-all, --from-claude, --from-cursor, --from-all) or --status / --clean." >&2
   echo "Run with -h for help." >&2
   exit 1
 fi
@@ -308,7 +356,7 @@ _do_link() {
   if [[ -L "$dst" ]]; then
     local existing
     existing="$(readlink "$dst")"
-    if [[ "$existing" == "$src" ]]; then
+    if [[ "$existing" == "$src" || "$existing" == "${src}/" ]]; then
       echo "  [$name] Already linked ✓"
       return
     else

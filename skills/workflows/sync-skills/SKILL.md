@@ -40,6 +40,9 @@ $SCRIPT --link --to-all
 # Check what's linked, copied, or missing
 $SCRIPT --status
 
+# Remove broken symlinks (e.g. after deleting a skill from the repo)
+$SCRIPT --clean
+
 # Link just one category to Claude Code
 $SCRIPT --link --to-claude meta
 
@@ -70,6 +73,7 @@ Creates symlinks from global locations pointing to repo directories. This is the
 ### Copy Mode (`--copy`)
 
 Copies skill directories instead of symlinking. Use this when:
+
 - Deploying skills to a machine that doesn't have the repo cloned
 - You need a frozen snapshot that won't change with repo edits
 - The target location is on a different filesystem that doesn't support symlinks
@@ -92,6 +96,7 @@ Copies skills FROM global locations INTO the repo. Always copies (not symlinks) 
 | `--from-claude` | Pull from Claude Code into repo |
 | `--from-all` | Pull from both |
 | `--status` | Show what's linked, copied, or missing across all locations |
+| `--clean` | Remove broken symlinks from global locations |
 | `--dry-run` | Preview what would happen without making changes |
 | `-h, --help` | Show help |
 
@@ -113,6 +118,7 @@ $SCRIPT --from-cursor shell              # Pull only the shell skill
 ## After Linking
 
 Once linked, skills are available automatically:
+
 - **Claude Code**: Skills in `~/.claude/skills/` are picked up by new sessions
 - **Cursor**: Skills in `~/.cursor/skills-cursor/` appear in all workspaces
 

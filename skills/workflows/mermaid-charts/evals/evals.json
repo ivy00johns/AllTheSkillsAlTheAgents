@@ -5,49 +5,110 @@
       "id": 0,
       "prompt": "Diagram the beads three-layer architecture. The integration layer has MCP Server (Python/FastMCP) and Claude Code Plugin (TypeScript) — both invoke the `bd` binary as a subprocess (the CLI is the contract). The CLI layer is a Cobra app with 120+ commands, a command router, lifecycle hooks (PersistentPreRunE/PostRun), signal handling, and a compat layer. The storage layer has DoltStore connecting via MySQL wire protocol to a dolt sql-server, with circuit breaker, retry logic, connection pooling, and transaction management. Below that is the on-disk Dolt database which federates to DoltHub/S3/GCS via remotes. Show all three layers, the key components in each, and the data flow between them.",
       "expected_output": "A TB flowchart with 3 subgraphs (Integration, CLI, Storage), showing the subprocess boundary, MySQL wire protocol, and federation. 10-15 nodes total, clear layering.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block (```mermaid ... ```)"},
+        {"text": "Uses a flowchart diagram type (not sequence or mindmap)"},
+        {"text": "Has 3 distinct subgraphs or clearly labelled layer sections (Integration, CLI, Storage or equivalent)"},
+        {"text": "Shows the subprocess boundary — both MCP Server and Claude Plugin invoke the `bd` binary"},
+        {"text": "Includes DoltHub, S3, or GCS as federation targets at the bottom of the storage layer"},
+        {"text": "MySQL wire protocol is labelled on the connection between DoltStore and dolt sql-server"}
+      ]
     },
     {
       "id": 1,
       "prompt": "Create a diagram of beads' dependency type taxonomy. There are 22 named dependency types in 8 categories:\n\nWorkflow (affect scheduling): blocks, parent-child, conditional-blocks, waits-for.\nAssociation: related, discovered-from.\nGraph links: replies-to, relates-to, duplicates, supersedes.\nEntity (HOP): authored-by, assigned-to, approved-by, attests.\nConvoy: tracks.\nReference: until, caused-by, validates.\nDelegation: delegated-from.\n\nThe CRITICAL distinction: only the 4 workflow types affect ready work scheduling via AffectsReadyWork(). The rest are informational. Show all 22 types grouped by category with the workflow types visually distinguished.",
       "expected_output": "A mindmap or flowchart with 8 category subgraphs, all 22 types visible, and the 4 workflow types styled distinctly (different color or thick border) to show they're the ones that affect scheduling.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "All 4 workflow type names appear: blocks, parent-child, conditional-blocks, waits-for"},
+        {"text": "At least 6 distinct category groupings are visible in the diagram"},
+        {"text": "Workflow types are visually distinguished from informational types (via classDef, different shape, or equivalent)"},
+        {"text": "The distinction is explained or labelled — the diagram communicates that workflow types affect AffectsReadyWork() / scheduling"}
+      ]
     },
     {
       "id": 2,
       "prompt": "Diagram Gas Town's worker role hierarchy and communication flows. 8 roles split into two tiers:\n\nTown-level (cross-rig): Mayor (1, persistent, coordinator — initiates convoys and slings work), Deacon (1, persistent — patrol and monitoring), Dogs (N, ephemeral — one-shot tasks), Boot (1, special Dog — 5-minute tick daemon).\n\nRig-level (per-project): Witness (1 per rig, persistent — monitors rig health), Refinery (1 per rig, persistent — processes merge queue via batch-then-bisect), Polecats (N per rig, persistent identity/ephemeral sessions — the workhorses, do actual coding), Crew (N per rig, persistent — user-managed workers).\n\nPlus the Overseer (human, role 8, has inbox, is the boss).\n\nMayor slings work to Polecats. Polecats submit MRs to Refinery. Refinery merges to main. Deacon patrols all workers. Overseer oversees everything via inbox. Show the hierarchy and communication flows.",
       "expected_output": "A diagram with town-level and rig-level subgraphs plus the Overseer, 9+ roles visible, communication flows labeled with what they exchange (slings, MRs, patrols, inbox messages).",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "Town-level and Rig-level tiers are visually separated (subgraphs or distinct sections)"},
+        {"text": "All 9 roles are named: Mayor, Deacon, Dogs, Boot, Witness, Refinery, Polecats, Crew, Overseer"},
+        {"text": "Mayor → Polecats communication is shown (work sling)"},
+        {"text": "Polecats → Refinery communication is shown (MR submission)"},
+        {"text": "Communication flows have labels indicating what is exchanged (not just unlabeled arrows)"}
+      ]
     },
     {
       "id": 3,
       "prompt": "Diagram the full end-to-end convoy workflow in Gas Town:\n\n1. User tells Mayor what they want\n2. Mayor creates beads (bd create), creates a convoy (gt convoy create), slings work (gt sling)\n3. gt sling hangs bead on target agent's hook, spawns polecat session in fresh git worktree\n4. Polecat picks up work via GUPP (polling), follows mol-polecat-work formula (10 steps), works in worktree\n5. Polecat submits a Merge Request to Refinery\n6. Refinery processes via batch-then-bisect (Bors-style): batch [A,B,C,D] → rebase as stack → test tip (D) → if PASS: fast-forward merge all → if FAIL: binary bisect to find culprit\n7. On merge success: convoy tracks completion\n8. When all convoy issues land: convoy status → Landed, user notified\n\nAlso show the failure loop: if verdict is FIX_NEEDED, polecat fixes and resubmits.\n\nThis needs to handle 6+ actors and the merge queue bisect logic without becoming unreadable.",
       "expected_output": "A sequence diagram or flowchart showing the full pipeline with the merge queue bisect logic visible, the failure/retry loop, and 6+ actors clearly labeled. Should be a single coherent diagram, not split into tiny pieces.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "At least 5 distinct actors or participants are named (User, Mayor, Polecat, Refinery, and at least one more)"},
+        {"text": "The batch-then-bisect merge queue logic is shown (batch, test, pass/fail branching)"},
+        {"text": "The failure/retry loop is visible — FIX_NEEDED or equivalent leads back to resubmission"},
+        {"text": "The convoy landing state is shown (all issues merged → Landed or equivalent)"}
+      ]
     },
     {
       "id": 4,
       "prompt": "Map the gstack skill system architecture. gstack has 13 skills as slash commands organized into roles:\n\n- CEO: /ceo, /coo, /retro — high-level strategic review, 14 cognitive patterns\n- Engineering: /eng, /plan, /impl, /test, /pre-commit — engineering workflow, 15 cognitive patterns\n- Design: /design, /design-review, /ux-audit — design intelligence, 12 cognitive patterns, 80 design audit items, 10 AI slop patterns\n- QA: /qa — test strategy and execution\n- Release: /release, /deploy — shipping pipeline\n\nThe skills are NOT static markdown — they're generated from .tmpl templates at build time via `build-skills.sh` (Bun). Templates use 10 placeholders (TOOL, PROJECT_ROOT, etc.) resolved at build.\n\nBelow the skills is the Browse CLI — a persistent Playwright daemon (HTTP server on localhost) with 50+ commands, the @e ref system for element addressing, and snapshot-based interaction.\n\nThe eval system has 3 tiers: free/fast (no external calls), E2E ($3.85/run, session-runner.ts), LLM-as-judge ($0.15, rubric-based).\n\nShow the full system: skills → templates → browse CLI → eval system, with the role groupings.",
       "expected_output": "A multi-layer flowchart showing: role groups of skills at top, template build system in middle, Browse CLI daemon architecture, and eval system. 15-20 nodes across 4-5 subgraphs.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "All 5 role groups are shown: CEO, Engineering, Design, QA, Release"},
+        {"text": "The template build system (build-skills.sh or .tmpl templates) is shown as a separate layer/component"},
+        {"text": "Browse CLI is shown as a distinct layer below the skills"},
+        {"text": "The 3-tier eval system is shown (free/fast, E2E, LLM-as-judge or equivalent tiers)"}
+      ]
     },
     {
       "id": 5,
       "prompt": "Diagram overstory's orchestrator-is-your-session architecture. The key insight: your Claude Code session IS the orchestrator — no separate daemon.\n\nThe flow:\n1. SessionStart hook → runs `ov prime` (loads config, mulch expertise, canopy prompts, run status)\n2. UserPromptSubmit hook → runs `ov mail check --inject` (surfaces unread agent messages)\n3. Orchestrator (you) uses `ov` CLI via Bash tool to:\n   - `ov sling` → creates git worktree + tmux session + deploys overlay CLAUDE.md + hooks\n   - `ov mail send/check` → SQLite mail system (mail.db, WAL mode, ~1-5ms)\n   - `ov merge` → FIFO queue with 4-tier resolution (clean → auto → AI → reimagine)\n   - `ov status/dashboard/inspect` → observability from events.db\n\nWorkers run in isolated worktrees with their own tmux sessions. Each gets a two-layer instruction set: Layer 1 (base agent definition .md) + Layer 2 (dynamic overlay with task ID, file scope, spec).\n\n4 SQLite databases: mail.db, sessions.db, events.db, metrics.db — all WAL mode.\n\n9 runtime adapters: Claude, Pi, Copilot, Codex, Gemini, Sapling, OpenCode, Cursor.\n\nShow the hook-driven loop, the spawn pipeline, the databases, and the runtime abstraction.",
       "expected_output": "A comprehensive architecture diagram with the hook-driven orchestrator loop at the top, the sling spawn pipeline, 4 SQLite databases, worker isolation (worktrees + tmux), and the runtime adapter layer. 15-25 nodes, well-layered with subgraphs.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "SessionStart and UserPromptSubmit hooks are shown driving the orchestrator loop"},
+        {"text": "All 4 SQLite databases are named: mail.db, sessions.db, events.db, metrics.db"},
+        {"text": "Worker isolation is shown — worktrees and/or tmux sessions as the isolation mechanism"},
+        {"text": "The runtime adapter layer is shown (at least 3 runtime names: Claude, Cursor, Copilot, or similar)"},
+        {"text": "The ov sling spawn pipeline is shown (worktree creation + overlay deployment)"}
+      ]
     },
     {
       "id": 6,
       "prompt": "Diagram overstory's 4-tier merge conflict resolution system:\n\nTier 1 (Clean Merge): `git merge --no-edit`. Exit 0 = done.\nTier 2 (Auto-Resolve): Parse conflict markers, keep incoming (agent) changes. Safety check: `hasContentfulCanonical()` — if canonical side has real content, skip to next tier to prevent data loss. Supports `merge=union` gitattributes.\nTier 3 (AI-Resolve): Spawn headless Claude via `runtime.buildPrintCommand()`. Validate output isn't prose via `looksLikeProse()`. Enrich with historical context from mulch.\nTier 4 (Reimagine): Abort merge entirely. Get canonical version + branch version. AI reimplements changes from scratch on canonical base.\n\nBefore any tier: auto-commit os-eco state files, stash dirty tracked files, delete overlapping untracked files.\nAfter each tier: record pattern to mulch for learning. Query mulch before starting to skip historically-failing tiers.\n\nShow the escalation cascade with the pre-checks, per-tier logic, and the mulch learning feedback loop.",
       "expected_output": "A flowchart showing the 4 tiers as a cascade (try tier 1, fail → tier 2, fail → tier 3, fail → tier 4), with pre-merge housekeeping, the safety checks at each tier, and the mulch feedback loop. Styled to show the escalation from cheap to expensive.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "All 4 tiers are present and labelled (Clean, Auto-Resolve, AI-Resolve, Reimagine or equivalent)"},
+        {"text": "The cascade/escalation structure is clear — each failed tier leads to the next"},
+        {"text": "Pre-merge housekeeping is shown (auto-commit, stash, or delete untracked — at least one)"},
+        {"text": "The mulch feedback loop is shown — either recording patterns to mulch or querying mulch before tiers"},
+        {"text": "Tier 2 safety check (hasContentfulCanonical or equivalent data-loss-prevention check) is shown"}
+      ]
     },
     {
       "id": 7,
       "prompt": "Create a comparison diagram mapping all 4 AI agent orchestration projects and where they sit relative to each other:\n\n- Beads: git-native issue tracker (Go, 225k LoC). Owns: dependency graph, ready queue, resumability, durable work state. Data: Dolt database.\n- Gas Town: multi-agent orchestrator (Go, 377k LoC). Owns: worker lifecycle, isolation (worktrees), handoff, patrol, merge queue. Built ON TOP of Beads. Workers: 8 roles.\n- gstack: quality intelligence layer (Bun/TS). Owns: cognitive review patterns, browser automation (Playwright), design intelligence, eval system. 13 skills, NOT an orchestrator.\n- Overstory: multi-agent orchestrator (Bun/TS, 96k LoC). Owns: runtime-neutral orchestration (9 adapters), SQLite mail, tiered merge, watchdog. 10 agent roles. Part of os-eco (seeds, mulch, canopy).\n- AllTheSkillsAllTheAgents: prompt architecture (markdown, 17 skills). Owns: contract-first architecture, file ownership maps, QA gating, role definitions. NOT runtime infrastructure.\n\nShow what each system owns, how they relate (Gas Town depends on Beads, Skills defines roles that Overstory executes), and the gaps between them. This should be a single comprehensive diagram, not 5 separate ones.",
       "expected_output": "A single ecosystem map with 5 systems as subgraphs, showing ownership domains, dependencies (Gas Town → Beads), complementary relationships (Skills ↔ Overstory), and the unique contribution of each. Should handle 20-30 nodes without becoming unreadable by using clear subgraph boundaries and consistent styling.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {"text": "Output contains a valid mermaid code block"},
+        {"text": "All 5 systems are present: Beads, Gas Town, gstack, Overstory, AllTheSkillsAllTheAgents"},
+        {"text": "Gas Town → Beads dependency is shown (Gas Town is built on top of Beads)"},
+        {"text": "The diagram is a single coherent diagram, not split into separate independent diagrams"},
+        {"text": "Each system has at least one ownership domain or key capability labelled"},
+        {"text": "Uses subgraphs or clear visual boundaries to keep 20+ nodes readable"}
+      ]
     }
   ]
 }

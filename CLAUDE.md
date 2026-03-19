@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 17 skills (44 files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are symlinked to `~/.claude/skills/` for global availability.
+A multi-agent orchestration toolkit for Claude Code — 21 skills (48+ files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are symlinked to `~/.claude/skills/` for global availability.
 
 ## Install / Sync
 
@@ -38,7 +38,8 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 - **`skills/roles/`** — 9 implementation agents (backend, frontend, infrastructure, qe, security, docs, observability, db-migration, performance). Each has a SKILL.md + reference files with validation checklists.
 - **`skills/contracts/`** — contract-author (generates contracts from templates) and contract-auditor (verifies implementations match). Templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema.
 - **`skills/meta/`** — skill-writer (generates new skills), project-profiler (codebase → CLAUDE.md + profile.yaml), code-reviewer (structured review with rubric).
-- **`skills/workflows/`** — context-manager (handoffs at ~80% context) and deployment-checklist (pre-deploy gates).
+- **`skills/git/`** — Git workflow conventions: git-commit (conventional commits), git-pr (PR creation/updates), git-pr-feedback (triage and address review comments), git-branch-cleanup (prune stale/merged branches).
+- **`skills/workflows/`** — context-manager (handoffs at ~80% context), deployment-checklist (pre-deploy gates), sync-skills, mermaid-charts, nano-banana, railway-deploy, plan-builder, settings-consolidator.
 
 ## Key Design Decisions
 
