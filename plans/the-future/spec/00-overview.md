@@ -180,15 +180,32 @@ Every design decision traces back to a specific source platform and research doc
 
 ## Open Questions
 
-These are deliberate unknowns flagged in the specs for team decision:
+### Resolved
 
-1. **Platform name** — 5 candidates scored in 02; no final pick yet
-2. **Dolt vs SQLite-only** — Dolt is the bet, but SQLite fallback is documented if perf doesn't hold
+1. ~~**Platform name**~~ → **The Hive.** Confirmed 2026-03-20. See `claude_research/project-names.md` for the complete naming vocabulary.
+2. ~~**Dolt vs SQLite-only**~~ → **Service-hosted architecture.** PostgreSQL + Valkey + ClickHouse alongside Dolt for the work graph. Resolved 2026-03-20 based on gap research alignment with scaffold.
+4. ~~**Formula language**~~ → **TOML.** Both source systems (Beads, Gastown) use TOML. Spec already uses TOML with complete examples.
+
+### Still Open
+
 3. **Browser binary** — Ship compiled Chromium (~58MB) or require system install?
-4. **Formula language** — TOML (current spec) vs YAML vs custom DSL
 5. **Agent team pricing** — Claude Code Agent Teams vs tmux-based fleet (cost model differs)
 6. **Federation scope for 1.0** — Full federation or defer to post-1.0?
 7. **Eval rubric calibration** — LLM-as-judge rubrics need real-world calibration data
+
+---
+
+## Architecture Decisions (Resolved 2026-03-20)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Deployment model | Service-hosted (Fastify, Postgres+Valkey+ClickHouse, Docker) | Gap research built on scaffold, not spec |
+| Dashboard process | `platform serve` — TypeScript serves HTTP directly | Zero new architecture with existing Fastify services |
+| AG-UI protocol | External only — adapter at dashboard boundary | Internal events stay Hive-native; AG-UI for external consumers |
+| Platform name | **The Hive** | Confirmed. Build target: `~/AI/The-Hive` |
+| Dashboard DB | The Glass reads spec DBs + maintains own UI DB | Clean separation; Glass can be rebuilt without touching operational data |
+
+See `spec-revision/00-master-revision-plan.md` for full decision rationale.
 
 ---
 

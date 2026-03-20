@@ -37,7 +37,7 @@ CREATE TABLE work_items (
   id              VARCHAR(255) PRIMARY KEY,   -- hash-based "wi-a1b2c3" or counter "wi-42"
   content_hash    VARCHAR(64),                -- SHA-256 of canonical fields for cross-clone dedup
   title           VARCHAR(500) NOT NULL,      -- required, max 500 chars
-  body            TEXT NOT NULL DEFAULT '',    -- full description / problem statement
+  description     TEXT NOT NULL DEFAULT '',    -- full description / problem statement
   type            VARCHAR(32) NOT NULL DEFAULT 'task',
                   -- core: bug, feature, task, chore, epic, decision, message, molecule
                   -- system: event, gate, convoy, agent, role, rig, slot
@@ -919,7 +919,7 @@ FUNCTION compactItem(item: WorkItem) -> CompactionResult:
      while preserving key technical decisions and outcomes.
 
      **Title:** {item.title}
-     **Description:** {item.body}
+     **Description:** {item.description}
      **Design:** {item.design_notes}
      **Acceptance Criteria:** {item.acceptance_criteria}
      **Notes:** {item.notes}
@@ -934,7 +934,7 @@ FUNCTION compactItem(item: WorkItem) -> CompactionResult:
 
   5. APPLY:
      UPDATE work_items SET
-       body = summary,
+       description = summary,
        design_notes = '',
        notes = '',
        acceptance_criteria = '',

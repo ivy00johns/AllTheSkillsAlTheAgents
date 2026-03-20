@@ -162,38 +162,31 @@ All 6 agents independently converged on the same core gaps. Here are the new spe
 
 ---
 
-## Architecture Decisions to Resolve
+## Architecture Decisions — RESOLVED 2026-03-20
 
-These require human decision before proceeding:
+### 1. Service-Hosted Architecture ✅
+**Decision:** Service-hosted microservices. Rewrite doc 17 to match the scaffold.
+**Rationale:** Gap research (deployment, database, testing) was done assuming the scaffold architecture — Fastify services, PostgreSQL + Valkey + ClickHouse, Docker Compose → Kubernetes. Three of eight gap reports are built around the scaffold. The spec is the outlier.
+**Impact:** Doc 17 needs full rewrite. Doc 03 data store decisions need update (Postgres + Valkey + ClickHouse alongside Dolt for work graph).
 
-### 1. Local-First Monolith vs Service-Hosted Architecture
-**Spec says:** TypeScript/Bun monolith, Dolt + SQLite, tmux agents, local developer machine
-**Scaffold says:** Go + TypeScript microservices, Postgres + NATS + MinIO + ClickHouse, Docker
-**Alignment:** 2.4/5
-**Decision needed:** Pick one and rewrite doc 17 (or the scaffold) to match. Both are defensible.
+### 2. TypeScript Serves HTTP Directly ✅
+**Decision:** Option (c). `platform serve` command, TypeScript serves HTTP directly.
+**Rationale:** The Hive already has Fastify services. Adding a serve command is zero new architecture. Rust/Tauri is a separate runtime with no path to the existing TypeScript codebase.
+**Impact:** Doc 18 (API Layer) specifies Fastify HTTP server. No Rust/Tauri in the core platform.
 
-### 2. Single Process vs Two Processes for Dashboard
-**Spec says:** CLI-only TypeScript/Bun process
-**Dashboard says:** Rust/Tauri backend + React frontend as separate process
-**Options:** (a) Rust wraps TypeScript, (b) Rust replaces process spawning, (c) TypeScript serves HTTP directly
-**Recommendation:** Option (c) — add `platform serve` command, simplest path
+### 3. AG-UI as External Protocol Only ✅
+**Decision:** Option (b). Keep internal Hive events, AG-UI adapter at the dashboard boundary.
+**Rationale:** The internal event bus (The Airway, Valkey Streams) uses Hive's own event types. Rewriting doc 13 to swap in AG-UI would couple internals to an external spec. The adapter means The Hive stays coherent internally and speaks AG-UI to any external consumer.
+**Impact:** Doc 13 keeps internal event types. Doc 19 (UI Layer) specifies the AG-UI adapter. Future LangChain/Google/AWS integrations get AG-UI for free.
 
-### 3. AG-UI as Internal or External Protocol
-**Spec says:** Custom event types in events.db
-**Dashboard says:** AG-UI (17 event types, adopted by Google/LangChain/AWS/Microsoft)
-**Options:** (a) AG-UI replaces internal events (rewrite doc 13), (b) Translation layer between internal and AG-UI
-**Recommendation:** Option (b) — keep internal events, add AG-UI adapter for dashboard consumption
+### 4. The Hive ✅
+**Decision:** Closed. It's The Hive. Build target: `~/AI/The-Hive`.
+**Impact:** Doc 02 naming question closed. All documents use Hive vocabulary.
 
-### 4. Platform Name
-**Current:** 5 candidates scored in doc 02, no final pick. "Hive" scores highest on memorability.
-**Research:** project-names.md and doc 02 both converge on "Hive." Build target is already `~/AI/The-Hive`.
-**Recommendation:** Close this. It's The Hive.
-
-### 5. SQLite Ownership Model for Dashboard
-**Spec has:** sessions.db, events.db, metrics.db, mail.db
-**Dashboard needs:** block state, layouts, approval history
-**Options:** (a) Dashboard reads spec's DBs + own UI DB, (b) Spec's DBs extended with UI tables, (c) Dashboard maintains synced copy
-**Recommendation:** Option (a) — clean separation, UI DB is additive
+### 5. Dashboard Reads Spec DBs + Own UI DB ✅
+**Decision:** Option (a). The Glass reads operational databases (sessions.db, events.db, metrics.db, mail.db) and maintains its own UI database for layout state, approval history, and panel preferences.
+**Rationale:** Clean separation. The Glass can be rebuilt, reset, or replaced without touching operational data.
+**Impact:** Doc 19 specifies the UI database schema. Operational databases are read-only from The Glass's perspective.
 
 ---
 

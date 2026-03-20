@@ -1,8 +1,9 @@
 # 03 - System Architecture
 
-Clean-sheet architecture specification for an AI agent orchestration platform.
+Architecture specification for The Hive — an AI agent orchestration platform.
 Synthesizes the best ideas from five existing systems: Beads, Gas Town, Overstory,
-gstack, and ATSA. Designed for a solo developer today and a federated team tomorrow.
+gstack, and ATSA. Service-hosted from day one. Designed for a solo developer
+today and a federated team tomorrow.
 
 ---
 
@@ -111,9 +112,11 @@ supervision hierarchy, and handle inter-agent communication.
   - Depth 1: Lead (team coordination, can spawn depth-2 workers)
   - Depth 2: Leaf workers (Scout, Builder, Reviewer, Merger)
   - Out-of-tree: Monitor (fleet health patrol, no worktree)
-- **Mail System** — SQLite-backed message bus for asynchronous inter-agent
-  communication. Supports direct messages, broadcast groups (`@all`, `@builders`,
-  `@leads`), and typed protocol messages. Latency: ~1-5ms per operation.
+- **Mail System** — Message bus for asynchronous inter-agent communication,
+  backed by Valkey Streams (The Airway) for real-time delivery and PostgreSQL
+  for persistence. Supports direct messages, broadcast groups (`@all`,
+  `@builders`, `@leads`), and typed protocol messages. Latency: ~1-5ms per
+  operation.
 - **Lifecycle Manager** — Tracks agent states: `spawning`, `running`, `working`,
   `stuck`, `done`, `stopped`, `dead`. Manages handoffs at context limits, restart
   on crash, and clean shutdown. GUPP principle: if there is work on your hook,
@@ -502,33 +505,101 @@ scorecards, federation state, merge queue entries.
 - Content hash (SHA-256) for deduplication across federated instances
 - UUID primary keys on auxiliary tables for merge safety
 
-### SQLite Databases (Operational Data, Per-Instance)
+### PostgreSQL (Operational Data, Production)
 
-Four SQLite databases, all with WAL mode and busy timeouts for safe concurrent
-access from 10+ agent processes:
+Production operational data lives in PostgreSQL. Four logical schemas, all in a
+single PostgreSQL instance:
 
-| Database | Location | Purpose | Write Pattern |
-|----------|----------|---------|---------------|
-| `mail.db` | `.platform/mail.db` | Inter-agent messaging | Many writers, ~1-5ms |
-| `sessions.db` | `.platform/sessions.db` | Agent lifecycle, run tracking | Moderate writes |
-| `events.db` | `.platform/events.db` | Tool calls, spawns, errors | High-frequency writes |
-| `metrics.db` | `.platform/metrics.db` | Token usage, cost tracking | Periodic writes |
+| Schema | Purpose | Write Pattern |
+|--------|---------|---------------|
+| `mail` | Inter-agent messaging | Many writers, ~1-5ms |
+| `sessions` | Agent lifecycle, run tracking | Moderate writes |
+| `events` | Tool calls, spawns, errors | High-frequency writes |
+| `metrics` | Token usage, cost tracking | Periodic writes |
 
-**Why SQLite (not Dolt) for operational data:**
-- **Speed** — WAL mode handles concurrent writers with minimal contention.
-  Mail delivery in 1-5ms would be unacceptable at Dolt commit overhead.
-- **No server** — Each database is a single file. No connection management,
-  no port allocation, no daemon lifecycle.
-- **Ephemeral by nature** — Session events, mail messages, and token snapshots
-  are operational data that does not need version control or federation.
-- **Independent lifecycle** — Can be deleted and rebuilt without affecting work
-  state. A fresh `mail.db` is an empty inbox, not data loss.
+**Why PostgreSQL for production operational data:**
+- **Concurrent writes** — Connection pooling and MVCC handle 10+ agent
+  processes without WAL contention limits.
+- **pgvector extension** — Honey (agent semantic memory) uses pgvector with
+  HNSW index for similarity search over agent experience embeddings.
+- **Dashboard reads** — The Glass (dashboard) reads spec databases and
+  maintains its own UI state database in PostgreSQL. Single connection pool
+  for all dashboard queries.
+- **Mature ecosystem** — Monitoring, backup, replication tooling out of the box.
 
-**Configuration:**
+**SQLite retained for local development fallback:**
+For solo developer onboarding, SQLite databases provide zero-config operation.
+The storage adapter pattern (see below) abstracts the backend so that the same
+business logic runs against SQLite locally and PostgreSQL in production.
+
 ```sql
+-- SQLite local dev configuration
 PRAGMA journal_mode=WAL;
 PRAGMA busy_timeout=5000;
 ```
+
+### Valkey Streams (The Airway — Real-Time Event Bus)
+
+All internal real-time events flow through Valkey Streams. This is The Airway —
+the platform's nervous system for inter-service communication.
+
+**Event categories:**
+- Agent lifecycle events (spawn, running, stuck, done, dead)
+- Work dispatch events (assigned, slung, completed)
+- Quality gate events (pass, fail, block)
+- Mail delivery (agent-to-agent messages)
+- Observability events (tool calls, errors, health checks)
+
+**Why Valkey Streams (not direct inter-process):**
+- **Decoupled producers/consumers** — Services publish events without knowing
+  who consumes them. The dashboard, the watchdog, and the orchestrator all
+  subscribe independently.
+- **Replay** — Consumer groups with acknowledgment. A crashed consumer resumes
+  from its last checkpoint, not from the beginning.
+- **AG-UI boundary** — AG-UI protocol is external-only. An AG-UI adapter at
+  the dashboard boundary translates Airway events into AG-UI format for
+  external consumers. Internal services never speak AG-UI.
+
+**Configuration:** Single Valkey instance in Docker Compose. No cluster needed
+until event volume exceeds 100K/day.
+
+### ClickHouse (Analytics — The Trail and The Yield, At Scale)
+
+ClickHouse is the analytics engine for high-volume trace data (The Trail) and
+aggregated metrics (The Yield). It is not required at launch.
+
+**Database Scaling Inflection Points:**
+- Phase 1-2 (~1-20 agents): PostgreSQL handles all event and metric queries.
+  No ClickHouse needed.
+- Inflection trigger: Event volume exceeds 10K/day OR dashboard aggregate
+  queries exceed 5 seconds.
+- Phase 3+: Migrate event and metric tables to ClickHouse. PostgreSQL retains
+  operational data (mail, sessions). The storage adapter pattern makes this
+  migration a configuration change, not a rewrite.
+
+### Storage Adapter Pattern
+
+All data access is abstracted behind interfaces from day one. Concrete backends
+are injected at startup based on configuration.
+
+```typescript
+interface EventStore {
+  append(event: PlatformEvent): Promise<void>;
+  query(filter: EventFilter): Promise<PlatformEvent[]>;
+  aggregate(query: AggregateQuery): Promise<AggregateResult>;
+}
+
+// Implementations:
+// - SqliteEventStore  (local dev)
+// - PostgresEventStore (production, Phase 1-2)
+// - ClickHouseEventStore (production, Phase 3+)
+```
+
+**Why abstract from day one:** The platform's data needs will evolve.
+PostgreSQL is sufficient for early phases, but analytics workloads will
+eventually require a columnar engine. Abstracting storage behind interfaces
+means backend changes (SQLite to PostgreSQL, PostgreSQL to ClickHouse) do not
+require business logic rewrites.
 
 ### Git-Native Files (Configuration, Skills)
 
@@ -549,9 +620,9 @@ from Dolt point to filesystem paths. Rationale: Binary blobs in Dolt would bloat
 commit history. The filesystem with content-addressable naming provides deduplication
 without version-control overhead.
 
-**External databases** — No Postgres, no Redis, no Elasticsearch. The platform
-deliberately limits its data dependencies to Dolt + SQLite + filesystem. Every
-additional database is operational overhead that scales poorly for solo developers.
+**Search engines** — No Elasticsearch, no Meilisearch. Full-text search uses
+PostgreSQL's built-in tsvector/tsquery. Semantic search uses pgvector. The
+platform does not need a dedicated search engine at current scale.
 
 ---
 
@@ -599,6 +670,56 @@ Verbal contract changes are an anti-pattern — always write the full updated
 contract.
 
 **Source:** ATSA contract-author and contract-auditor.
+
+### Policy Fabric
+
+**Responsibility:** Centralize the rules that govern how work flows through the
+platform. The policy fabric is an explicit cross-cutting concern that sits between
+the orchestration layer and the quality layer.
+
+**Why a separate concern:** Codex research identified a "hidden fourth layer"
+problem — policy logic (contract compilation, ownership enforcement, gate rules,
+escalation paths, evidence routing) was distributed across Layers 1-3 with no
+single owner. This created ownership ambiguity: when a gate rule changed, it was
+unclear whether the change belonged to the orchestration layer, the quality layer,
+or the skill layer. The policy fabric resolves this by giving policy a single home.
+
+**Owns:**
+- **Contract compilation** — Parsing contract definitions into enforceable rules
+  that the quality layer evaluates and the orchestration layer sequences.
+- **Ownership enforcement** — The canonical ownership map. Resolves conflicts
+  before agents spawn. Provides the ground truth that guard rules enforce.
+- **Gate rules** — Defines what constitutes a passing gate, which scores block,
+  and which thresholds are configurable vs. hard-coded.
+- **Escalation paths** — Rules for when to nudge, when to escalate to a lead,
+  when to terminate, and when to involve a human. Consumed by the lifecycle
+  manager and the watchdog.
+- **Evidence routing** — Rules for which evidence artifacts are required for
+  each gate, where they are stored, and how long they are retained.
+
+**Interface:**
+```typescript
+interface PolicyFabric {
+  // Ownership
+  resolveOwnership(files: string[]): OwnershipMap;
+  checkOwnership(agentId: string, file: string): boolean;
+
+  // Gates
+  getGateRules(gateType: GateType): GateRule[];
+  evaluatePolicy(context: PolicyContext): PolicyDecision;
+
+  // Escalation
+  getEscalationPath(situation: SituationType): EscalationStep[];
+
+  // Evidence
+  getRequiredEvidence(gateType: GateType): EvidenceRequirement[];
+}
+```
+
+**Interaction pattern:** The orchestration layer consults the policy fabric
+before dispatching work (ownership check) and after receiving quality results
+(gate evaluation). The quality layer produces evidence; the policy fabric
+decides what that evidence means.
 
 ### Context Management
 
@@ -807,28 +928,60 @@ Evidence is stored on the filesystem with hash-based naming. References from
 work items point to evidence paths. Evidence is never deleted during active work —
 only aged out during compaction.
 
+### 8. Four-Phase Model (Design Filter)
+
+Every feature and component in the platform maps to one of four phases. This
+model, derived from Codex research, serves as a design filter for prioritization.
+
+```
+Sense → Decide → Act → Remember
+```
+
+| Phase | Responsibility | Platform Components |
+|-------|---------------|-------------------|
+| **Sense** | Gather information, detect state changes, collect evidence | Watchdog, Process Monitor, Browser Automation, event ingestion |
+| **Decide** | Route work, evaluate gates, select strategy | Policy Fabric, Dispatcher, Model Router, QA Gate |
+| **Act** | Execute tasks, write code, run tests, merge | Runtime Adapters, Worktree Isolator, Merge Queue, agents |
+| **Remember** | Persist outcomes, update scorecards, build institutional memory | Work Item Store (Dolt), Honey (pgvector), RunLedger, The Trail |
+
+**Prioritization rule:** Features that improve handoffs between phases are
+higher priority than features that strengthen a single node. A better dispatcher
+(Decide) matters less than a better evidence-to-routing pipeline (Sense→Decide).
+
+**Most under-specified handoffs (fix these first):**
+1. **Sense→Decide** — How does evidence from monitoring get routed to the right
+   decision-maker? Currently implicit; needs explicit evidence→routing rules in
+   the Policy Fabric.
+2. **Act→Remember** — The RunLedger (what happened during a run, what worked,
+   what failed) is not yet defined. Without it, the platform cannot learn from
+   past executions.
+3. **Remember→Decide** — Agent scorecards should influence future routing
+   decisions (assign proven agents to critical paths). This feedback loop is
+   not yet wired.
+
+**Source:** Codex spec revision research.
+
 ---
 
 ## 6. Deployment Topology
 
 ### Scenario 1: Solo Developer
 
-Single machine, one Dolt instance, 1-10 agents.
+Docker Compose on a single machine, all services containerized.
 
 ```mermaid
 graph TB
     subgraph Machine["Developer Machine"]
         subgraph Orchestrator["Your Claude Code Session"]
-            CLI[Platform CLI]
+            CLI["Platform CLI (The Smoker)"]
             Hooks[Shell Hooks]
         end
 
-        subgraph Data["Data Stores"]
+        subgraph DockerCompose["Docker Compose"]
+            Fastify["Fastify Service (The Glass backend)"]
             Dolt[(Dolt SQL Server<br/>port 3307)]
-            SQLite1[(mail.db)]
-            SQLite2[(sessions.db)]
-            SQLite3[(events.db)]
-            SQLite4[(metrics.db)]
+            PG[(PostgreSQL<br/>port 5432)]
+            Valkey[(Valkey<br/>The Airway)]
         end
 
         subgraph Agents["Agent Fleet (1-10)"]
@@ -842,102 +995,128 @@ graph TB
             PW[Playwright<br/>Headless Chromium]
         end
 
-        CLI --> Dolt
-        CLI --> SQLite1
-        A1 --> Dolt
-        A1 --> SQLite1
-        A2 --> Dolt
-        A2 --> SQLite1
-        A3 --> SQLite1
-        A4 --> Dolt
+        CLI --> Fastify
+        Fastify --> Dolt
+        Fastify --> PG
+        Fastify --> Valkey
+        A1 -->|via Airway| Valkey
+        A2 -->|via Airway| Valkey
+        A3 -->|via Airway| Valkey
         A4 --> PW
     end
 ```
 
 **Characteristics:**
-- Dolt auto-starts when first CLI command runs, auto-stops when last client exits
-- All agents share one Dolt server, one set of SQLite databases
+- `docker compose up` starts all services (PostgreSQL, Valkey, Dolt, Fastify)
+- `platform serve` starts the Fastify HTTP service — TypeScript serves HTTP directly
+- All inter-service communication via HTTP and Valkey Streams (The Airway)
 - Worktrees provide file isolation; Dolt transactions provide data isolation
 - Browser daemon starts on first Browse command, idles after 30 minutes
 - Typical cost: $5-30/build depending on agent count and model selection
+- SQLite fallback: `platform serve --local` skips Docker, uses SQLite for everything
 
-### Scenario 2: Team
+### Scenario 2: Small Team
 
-Shared Dolt remote, multiple machines, 10-30 agents.
+Single VPS or small cluster, shared services, 10-30 agents.
 
 ```mermaid
 graph TB
-    subgraph Remote["Shared Infrastructure"]
-        DoltHub[(DoltHub Remote<br/>or self-hosted)]
+    subgraph Infra["Shared Infrastructure (VPS or small cluster)"]
+        LB[Load Balancer]
+        F1["Fastify Instance 1"]
+        F2["Fastify Instance 2"]
+        PG[(PostgreSQL)]
+        Dolt[(Dolt SQL Server)]
+        Valkey[(Valkey)]
+        DoltHub[(DoltHub Remote<br/>for federation)]
+
+        LB --> F1
+        LB --> F2
+        F1 --> PG
+        F1 --> Dolt
+        F1 --> Valkey
+        F2 --> PG
+        F2 --> Dolt
+        F2 --> Valkey
     end
 
     subgraph Dev1["Developer 1"]
         D1CLI[Platform CLI]
-        D1Dolt[(Local Dolt)]
         D1Agents["Agents (5-15)"]
-        D1CLI --> D1Dolt
-        D1Agents --> D1Dolt
     end
 
     subgraph Dev2["Developer 2"]
         D2CLI[Platform CLI]
-        D2Dolt[(Local Dolt)]
         D2Agents["Agents (5-15)"]
-        D2CLI --> D2Dolt
-        D2Agents --> D2Dolt
     end
 
-    D1Dolt <-->|push/pull| DoltHub
-    D2Dolt <-->|push/pull| DoltHub
+    D1CLI -->|HTTP| LB
+    D2CLI -->|HTTP| LB
+    Dolt <-->|push/pull| DoltHub
 ```
 
 **Characteristics:**
-- Each developer runs their own Dolt server locally
+- Shared PostgreSQL, Valkey, and Dolt instances for the team
 - Work items sync via Dolt push/pull to a shared remote (DoltHub or self-hosted)
 - Hash-based IDs prevent merge conflicts across instances
 - Content hashing detects duplicate work items during sync
 - Cross-developer references use `external:<instance>:<id>` format
-- SQLite databases are local-only (mail, events, metrics do not sync)
+- Events and metrics shared via PostgreSQL — all developers see fleet-wide state
 
-### Scenario 3: Federated
+### Scenario 3: Enterprise
 
-Multiple Dolt instances syncing via DoltHub, cross-organization.
+Kubernetes with KEDA queue-depth autoscaling.
 
 ```mermaid
 graph TB
-    subgraph Org1["Organization A"]
-        subgraph Town1["Town Alpha"]
-            T1Dolt[(Dolt Server)]
-            T1Rig1["Rig: frontend"]
-            T1Rig2["Rig: backend"]
-            T1Rig1 --> T1Dolt
-            T1Rig2 --> T1Dolt
+    subgraph K8s["Kubernetes Cluster"]
+        subgraph Services["Service Pods"]
+            F1["Fastify Pod 1"]
+            F2["Fastify Pod 2"]
+            Fn["Fastify Pod N"]
         end
+
+        subgraph Data["Data Layer"]
+            PG[(PostgreSQL<br/>+ pgvector)]
+            Dolt[(Dolt SQL Server)]
+            Valkey[(Valkey Cluster)]
+            CH[(ClickHouse<br/>analytics)]
+        end
+
+        subgraph Scaling["Autoscaling"]
+            KEDA[KEDA Scaler]
+            KEDA -->|"queue-depth<br/>scaling"| Services
+            KEDA -->|monitor| Valkey
+        end
+
+        F1 --> PG
+        F1 --> Dolt
+        F1 --> Valkey
+        F1 --> CH
+        F2 --> PG
+        F2 --> Dolt
+        F2 --> Valkey
+        Fn --> PG
     end
 
-    subgraph Org2["Organization B"]
-        subgraph Town2["Town Beta"]
-            T2Dolt[(Dolt Server)]
-            T2Rig1["Rig: api-client"]
-            T2Rig1 --> T2Dolt
-        end
-    end
-
-    subgraph Hub["Federation Hub"]
+    subgraph Federation["Federation"]
         DH[(DoltHub<br/>Federation Remote)]
     end
 
-    T1Dolt <-->|"push/pull<br/>sovereignty rules"| DH
-    T2Dolt <-->|"push/pull<br/>sovereignty rules"| DH
+    Dolt <-->|"push/pull<br/>sovereignty rules"| DH
 ```
 
 **Characteristics:**
-- Each organization runs independent towns with their own Dolt servers
+- KEDA autoscales on Valkey Stream queue depth, not CPU — required because
+  LLM workloads are I/O-bound (30-120s API waits, CPU at 1-6%), making
+  standard HPA (CPU/memory) useless for scaling decisions
+- ClickHouse added at this tier for analytics (The Trail traces, The Yield metrics)
+- PostgreSQL with pgvector for Honey (agent semantic memory)
 - Federation via DoltHub with sovereignty rules (who can modify what)
 - Cross-org work references use the `external:<org>:<rig>:<id>` format
 - Encrypted credentials for federation peer authentication
 - Content deduplication across organizations via hash-based IDs
-- Each town maintains full autonomy — federation is opt-in, not required
+- Each organization maintains full autonomy — federation is opt-in, not required
 
 ---
 
@@ -945,16 +1124,21 @@ graph TB
 
 | Concern | Choice | Rationale |
 |---------|--------|-----------|
-| **Language** | TypeScript / Bun | Ecosystem match with Overstory (96k LoC) and gstack. Bun provides fast startup, built-in SQLite (`bun:sqlite`), native `Bun.spawn`, and compiled binaries. TypeScript gives type safety without compilation overhead in Bun. |
-| **CLI Framework** | Commander.js | Proven in Overstory. Supports subcommands, global flags, `--json` output, and help generation. Lightweight compared to Cobra (Go) but sufficient for 50+ commands. |
-| **Primary Data** | Dolt SQL Server | Versioned SQL with git semantics. MySQL wire protocol for standard tooling. Federation via remotes. The only database that provides time-travel, branching, and three-way merge. |
-| **Operational Data** | SQLite (WAL mode) | Fast concurrent writes via WAL. No server process. Built into Bun runtime (`bun:sqlite`). Perfect for high-frequency ephemeral data (mail, events, metrics). |
-| **Process Isolation** | tmux (interactive) + Bun.spawn (headless) | tmux provides named sessions with capture/send-keys for interactive agents. Bun.spawn with NDJSON stdout for headless runtimes. Both are standard Unix primitives. |
+| **Language** | TypeScript on Node.js | TypeScript gives type safety across the entire stack. Node.js for production runtime; Fastify for HTTP services. |
+| **CLI Framework (The Smoker)** | Commander.js | Proven in Overstory. Supports subcommands, global flags, `--json` output, and help generation. Lightweight compared to Cobra (Go) but sufficient for 50+ commands. |
+| **HTTP Framework (The Glass backend)** | Fastify | High-performance HTTP framework for all service endpoints. `platform serve` command starts Fastify directly — TypeScript serves HTTP, no reverse proxy required for development. Fastify's plugin architecture maps cleanly to platform layers. |
+| **Work Graph (The Comb / The Frame)** | Dolt SQL Server | Versioned SQL with git semantics. Cell-level three-way merge (not line-level like text files). MySQL wire protocol for standard tooling. Federation via remotes. The only database that provides time-travel, branching, and merge at the row/column level. |
+| **Operational Data** | PostgreSQL (production) / SQLite (local dev) | PostgreSQL for production: robust concurrent writes, pgvector for Honey (agent semantic memory with HNSW index), mature ecosystem. SQLite retained as local development fallback — zero-config single-file databases for solo developer onboarding. Storage adapter pattern ensures business logic is backend-agnostic. |
+| **Real-Time Events (The Airway)** | Valkey Streams | Pub/sub event streaming for inter-service communication. All internal events flow through Valkey Streams — agent lifecycle, work dispatch, quality gate results, mail delivery. AG-UI protocol is external-only: an AG-UI adapter at the dashboard boundary translates Airway events for external consumers. |
+| **Analytics (The Trail / The Yield)** | ClickHouse (at scale) | Columnar analytics engine for traces (The Trail) and metrics (The Yield). Not required at launch — PostgreSQL is sufficient through Phase 2 (~20 agents). Add ClickHouse when event volume exceeds 10K/day or dashboard queries exceed 5 seconds. |
+| **Process Isolation** | tmux (interactive) + subprocess (headless) | tmux provides named sessions with capture/send-keys for interactive agents. Subprocess with NDJSON stdout for headless runtimes. Both are standard Unix primitives. |
 | **Git Worktrees** | Native git | `git worktree add` for per-agent file isolation. No custom filesystem abstraction. Cleanup via `git worktree remove`. |
-| **Browser Automation** | Playwright + compiled Bun binary | Persistent daemon model (~58MB binary). Cold start 3-5s, subsequent 100-200ms. AI-native ref system, staleness detection, cookie import. Compiles to a single distributable binary. |
+| **Browser Automation** | Playwright | Persistent daemon model. Cold start 3-5s, subsequent 100-200ms. AI-native ref system, staleness detection, cookie import. |
 | **Templates** | Handlebars / Mustache | CLAUDE.md generation, overlay generation, hook deployment. Simple variable substitution with partials. No logic in templates — data preparation happens in TypeScript. |
 | **Configuration** | YAML (project) + YAML (local, gitignored) | `config.yaml` committed to the repo (shared settings). `config.local.yaml` gitignored (machine-specific: ports, paths, API keys). Layered resolution: defaults < project < local < env vars < CLI flags. |
-| **Testing** | Bun test + custom eval harness | Bun's built-in test runner for unit and integration tests. Custom eval harness for skill validation (3-tier: static, E2E, LLM-judge). |
+| **Testing** | Vitest + custom eval harness | Vitest for unit and integration tests. Custom eval harness for skill validation (3-tier: static, E2E, LLM-judge). |
+| **Local Dev Environment** | Docker Compose | All services (PostgreSQL, Valkey, Dolt, ClickHouse when needed) run in containers. Single `docker compose up` for full local stack. |
+| **Production Deployment** | Kubernetes + KEDA | Kubernetes for container orchestration. KEDA for queue-depth autoscaling — required because LLM workloads are I/O-bound (30-120s API waits, CPU at 1-6%), making standard HPA useless. |
 
 ---
 
@@ -963,15 +1147,19 @@ graph TB
 These architectural constraints are load-bearing. Changing any of them would
 invalidate the design rationale and require rethinking dependent systems.
 
-### 1. Work state MUST be in Dolt
+### 1. Work graph MUST be in Dolt
 
-Not SQLite, not filesystem, not Postgres. Work items, dependencies, formulas,
-and agent identity live in Dolt SQL. This is the foundation of durability
-(survives crashes), federation (sync via push/pull), auditability (every write
-is a commit), and time-travel (query historical state).
+The work graph (The Comb / The Frame) — work items, dependencies, formulas,
+and agent identity — lives in Dolt SQL. Not PostgreSQL, not SQLite, not
+filesystem. Dolt's cell-level merge, branching, and federation are essential
+for the work graph. This is the foundation of durability (survives crashes),
+federation (sync via push/pull), auditability (every write is a commit), and
+time-travel (query historical state). Operational data (mail, events, metrics,
+sessions) lives in PostgreSQL — it needs concurrent write performance, not
+version control.
 
-**Consequence:** The Dolt server is a hard dependency. The system cannot operate
-without it. Auto-start mitigates this for solo developers.
+**Consequence:** The Dolt server is a hard dependency for the work graph. The
+system cannot operate without it. Docker Compose manages its lifecycle.
 
 ### 2. File ownership MUST be exclusive
 
@@ -1024,6 +1212,41 @@ which leads to context explosion, cost runaway, and coordination breakdown.
 
 **Consequence:** Complex tasks must be decomposed by Leads into leaf-sized units.
 If a leaf task is still too large, the Lead must re-decompose, not the leaf.
+
+### 7. Service-hosted from day one
+
+All services communicate via HTTP and Valkey Streams. No in-process coupling.
+The `platform serve` command starts a Fastify HTTP server. CLI commands are
+HTTP clients to that server. Agents publish and subscribe to Valkey Streams
+(The Airway) for real-time events.
+
+**Consequence:** Every component is independently deployable. Local development
+uses Docker Compose; production uses Kubernetes. The jump from one to the other
+is a deployment configuration change, not an architecture change.
+
+### 8. Storage MUST be abstracted behind interfaces
+
+Backend changes (SQLite→PostgreSQL, PostgreSQL→ClickHouse) should not require
+business logic rewrites. All data access goes through storage adapter interfaces.
+Concrete implementations are injected at startup based on configuration.
+
+**Consequence:** Adding a new storage backend (e.g., ClickHouse for analytics)
+is a new adapter implementation, not a refactor of every consumer. The platform
+can evolve its data layer without touching orchestration or quality logic.
+
+### 9. A2A protocol is deferred
+
+A2A (Agent-to-Agent protocol) solves cross-organization federation — agents in
+different security domains discovering and communicating with each other. Within
+a single Docker network or Kubernetes cluster, HTTP + Valkey Streams are
+sufficient and simpler.
+
+**Trigger for adoption:** Cross-organization federation requirement — when
+agents owned by different organizations need to collaborate. Until then, A2A
+adds protocol overhead without solving a problem the platform actually has.
+
+**Consequence:** Internal agent communication uses The Airway (Valkey Streams).
+The A2A adoption path is documented but not implemented.
 
 ---
 
