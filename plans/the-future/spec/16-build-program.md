@@ -562,10 +562,12 @@ From Phase 2 onward, the platform can manage its own build:
 
 | Phase Being Built | Platform Features Used |
 |-------------------|----------------------|
-| Phase 3 | Work tracking (Phase 1), agent dispatch (Phase 2), mail coordination (Phase 2) |
-| Phase 4 | + Quality gates (Phase 3), contract auditing (Phase 3) |
+| Phase 3 | Work tracking (Phase 1), agent dispatch (Phase 2), mail coordination (Phase 2), SSE observation (Phase 2) |
+| Dashboard D0-D2 | Work tracking (Phase 1), SSE stream (Phase 2), REST endpoints (Phase 2) |
+| Phase 4 | + Quality gates (Phase 3), contract auditing (Phase 3), approval interrupts (Phase 3) |
+| Dashboard D3-D5 | + AG-UI adapter (Phase 3), approval protocol (Phase 3), events/metrics (Phase 4) |
 | Phase 5 | + Merge queue (Phase 4), convoy tracking (Phase 4) |
-| Phase 6 | + Mixed runtime fleet (Phase 5), all quality intelligence (Phase 3) |
+| Phase 6 + D6-D7 | + Mixed runtime fleet (Phase 5), all quality intelligence (Phase 3), full dashboard (D0-D5) |
 
 Each subsequent phase uses more of the platform, generating real operational data and exposing integration issues earlier.
 
@@ -659,9 +661,19 @@ Each subsequent phase uses more of the platform, generating real operational dat
 |--------|-------|
 | Parallel agents | 5-8 (full platform capabilities available) |
 | Roles | 1 coordinator, 2 leads, 3-4 builders, 1 reviewer, 1 quality auditor, 1 watchdog |
-| Estimated tokens | ~10M (dashboard, watchdog, federation are substantial) |
-| Estimated cost | $80-150 |
+| Estimated tokens | ~8M (watchdog, federation, dashboard integration testing) |
+| Estimated cost | $60-120 |
 | Calendar time | 2 weeks |
+
+### Dashboard Parallel Track (D0-D7, ~8 weeks parallel with spec track)
+
+| Metric | Value |
+|--------|-------|
+| Parallel agents | 2-4 (frontend-focused builders + reviewer) |
+| Roles | 1 coordinator, 1 lead, 1-2 frontend builders, 1 reviewer |
+| Estimated tokens | ~15M (React components, SSE integration, E2E tests) |
+| Estimated cost | $120-240 |
+| Calendar time | ~8 weeks (overlaps with P3-P6, starts after P2) |
 
 ### Totals
 
@@ -669,7 +681,7 @@ Each subsequent phase uses more of the platform, generating real operational dat
 |--------|-------|
 | Total calendar time | 14 weeks (spec track) + ~8 weeks parallel (dashboard track) |
 | Total estimated tokens | ~35M (spec track) + ~15M (dashboard track) |
-| Total estimated build cost (LLM API for dogfooding) | $280-550 |
+| Total estimated build cost (LLM API for dogfooding) | $400-790 ($280-550 spec + $120-240 dashboard) |
 | Peak parallel agents | 8 (Phase 6) |
 | Minimum viable product | Phase 2 complete (~$50-100, 6 weeks) |
 
