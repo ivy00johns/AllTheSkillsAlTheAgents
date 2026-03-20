@@ -1,0 +1,23 @@
+{
+  "skill_name": "repo-deep-dive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just cloned the overstory repo to ~/repos/overstory and I have a deep research doc at plans/the-future/claude_research/overstory-research.md — do a deep dive on it. I want to understand how their agent system works compared to our skills ecosystem.",
+      "expected_output": "A structured deep dive output in {project}_deepdive/source-material/ with 00-INDEX.md through 12-frontier-assessment.md. Should include a 'by the numbers' table, architecture diagram, subsystem deep dives covering the agent system and messaging, and comparison/convergence docs comparing with AllTheSkillsAllTheAgents.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "hey I found this cool project called 'tanuki' — its a Go-based task orchestrator. repo is at ~/code/tanuki, deep research doc is attached. break it down for me, I want to know if there's anything worth stealing for our orchestrator skill",
+      "expected_output": "Should produce a deep dive with appropriately named subsystem documents based on what tanuki actually contains (not following a fixed template). The comparison doc should specifically address what tanuki has that the orchestrator skill lacks. Casual tone in the prompt shouldn't affect output quality.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "deep dive on this repo — ~/projects/wavelet. it's a small project, only about 8k lines of Rust. the deep research md is at ~/research/wavelet-analysis.md. mainly interested in how they handle their plugin system since we might want something similar.",
+      "expected_output": "Should adapt scope for a smaller codebase (6-8 documents instead of 12-14). Should still include INDEX, overview, architecture, the plugin system as a dedicated subsystem doc, and comparison/frontier docs. The plugin system doc should be the most detailed since the user called it out.",
+      "files": []
+    }
+  ]
+}
