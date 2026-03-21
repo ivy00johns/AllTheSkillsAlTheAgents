@@ -196,6 +196,14 @@ COORDINATOR MAIN LOOP (each turn):
      - Quality gates passed?
      - If all met --> finalize and report
 
+     Exit predicates (ALL THREE must be true for coordinator to exit):
+       a. `allAgentsDone`: sessions table shows no active Workers
+       b. `taskTrackerEmpty`: work_items has no open/active Cells
+       c. `onShutdownSignal`: SIGTERM/SIGINT received (or all work complete)
+     The coordinator does NOT exit when a single batch completes. It
+     evaluates all three predicates each turn and only exits when all
+     are satisfied simultaneously.
+
   7. CHECK CONTEXT HEALTH
      - If approaching ~80% context window --> trigger handoff
      - Save checkpoint, spawn fresh coordinator session
@@ -294,6 +302,24 @@ doctor failures.
 3. Compute dependency graph -- which tasks depend on which
 4. Determine file ownership map -- exclusive ownership, no overlaps between agents
 5. Size the agent fleet -- based on task count, complexity, and available runtime
+
+**Decomposition heuristics:**
+
+A Cell is atomic when it can be completed in a single Worker session (~30-60 minutes).
+The Queen (coordinator in Plan phase) applies these rules:
+
+- If estimated effort exceeds **2 hours**, decompose into sub-Cells
+- If a group contains **>5 related Cells**, create an epic to track them as a unit
+- Each non-trivial decomposition includes a brief **rationale** explaining why the
+  breakdown was chosen (e.g., "Split auth module into token validation and session
+  management because they have independent test suites and no shared mutable state")
+- Decomposition rationale is recorded on the epic or parent Cell for traceability
+
+Signs a Cell needs further decomposition:
+- Touches more than 6 files across multiple directories
+- Has acceptance criteria that span multiple functional domains
+- Requires coordination with more than one other Cell's output
+- Cannot be meaningfully tested in isolation
 
 **Fleet sizing logic:**
 
@@ -463,64 +489,85 @@ platform sling <work-item-id> --to <builder-name> --mode "staff-engineer"
 ```
 platform sling wi-a1b2c3 --to builder-alpha --worktree .worktrees/builder-alpha
 
-  1. VALIDATE
-     - Check hierarchy depth limit (max 3 levels)
+  1. VALIDATE TARGET BEACON
+     - Confirm the target Worker identity exists and its beacon is live
+     - Check hierarchy depth limit: query `sessions` table for calling
+       Worker's depth. Return error if depth >= maxDepth. This is the
+       PRIMARY enforcement — the CLAUDE.md guard rule is defense-in-depth
+       redundancy, not the primary mechanism.
      - Check agent doesn't already have hooked work
      - Check work item is in 'open' or 'ready' status
 
-  2. CLAIM WORK ITEM
-     - Atomic compare-and-swap: status open --> active, assignee --> builder-alpha
-     - In Dolt: single UPDATE with WHERE status='open' (race-safe)
-     - Record claim timestamp
-
-  3. CREATE WORKTREE
+  2. CREATE WORKTREE
      - git worktree add <path> -b builder-alpha/wi-a1b2c3
      - Base branch: canonical (main) or specified --base-branch
 
-  4. LOAD SKILL
-     - Resolve skill for agent role + domain specialization
-     - Load full SKILL.md body (progressive disclosure: now is the time)
+  3. CHECKOUT FEATURE BRANCH
+     - Ensure the branch is clean and at the expected base commit
+     - Record branch creation in events.db
 
-  5. GENERATE OVERLAY
+  4. WRITE CLAUDE.MD OVERLAY
      - Template variables: {{AGENT_NAME}}, {{TASK_ID}}, {{BRANCH_NAME}},
        {{FILE_SCOPE}}, {{QUALITY_GATES}}, {{EXPERTISE}}, {{PARENT_AGENT}}
+     - Overlay includes Caste-specific instructions (Builder, Reviewer, etc.)
+     - Resolve skill for agent role + domain specialization
+     - Load full SKILL.md body (progressive disclosure: now is the time)
      - Write overlay to worktree instruction path
 
-  6. DEPLOY HOOKS
+  5. DEPLOY GUARD RULES
+     - Tool restrictions based on capability (builder, scout, reviewer)
+     - Bash pattern guards (allowed/denied commands)
+     - Path boundary enforcement (agent restricted to worktree)
      - Write runtime-specific config to worktree:
        Claude: .claude/settings.local.json (SessionStart + UserPromptSubmit hooks)
        Pi: .pi/extensions/overstory-guard.json
        Codex: AGENTS.md
        Gemini: GEMINI.md
 
-  7. DEPLOY GUARDS
-     - Tool restrictions based on capability (builder, scout, reviewer)
-     - Bash pattern guards (allowed/denied commands)
-     - Path boundary enforcement (agent restricted to worktree)
-
-  8. SPAWN SESSION
-     - tmux: tmux new-session -d -s builder-alpha -c <worktree-path>
-     - Subagent: Agent tool invocation within parent context
-     - Headless: Bun.spawn with NDJSON event stream
-
-  9. WAIT FOR READY
-     - Poll tmux pane content for readiness signal
-     - Handle permission dialogs (auto-approve)
-     - Timeout after configurable threshold
-
- 10. SEND INITIAL PROMPT
-     - Beacon verification (for Claude Code: resend if TUI swallowed Enter)
-     - Initial prompt includes: task summary, hook reference, GUPP reminder
-
- 11. REGISTER SESSION
-     - Insert into sessions.db: agent_name, session_id, pid, tmux_session,
+  6. REGISTER SESSION IN POSTGRESQL
+     - Insert into sessions table: agent_name, session_id, pid, tmux_session,
        task_id, worktree_path, branch_name, capability, parent_agent, depth
      - Record spawn event in events.db
 
- 12. SET HOOK
+  7. CREATE WORK ITEM WITH HOOKS
+     - Atomic compare-and-swap: status open --> active, assignee --> builder-alpha
+     - In Dolt: single UPDATE with WHERE status='open' (race-safe)
+     - Record claim timestamp
+     - Link work item hooks to the registered session
+
+  8. SEND DISPATCH MESSAGE VIA THE AIRWAY
+     - Dispatch mail to agent with task summary, hook reference, GUPP reminder
+     - Message routed through The Airway (mail system)
+
+  9. START TMUX SESSION
+     - tmux: tmux new-session -d -s builder-alpha -c <worktree-path>
+     - Subagent: Agent tool invocation within parent context
+     - Headless: Bun.spawn with NDJSON event stream
+     - Handle permission dialogs (auto-approve)
+
+ 10. SEND BEACON VERIFICATION MESSAGE
+     - For Claude Code: send known beacon string
+     - Verify beacon appears in tmux output before sending real prompt
+     - For runtimes without beacon support: skip this step
+
+ 11. WAIT FOR BEACON RESPONSE
+     - Wait up to 10 seconds for beacon acknowledgment
+     - If no response within 10s, resend beacon (handles TUI late-init)
+     - This is necessary because Claude's TUI sometimes swallows Enter
+       during late initialization
+     - On confirmed response: proceed to dispatch event recording
+
+ 12. RECORD DISPATCH EVENT IN THE TRAIL
      - Update work item: hook_bead --> wi-a1b2c3
      - Agent will find this on next hook check
-     - Send dispatch mail to agent
+     - Record full dispatch trace in The Trail (events store)
+
+  ROLLBACK ON FAILURE:
+     - If any step fails, execute compensating actions:
+       → Clean up worktree (git worktree remove)
+       → Deregister session from sessions table
+       → Mark Cell as open (revert work item status to 'open')
+       → Record rollback event in The Trail with failure reason
 ```
 
 ### Sling Sequence Diagram
@@ -798,6 +845,42 @@ right retry strategy:
 | Merge conflict | Merge specialist | Branch diverged too far |
 | Timeout | New agent (session may be stuck) | Context window exhaustion |
 | Crash | New agent (runtime failure) | Process died, OOM |
+
+---
+
+## 7b. CI Failure Injection
+
+When a Worker's CI run fails, the platform automatically injects the failure output back
+into the Worker's context before retry. This closes the feedback loop between CI and the
+agent, enabling self-correction without human intervention.
+
+### Pattern
+
+```
+Worker submits code → CI pipeline runs → CI fails
+  → Platform hooks on CI failure event
+    → Extract relevant error output (test failures, lint errors, type errors)
+    → Send as `inject` message to the Worker via The Airway
+      → Worker receives failure context in next turn
+        → Worker self-corrects and resubmits
+```
+
+### Effectiveness
+
+Composio AO achieves an **84.6% CI self-correction rate** using this pattern. The key
+insight is that agents correct CI failures efficiently when they receive the exact error
+output, not a summary or classification. The raw CI output gives the agent everything it
+needs to diagnose and fix the issue.
+
+### Implementation
+
+- Hook on CI failure event (GitHub Actions webhook, or local test runner exit code)
+- Extract relevant error output: last 200 lines of failing test, full lint report, or
+  TypeScript error output
+- Truncate if output exceeds 4000 tokens (preserve the error, trim the preamble)
+- Send as `inject` message to the Worker: `platform mail send --to <agent> --subject "CI failure" --body "<error-output>"`
+- The Worker's `UserPromptSubmit` hook picks up the message on its next turn
+- Retry count incremented on the work item (circuit breaker still applies)
 
 ---
 
@@ -1159,7 +1242,8 @@ Watchdog (persistent, timer-driven)
 
 ### Exponential Backoff for Patrols
 
-When the fleet is healthy and no work needs attention, patrol frequency decreases:
+When the fleet is healthy and no work needs attention, patrol frequency decreases to
+prevent wasting LLM tokens during idle periods:
 
 ```
 Patrol finds issues    --> next patrol in 30 seconds
@@ -1167,8 +1251,60 @@ Patrol finds nothing   --> next patrol in 60 seconds
 Still nothing          --> next patrol in 2 minutes
 Still nothing          --> next patrol in 5 minutes (max backoff)
 
-Any mutation event (sling, merge, escalation) --> reset to 30 seconds
+Reset to 30 seconds on ANY of:
+  - Work item state change (open → active, active → submitting, etc.)
+  - Sling command issued
+  - Merge event
+  - Escalation received
+  - New mail to coordinator
 ```
+
+The backoff prevents the patrol agent from consuming LLM tokens on idle triage calls.
+At the 2-minute interval, a patrol agent checking 10 idle agents costs approximately
+$0.01 per hour in tokens. Without backoff, the same check at 30-second intervals costs
+$0.04 per hour -- trivial in absolute terms, but the principle matters: tokens spent on
+"nothing is wrong" should be minimized so that tokens spent on "here is the problem"
+have maximum context budget.
+
+---
+
+## 10b. Workload Signals
+
+The platform exposes a workload signal endpoint that Workers can voluntarily check before
+submitting new work. This provides backpressure without hard enforcement -- Workers that
+respect the signal contribute to fleet stability; Workers that ignore it still function
+but may experience longer queue times.
+
+### Endpoint
+
+```
+GET /api/workload → { "signal": "normal" | "throttle" | "shed" | "pause" }
+```
+
+### Signal Thresholds
+
+| Signal | Condition | Worker Behavior |
+|--------|-----------|-----------------|
+| `normal` | Error rate < 10% AND queued Cells < 50 | Proceed normally |
+| `throttle` | Error rate >= 10% OR queued Cells >= 50 | Reduce submission rate, batch small changes |
+| `shed` | Error rate >= 25% OR queued Cells >= 100 | Defer non-critical work, focus on completing in-progress Cells |
+| `pause` | No Workers online | Stop submitting; wait for fleet recovery |
+
+### Design
+
+- **Advisory, not enforced.** Workers voluntarily check before submitting work. The
+  platform does not reject submissions based on workload signal.
+- **Configurable thresholds** via environment variables:
+  ```bash
+  WORKLOAD_THROTTLE_ERROR_RATE=0.10     # 10% error rate triggers throttle
+  WORKLOAD_THROTTLE_QUEUE_DEPTH=50      # 50 queued Cells triggers throttle
+  WORKLOAD_SHED_ERROR_RATE=0.25         # 25% error rate triggers shed
+  WORKLOAD_SHED_QUEUE_DEPTH=100         # 100 queued Cells triggers shed
+  ```
+- **Computed from live data:** error rate from the last 5-minute window in events.db;
+  queue depth from work_items with status='open' or status='queued'.
+- **Low overhead:** the endpoint reads cached counters updated every 10 seconds, not
+  live database queries per request.
 
 ---
 

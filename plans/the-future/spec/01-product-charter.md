@@ -431,7 +431,7 @@ This platform uses operational roles. Agents have capabilities, not job titles. 
 
 ## 8. Architecture Preview
 
-The full system architecture is specified in `02-system-architecture.md`. This section provides a conceptual preview for context.
+The full system architecture is specified in `03-system-architecture.md`. This section provides a conceptual preview for context.
 
 ### Layered Architecture
 
@@ -534,4 +534,4 @@ This charter synthesizes findings from the following research:
 
 ---
 
-*This document defines the WHAT and WHY. The HOW is specified in `02-system-architecture.md`. The WHEN is specified in `03-build-program.md`. The WHERE (initial repo structure) is specified in `04-repo-bootstrap.md`.*
+*This document defines the WHAT and WHY. The HOW is specified in `03-system-architecture.md`. The WHEN is specified in `16-build-program.md`. The WHERE (initial repo structure) is specified in `17-repo-bootstrap.md`.*

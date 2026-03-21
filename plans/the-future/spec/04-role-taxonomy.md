@@ -553,6 +553,20 @@ graph TD
 | Cleanup | Manual | Automatic on completion |
 | Best for | Design, exploration, long-running | Discrete, well-defined tasks |
 
+### Direct vs Queue Integration (Crew vs Builder/Polecat)
+
+This distinction is critical for understanding when work flows through the merge queue and when it does not:
+
+| Dimension | Crew (Direct Integration) | Builder/Polecat (Queue Integration) |
+|-----------|--------------------------|-------------------------------------|
+| **Git isolation** | Full repo clone | Worktree on feature branch |
+| **Merge path** | Push to main directly | Branch enters Refinery merge queue |
+| **Witness monitoring** | NOT monitored | Monitored by Witnesses |
+| **Use case** | Trusted maintenance, ad-hoc fixes, exploration | Parallel build work, feature implementation |
+| **Contention risk** | None (bypasses queue) | Managed by batch-then-bisect |
+
+**Why this matters:** Without this distinction, all work -- including trivial maintenance like updating a README or fixing a typo -- would route through the merge queue. This creates unnecessary contention and delays when 15 builders are competing for merge slots. Crew agents handle trusted, low-risk work directly, reserving the merge queue for parallel build work where conflict detection and quality gates are essential.
+
 ---
 
 ## 5. Tool Guard Rules
@@ -798,8 +812,48 @@ interface AgentScorecard {
   avgTaskDurationMs: number;    // Average time to complete a task
   avgTokenCost: number;         // Average token cost per task
   costPerTask: number;          // Average USD cost per task
+  crystallizes: boolean;         // Whether current work contributes to CV
 }
 ```
+
+The `crystallizes` boolean on work items controls whether a Cell's outcome contributes to the Worker's CV and scorecard. When `crystallizes` is `false`, the task is executed but does not affect reputation metrics. This prevents trivial tasks -- heartbeat patrols, maintenance cleanup, log rotation -- from diluting an agent's accumulated expertise scores. Only substantive work (implementation, review, complex merge resolution) should crystallize into the permanent record.
+
+```typescript
+// Example: heartbeat patrol does not crystallize
+const maintenanceTask = { taskId: "wi-maint-001", crystallizes: false };
+
+// Example: feature implementation crystallizes
+const featureTask = { taskId: "wi-a1b2c3", crystallizes: true };
+```
+
+### Agent Credential Lifecycle
+
+The Queen (Coordinator at depth 0) is the sole certificate authority for agent credentials. All agent authentication uses **EdDSA/Ed25519 JWT** tokens with the following claims:
+
+| Claim | Purpose |
+|-------|---------|
+| `iss` | Issuer (always the Queen's identity) |
+| `sub` | Agent identity (e.g., `builder-alpha`) |
+| `aud` | Target service or `platform` |
+| `exp` | Expiration timestamp |
+| `iat` | Issued-at timestamp |
+| `jti` | Unique token ID (for revocation tracking) |
+| `cell_id` | The Cell (work unit) this credential is scoped to |
+| `caste` | Operational role (builder, reviewer, lead, etc.) |
+| `capabilities[]` | Granted capabilities for this session |
+| `max_budget_cents` | Maximum spend authorized for this agent |
+
+**Seven-step spawn-to-revoke sequence:**
+
+1. **Create Cell** -- Queen creates the work unit record
+2. **Generate JWT** -- Queen signs a scoped credential for the Worker
+3. **Create Valkey ACL** -- Restrict the Worker to `~cell:{cellId}:{workerId}:*` key prefixes
+4. **Inject credentials** -- Credentials placed in the Worker's sandbox environment
+5. **Validate on startup** -- Worker verifies its own credential before beginning work
+6. **Use for service calls** -- Every inter-service call presents the JWT for authorization
+7. **Revoke on completion** -- Queen adds the `jti` to the revocation blocklist and deletes the Valkey ACL
+
+The revocation blocklist is checked on every auth call. Expired tokens are rejected even if not explicitly revoked. See doc 20 (Security Hardening) for the full credential protocol, key rotation schedule, and emergency revocation procedures.
 
 ### Attribution
 

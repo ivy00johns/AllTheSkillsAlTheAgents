@@ -1496,7 +1496,194 @@ handles this trivially.
 
 ---
 
-## 14. Relationship to Other Specifications
+## 14. Cost Enforcement Layer
+
+### LiteLLM Proxy as Mandatory LLM Gateway
+
+All Worker LLM calls route through a LiteLLM proxy instance. No Worker communicates directly with Anthropic, OpenAI, or any other model provider. The proxy is the single enforcement point for budgets, routing, and cost tracking.
+
+### Five-Level Budget Hierarchy
+
+| Level | Scope | Example | Enforcement |
+|-------|-------|---------|-------------|
+| Organization | All teams across the platform | $5,000/month total | Hard cap -- all requests rejected when exhausted |
+| Team | A group of Workers on a shared project | $500/month for team-alpha | Hard cap -- team Workers blocked |
+| API Key | A single virtual API key | $50/day for key-builder-1 | Hard cap per key |
+| User | A human operator's total spend | $200/month for john | Soft cap with notification, hard cap configurable |
+| End User | Per-task or per-Cell attribution | $10 max for wi-a1b2 | Advisory -- logged, not enforced by default |
+
+### Pre-Dispatch Estimation
+
+Before the Queen spawns a Worker, she estimates the Cell's token cost using `/v1/messages/count_tokens` against the planned prompt. If the estimated cost would exceed the remaining budget at any level in the hierarchy, the spawn is deferred or the Cell is re-routed to a cheaper model tier.
+
+### Model Routing Table
+
+| Task Category | Default Model | Rationale |
+|---------------|--------------|-----------|
+| Documentation, test generation | Haiku | Low complexity, high volume, cost-sensitive |
+| Standard coding, implementation | Sonnet | Balanced quality/cost for typical build tasks |
+| Complex refactoring, architecture | Opus | High-stakes decisions justify premium cost |
+| Triage, classification (watchdog) | Haiku | Fast, cheap, disposable analysis |
+
+The routing table is configurable per project. Workers can request a specific model, but the proxy enforces the budget -- a Worker requesting Opus when only Haiku budget remains will be downgraded.
+
+### Prompt Caching Economics
+
+In agentic workloads, 90%+ of tokens are cache reads (system prompts, contracts, project context). Cache-aware pricing is critical for accurate cost tracking:
+
+| Token Type | Pricing Relative to Input | Notes |
+|------------|--------------------------|-------|
+| Cache reads | 10% of input price | Dominates agentic workloads |
+| Cache creation | 125% of input price | First-time prompt caching overhead |
+| Input (uncached) | 100% (base price) | Rare in steady-state agent operation |
+| Output | Model-specific (typically 5x input) | Proportional to task complexity |
+
+### Per-Worker Virtual API Keys
+
+Each spawned Worker receives a virtual API key with a `max_budget` cap. The key is created in LiteLLM at spawn time and deleted at session end. This provides per-Worker isolation without shared budget contention.
+
+### Prometheus Alerting Rules
+
+| Alert | Condition | Action |
+|-------|-----------|--------|
+| `RunawayWorkerSpend` | Single Worker spend > 3x fleet average over 10-minute window | Notify coordinator, throttle Worker |
+| `TeamBudgetCritical` | Team budget > 80% consumed | Notify team lead, suggest model downgrade |
+| `WorkerRequestSpike` | Worker request rate > 10x normal over 5-minute window | Investigate loop, potential auto-pause |
+
+### Per-Cell Token Cost Attribution
+
+Every LLM request includes the `cell_id` (work item ID) in the request metadata. The LiteLLM proxy logs this alongside token counts, enabling precise cost attribution:
+
+```sql
+-- Cost per Cell
+SELECT cell_id, SUM(input_tokens + output_tokens) AS total_tokens,
+       SUM(estimated_cost_usd) AS total_cost
+FROM token_usage
+WHERE cell_id IS NOT NULL
+GROUP BY cell_id
+ORDER BY total_cost DESC;
+```
+
+---
+
+## 15. Data Retention Policy
+
+Observability data has differentiated retention requirements based on its forensic and operational value:
+
+| Data Category | Retention Period | Rationale |
+|---------------|-----------------|-----------|
+| Activities (events.db) | 90 days | Operational debugging window |
+| Audit log (Dolt) | 365 days | Compliance and forensic record |
+| Logs (structured events) | 30 days | Short-term operational visibility |
+| Notifications (alerts) | 60 days | Enough to detect recurring patterns |
+| Token usage records | 90 days | Cost analysis and budget planning |
+
+Setting any retention period to `0` disables retention for that category (data is kept forever). This is useful for compliance-heavy environments where deletion is not permitted.
+
+### Cleanup Commands
+
+```bash
+# Preview what would be deleted (no changes made)
+platform cleanup --dry-run
+# Output:
+#   Would delete: 12,847 events older than 90 days
+#   Would delete: 342 notifications older than 60 days
+#   Would delete: 5,201 token_usage records older than 90 days
+#   Total space recovered: ~45 MB
+
+# Execute cleanup
+platform cleanup
+# Output:
+#   Deleted: 12,847 events (38 MB recovered)
+#   Deleted: 342 notifications (200 KB recovered)
+#   Deleted: 5,201 token_usage records (6.8 MB recovered)
+#   VACUUM completed on 3 databases
+```
+
+---
+
+## 16. Trajectory Anti-Pattern Detection (The Trail)
+
+The Trail (session trajectory recording) enables automatic detection of unproductive agent behavior patterns. Each anti-pattern triggers a Signal (notification event) to the coordinator or parent agent.
+
+### Detection Rules
+
+| Anti-Pattern | Detection Criteria | Signal |
+|--------------|-------------------|--------|
+| **Retry spiral** | 3+ consecutive failures of the same tool call | `antipattern.retry_spiral` -- agent is repeating a failed approach |
+| **Infinite loop** | Same (state, action) pair observed twice in the same session | `antipattern.infinite_loop` -- agent is not making progress |
+| **Context window bloat** | >70% of context window consumed while mid-task (not near completion) | `antipattern.context_bloat` -- agent reading too much, doing too little |
+| **Tool call spiral** | Same tool called >10 times without observable progress (no file changes, no status updates) | `antipattern.tool_spiral` -- agent stuck in analysis paralysis |
+| **Budget exhaustion** | >80% of Cell budget consumed without proportional completion progress | `antipattern.budget_exhaustion` -- cost outpacing value |
+
+### Signal Flow
+
+When an anti-pattern is detected:
+
+1. The Trail analyzer emits a typed Signal event to The Airway (Valkey Streams)
+2. The watchdog picks up the Signal and evaluates severity
+3. Low severity (retry_spiral, tool_spiral): logged, nudge attempted
+4. Medium severity (context_bloat, budget_exhaustion): escalated to parent agent
+5. High severity (infinite_loop): immediate intervention -- session paused, coordinator notified
+
+### Integration with Watchdog Tiers
+
+Anti-pattern detection runs as part of the Tier 0 daemon cycle. It reads the Trail (recent tool calls and state transitions) from events.db and applies pattern matching rules. No LLM call is needed -- these are mechanical checks against observable sequences. When a pattern matches, it creates an event that Tier 1 (AI triage) can use as additional context for its classification.
+
+---
+
+## 17. Push Delivery for The Glass (Airway Events)
+
+### SSE Endpoint
+
+The Airway (Valkey Streams) provides push delivery of events to The Glass (dashboard UI). An SSE endpoint translates internal Hive events to AG-UI format for browser consumption:
+
+```
+GET /api/events?stream=fleet&last_event_id=1234
+```
+
+The AG-UI adapter is a translation layer at the SSE boundary -- all internal events remain Hive-native (typed events in Valkey Streams and SQLite). The adapter converts them to AG-UI `RunAgentEvent`, `ToolCallEvent`, `StatusEvent`, etc. only at the SSE serialization point.
+
+### Reconnection Semantics
+
+The endpoint supports `Last-Event-ID` reconnection (standard SSE). When a client reconnects:
+
+1. If the `Last-Event-ID` is within the Valkey Stream retention window, replay from that point
+2. If the `Last-Event-ID` is too old (stream trimmed), send a full state snapshot first, then resume live streaming
+3. Full state snapshots are sent every 5 seconds as heartbeat frames regardless, so reconnecting clients never wait more than 5 seconds for a consistent view
+
+### Valkey as Event Bus (Not Persistence)
+
+Valkey Streams provide the real-time fan-out mechanism. They are NOT the persistence layer. Events are durably stored in events.db (SQLite) and audit_log (Dolt). Valkey is ephemeral -- if Valkey restarts, the SSE endpoint rebuilds its state from SQLite on next client connection.
+
+---
+
+## 18. Per-Worker Terminal Buffer
+
+### Ring Buffers
+
+Each Worker maintains in-memory ring buffers for terminal output:
+
+| Stream | Buffer Size | Purpose |
+|--------|-------------|---------|
+| stdout | 10,000 lines | Standard output from tool calls, build output, test results |
+| stderr | 5,000 lines | Error output, warnings, diagnostic messages |
+
+### Storage and Delivery
+
+Terminal buffers live in Valkey (keyed by Worker session ID). The Glass subscribes to Worker terminal output via WebSocket and receives lines as they are written.
+
+### Persistence Guarantees
+
+Terminal buffers are NOT persisted to disk. This is a deliberate trade-off:
+
+- If The Glass reconnects, the buffer replays from Valkey (lines still in the ring buffer are available)
+- If Valkey restarts, terminal history is lost -- but Workers continue operating normally, and new output resumes streaming immediately
+- For forensic purposes, tool call results are recorded in events.db (the `tool_end` event captures `result_summary`). The terminal buffer is for live observation, not audit.
+
+---
+
+## 19. Relationship to Other Specifications
 
 | Specification | Relationship |
 |---------------|-------------|

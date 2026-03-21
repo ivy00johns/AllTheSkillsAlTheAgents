@@ -100,6 +100,20 @@ WAL mode is set on database creation and provides:
 - Crash recovery (WAL replay on next open)
 - No server process required
 
+### Mail Delivery Guarantees
+
+The mail bus provides **at-least-once** delivery. Messages may be delivered more than once under failure conditions (e.g., hook fires, agent crashes before marking as read, hook fires again on respawn). Receivers must handle duplicate messages gracefully by checking `message_id` before acting on protocol messages.
+
+| Property | Guarantee | Implementation |
+|----------|-----------|----------------|
+| **Delivery** | At-least-once | Messages persist in PostgreSQL; hook re-delivers unread messages on every turn |
+| **Idempotency** | Receiver responsibility | Agents must check `id` field before processing — duplicate `worker_done` for the same `task_id` is a no-op |
+| **Durable store** | PostgreSQL | All messages written to PostgreSQL as the source of truth |
+| **Real-time notification** | Valkey Streams (The Airway) | Provides instant notification that new mail exists; not the durable store |
+| **Degraded mode** | PostgreSQL polling | If The Airway (Valkey Streams) is temporarily unavailable, agents poll PostgreSQL directly — higher latency but fully functional |
+
+The separation of concerns is deliberate: PostgreSQL guarantees durability and queryability, while Valkey Streams (The Airway) provides low-latency real-time notification. Neither depends on the other for correctness — The Airway is an optimization, not a requirement.
+
 ### Message Schema
 
 ```sql
@@ -906,6 +920,40 @@ platform sling wi-a1b2c3 --agent builder-alpha \
 # 5. New session starts, SessionStart hook loads checkpoint
 # 6. New session continues from checkpoint
 ```
+
+### Séance Handoff Protocol
+
+A checkpoint file alone is insufficient for reliable context transfer. Static summaries inevitably omit nuance — half-formed hypotheses, rejected approaches, implicit assumptions about code structure. The séance protocol addresses this by making the handoff conversational rather than documentary.
+
+**How it works:**
+
+1. When a Worker's context window approaches capacity (~80%), it writes a checkpoint file as described above
+2. The Worker sends a `handoff` message to its parent and terminates
+3. The parent spawns a **new session** for the same agent identity in the same sandbox
+4. The new session starts by **resuming the previous session's conversation** — it receives the checkpoint file plus an `inject` message containing a prompt to query unresolved items
+5. The new session explicitly asks questions about the previous session's state **before** proceeding with implementation
+
+**The inject message template:**
+
+```
+You are continuing work from a previous session that exhausted its context.
+
+Checkpoint: {checkpoint_path}
+Previous session completed: {progress_summary}
+Remaining work: {next_steps}
+
+BEFORE continuing implementation, review the checkpoint and identify:
+1. Any decisions that seem incomplete or ambiguous
+2. Any "next steps" that lack sufficient context to execute
+3. Any files that were modified but may have uncommitted partial changes
+
+If the previous session is still accessible (within the séance window),
+query it directly about unresolved items. Do not guess — ask.
+```
+
+**Why séance, not just checkpoint:** The checkpoint captures what was done and what remains. The séance captures *why* — the reasoning behind decisions, the approaches that were tried and rejected, the edge cases that were discovered but not yet addressed. This prevents the new session from re-exploring dead ends or making contradictory decisions.
+
+**Implementation:** The séance is implemented via the `inject` message type. When the platform detects a handoff-triggered spawn, it composes the inject message from the checkpoint data and delivers it as part of the SessionStart hook output, before the agent's first turn.
 
 ### Checkpoint Storage
 

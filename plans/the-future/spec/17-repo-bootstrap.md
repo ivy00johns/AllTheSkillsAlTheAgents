@@ -1,26 +1,30 @@
 # 17 — Repo Bootstrap Specification
 
 **Document type:** Implementation blueprint
-**Status:** DRAFT
-**Date:** 2026-03-18
-**Scope:** First commit scaffold, tooling, and dev workflow for the AI agent orchestration platform
-**Depends on:** `03-system-architecture.md` (5-layer model, tech stack), `05-data-model.md` (entities), `08-skill-system.md` (skill anatomy)
+**Status:** DRAFT (revised for service-hosted architecture)
+**Date:** 2026-03-20
+**Scope:** First commit scaffold, tooling, and dev workflow for The Hive — a service-hosted AI agent orchestration platform
+**Depends on:** `03-system-architecture.md` (5-layer model, tech stack), `05-data-model.md` (entities), `08-skill-system.md` (skill anatomy), `18-api-layer.md` (API surface)
 
 ---
 
 ## 1. Repository Structure
 
-This is the complete file tree for the first commit. Every directory and file listed here
-must exist. Files marked with `(stub)` contain only the module signature and a TODO comment;
-they are implemented in later phases. Files with full contents are specified in subsequent
-sections of this document.
+This is the complete file tree for the first commit. The Hive is a Turborepo/pnpm
+workspace monorepo. Apps are deployable processes, services are domain microservices,
+and packages are shared libraries consumed by both.
+
+Files marked with `(stub)` contain only the module signature and a TODO comment;
+they are implemented in later phases. Files with full contents are specified in
+subsequent sections of this document.
 
 ```
-platform/
+the-hive/
 ├── README.md
-├── package.json
-├── tsconfig.json
-├── bunfig.toml
+├── package.json                    # Workspace root (pnpm + Turborepo)
+├── pnpm-workspace.yaml
+├── turbo.json
+├── tsconfig.base.json              # Shared compiler options
 ├── biome.json
 ├── .gitignore
 ├── .gitattributes
@@ -30,125 +34,155 @@ platform/
 ├── AGENTS.md
 ├── GEMINI.md
 │
-├── src/
-│   ├── index.ts                  # CLI entry point
-│   ├── cli/
-│   │   ├── index.ts              # Commander.js setup
-│   │   ├── commands/
-│   │   │   ├── tracker.ts        # Work tracker commands
-│   │   │   ├── fleet.ts          # Agent fleet commands
-│   │   │   ├── mail.ts           # Communication commands
-│   │   │   ├── merge.ts          # Merge queue commands
-│   │   │   ├── sling.ts          # Work dispatch commands
-│   │   │   ├── skill.ts          # Skill management commands
-│   │   │   ├── contract.ts       # Contract commands
-│   │   │   ├── quality.ts        # Quality/eval commands
-│   │   │   ├── federation.ts     # Federation commands
-│   │   │   ├── config.ts         # Configuration commands
-│   │   │   └── doctor.ts         # Health check commands
-│   │   └── output.ts             # Shared output formatting
+├── apps/
+│   ├── control-plane/              # The Queen — orchestration API
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts            # Fastify server entry point
+│   │       ├── server.ts           # Server factory (createApp)
+│   │       ├── routes/
+│   │       │   ├── auth.ts         # Authentication routes
+│   │       │   ├── builds.ts       # Build lifecycle routes
+│   │       │   ├── agents.ts       # Worker fleet routes
+│   │       │   ├── work-items.ts   # Work tracker routes
+│   │       │   ├── mail.ts         # Communication routes
+│   │       │   ├── merge.ts        # Merge queue routes
+│   │       │   ├── approvals.ts    # Keeper approval routes
+│   │       │   ├── events.ts       # SSE event streaming
+│   │       │   ├── terminal.ts     # WebSocket terminal I/O
+│   │       │   └── health.ts       # Health check routes
+│   │       ├── plugins/
+│   │       │   ├── auth.ts         # @fastify/jwt + session plugin
+│   │       │   ├── rate-limit.ts   # @fastify/rate-limit (Valkey-backed)
+│   │       │   └── cors.ts         # @fastify/cors configuration
+│   │       └── cli/
+│   │           ├── index.ts        # Commander.js setup (The Smoker)
+│   │           ├── commands/
+│   │           │   ├── serve.ts    # platform serve (start Fastify)
+│   │           │   ├── tracker.ts  # Work tracker commands
+│   │           │   ├── fleet.ts    # Agent fleet commands
+│   │           │   ├── mail.ts     # Communication commands
+│   │           │   ├── merge.ts    # Merge queue commands
+│   │           │   ├── sling.ts    # Work dispatch commands
+│   │           │   ├── skill.ts    # Skill management commands
+│   │           │   ├── contract.ts # Contract commands
+│   │           │   ├── quality.ts  # Quality/eval commands
+│   │           │   ├── config.ts   # Configuration commands
+│   │           │   └── doctor.ts   # Health check commands
+│   │           └── output.ts       # Shared output formatting
 │   │
-│   ├── core/
-│   │   ├── types.ts              # Shared type definitions (ALL interfaces)
-│   │   ├── config.ts             # Configuration loader
-│   │   ├── id.ts                 # Hash-based ID generation
-│   │   ├── errors.ts             # Error types and handling
-│   │   └── logger.ts             # Structured logging
+│   └── operator-console/           # The Glass — React SPA (stub)
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── vite.config.ts
+│       └── src/
+│           ├── main.tsx
+│           └── App.tsx
+│
+├── services/
+│   ├── runtime-orchestrator/       # Agent spawning, lifecycle, worktrees
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts            # Service entry point
+│   │       ├── coordinator.ts      # Coordinator loop (stub)
+│   │       ├── sling.ts            # Work dispatch (stub)
+│   │       ├── lifecycle.ts        # Agent lifecycle (stub)
+│   │       ├── worktree.ts         # Git worktree management (stub)
+│   │       ├── context.ts          # Context tracking (stub)
+│   │       ├── circuit-breaker.ts  # Circuit breaker (stub)
+│   │       ├── convoy.ts           # Convoy coordination (stub)
+│   │       └── adapters/
+│   │           ├── adapter.ts      # RuntimeAdapter interface
+│   │           ├── detect.ts       # Auto-detection
+│   │           ├── claude-code.ts  # Claude Code adapter (stub)
+│   │           ├── pi-cli.ts       # Pi CLI adapter (stub)
+│   │           ├── codex-cli.ts    # Codex CLI adapter (stub)
+│   │           ├── gemini-cli.ts   # Gemini CLI adapter (stub)
+│   │           └── aider.ts        # Aider adapter (stub)
 │   │
-│   ├── data/
-│   │   ├── dolt/
-│   │   │   ├── connection.ts     # Dolt SQL Server connection
-│   │   │   ├── migrations/
-│   │   │   │   ├── 001-work-items.sql
-│   │   │   │   ├── 002-dependencies.sql
-│   │   │   │   ├── 003-agents.sql
-│   │   │   │   ├── 004-convoys.sql
-│   │   │   │   └── 005-evidence.sql
-│   │   │   └── queries/
-│   │   │       ├── ready-queue.sql
-│   │   │       ├── blocked-items.sql
-│   │   │       └── claim-item.sql
-│   │   │
-│   │   └── sqlite/
-│   │       ├── connection.ts     # SQLite connection (WAL mode)
-│   │       ├── mail.ts           # mail.db schema and queries
-│   │       ├── sessions.ts       # sessions.db schema and queries
-│   │       ├── events.ts         # events.db schema and queries
-│   │       └── metrics.ts        # metrics.db schema and queries
+│   ├── browser-automation/         # Browse CLI (Playwright)
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts            # Service entry point
+│   │       ├── browse.ts           # Browser session management (stub)
+│   │       └── design-audit.ts     # Design audit automation (stub)
 │   │
-│   ├── tracker/                  # Work tracker module (stub)
-│   │   ├── work-item.ts
-│   │   ├── dependency.ts
-│   │   ├── ready-queue.ts
-│   │   ├── formula.ts
-│   │   ├── gate.ts
-│   │   ├── compaction.ts
-│   │   └── hop.ts
+│   ├── review-engine/              # Quality intelligence
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts            # Service entry point
+│   │       ├── cognitive.ts        # Cognitive pattern review (stub)
+│   │       ├── qa-gate.ts          # QA gate evaluation (stub)
+│   │       ├── slop-detection.ts   # AI slop detection (stub)
+│   │       ├── evals.ts            # Eval system (stub)
+│   │       ├── contracts/
+│   │       │   ├── author.ts       # Contract generation (stub)
+│   │       │   ├── auditor.ts      # Contract auditing (stub)
+│   │       │   └── ownership.ts    # File ownership enforcement (stub)
+│   │       └── templates/
+│   │           └── .gitkeep
 │   │
-│   ├── orchestration/            # Orchestration engine (stub)
-│   │   ├── coordinator.ts
-│   │   ├── sling.ts
-│   │   ├── lifecycle.ts
-│   │   ├── worktree.ts
-│   │   ├── tmux.ts
-│   │   ├── context.ts
-│   │   ├── circuit-breaker.ts
-│   │   └── convoy.ts
+│   └── router/                     # Capability-based agent routing
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── src/
+│           ├── index.ts            # Service entry point
+│           ├── routing.ts          # Quality-aware routing (stub)
+│           └── scoring.ts          # Worker scorecard aggregation (stub)
+│
+├── packages/
+│   ├── contracts/                  # Shared JSON schemas + TypeScript types
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   ├── src/
+│   │   │   ├── index.ts            # Barrel export
+│   │   │   └── types.ts            # ALL shared type definitions
+│   │   └── schemas/
+│   │       ├── work-item.json      # JSON Schema for work items
+│   │       ├── agent.json          # JSON Schema for agents
+│   │       ├── run-ledger.json     # JSON Schema for run ledger entries
+│   │       ├── scorecard.json      # JSON Schema for worker scorecards
+│   │       └── evidence.json       # JSON Schema for evidence records
 │   │
-│   ├── communication/            # Inter-agent messaging (stub)
-│   │   ├── mail.ts
-│   │   ├── protocol.ts
-│   │   ├── broadcast.ts
-│   │   ├── nudge.ts
-│   │   └── hooks.ts
+│   ├── sdk/                        # Client SDK for inter-service calls
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       ├── index.ts
+│   │       ├── client.ts           # HTTP client factory
+│   │       └── airway.ts           # Valkey Streams client (The Airway)
 │   │
-│   ├── quality/                  # Quality intelligence (stub)
-│   │   ├── cognitive.ts
-│   │   ├── qa-gate.ts
-│   │   ├── design-audit.ts
-│   │   ├── slop-detection.ts
-│   │   ├── evals.ts
-│   │   └── browse.ts
-│   │
-│   ├── merge/                    # Merge system (stub)
-│   │   ├── queue.ts
-│   │   ├── resolution.ts
-│   │   ├── pre-merge.ts
-│   │   ├── post-merge.ts
-│   │   └── expertise.ts
-│   │
-│   ├── runtime/                  # Runtime adapters (stub)
-│   │   ├── adapter.ts
-│   │   ├── detect.ts
-│   │   ├── adapters/
-│   │   │   ├── claude-code.ts
-│   │   │   ├── pi-cli.ts
-│   │   │   ├── codex-cli.ts
-│   │   │   ├── gemini-cli.ts
-│   │   │   └── aider.ts
-│   │   ├── instruction-gen.ts
-│   │   └── fallback.ts
-│   │
-│   ├── contracts/                # Contract system (stub)
-│   │   ├── author.ts
-│   │   ├── auditor.ts
-│   │   ├── ownership.ts
-│   │   └── templates/
-│   │       └── .gitkeep
-│   │
-│   ├── federation/               # Federation module (stub)
-│   │   ├── sync.ts
-│   │   ├── sovereignty.ts
-│   │   ├── routing.ts
-│   │   └── portability.ts
-│   │
-│   └── observability/            # Observability subsystem (stub)
-│       ├── events.ts
-│       ├── watchdog.ts
-│       ├── dashboard.ts
-│       ├── alerts.ts
-│       ├── doctor.ts
-│       └── audit.ts
+│   └── shared/                     # Common utilities
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── src/
+│           ├── index.ts
+│           ├── id.ts               # Hash-based ID generation
+│           ├── errors.ts           # Error types and handling
+│           ├── logger.ts           # Structured logging (pino)
+│           ├── config.ts           # Environment-based config loader
+│           └── db/
+│               ├── postgres.ts     # PostgreSQL connection (pg + Drizzle)
+│               ├── dolt.ts         # Dolt connection (mysql2 — The Frame)
+│               ├── valkey.ts       # Valkey connection (ioredis — The Airway)
+│               └── clickhouse.ts   # ClickHouse connection (@clickhouse/client)
+│
+├── infra/
+│   ├── compose.local.yml           # Docker Compose for local dev
+│   ├── k8s/                        # Kubernetes manifests (Phase 5+)
+│   │   └── .gitkeep
+│   └── scripts/
+│       ├── check-prereqs.sh        # Verify node, docker, pnpm
+│       ├── dev-up.sh               # Start local infrastructure
+│       └── dev-down.sh             # Stop local infrastructure
+│
+├── docs/
+│   └── adr/
+│       └── 0001-core-principles.md # Architecture Decision Record
 │
 ├── skills/
 │   ├── coordinator/
@@ -166,9 +200,6 @@ platform/
 │   └── merger/
 │       └── SKILL.md
 │
-├── contracts/
-│   └── .gitkeep
-│
 ├── formulas/
 │   ├── standard-build.toml
 │   ├── review-cycle.toml
@@ -182,19 +213,22 @@ platform/
 ├── tests/
 │   ├── setup.ts
 │   ├── unit/
-│   │   ├── core/
+│   │   ├── shared/
 │   │   │   ├── id.test.ts
 │   │   │   ├── config.test.ts
 │   │   │   └── errors.test.ts
-│   │   ├── tracker/
+│   │   ├── control-plane/
 │   │   │   └── .gitkeep
-│   │   ├── communication/
+│   │   ├── runtime-orchestrator/
 │   │   │   └── .gitkeep
-│   │   └── merge/
+│   │   ├── review-engine/
+│   │   │   └── .gitkeep
+│   │   └── router/
 │   │       └── .gitkeep
 │   ├── integration/
+│   │   ├── postgres.test.ts
 │   │   ├── dolt.test.ts
-│   │   ├── sqlite.test.ts
+│   │   ├── valkey.test.ts
 │   │   └── .gitkeep
 │   └── e2e/
 │       └── .gitkeep
@@ -203,7 +237,7 @@ platform/
 │   └── workflows/
 │       └── ci.yml
 │
-└── docs/
+└── contracts/
     └── .gitkeep
 ```
 
@@ -211,62 +245,101 @@ platform/
 
 ## 2. Package Configuration
 
-### package.json
+### Root package.json
 
 ```json
 {
-  "name": "platform",
+  "name": "the-hive",
   "version": "0.1.0",
-  "description": "AI agent orchestration platform — work tracking, fleet management, merge queue, quality gates",
-  "type": "module",
-  "main": "dist/index.js",
-  "bin": {
-    "platform": "dist/index.js"
-  },
+  "private": true,
+  "description": "The Hive — AI agent orchestration platform. Work tracking, fleet management, merge queue, quality gates.",
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target bun",
-    "dev": "bun --watch src/index.ts",
-    "test": "bun test",
-    "test:unit": "bun test tests/unit",
-    "test:integration": "bun test tests/integration",
-    "test:e2e": "bun test tests/e2e",
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .platform/db",
-    "doctor": "bun run src/index.ts doctor",
-    "precommit": "bun run typecheck && bun run lint && bun run test:unit"
-  },
-  "dependencies": {
-    "commander": "^13.1.0",
-    "better-sqlite3": "^11.8.0",
-    "mysql2": "^3.12.0",
-    "yaml": "^2.7.0",
-    "handlebars": "^4.7.8",
-    "chalk": "^5.4.1",
-    "dotenv": "^16.5.0"
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean",
+    "doctor": "pnpm --filter @the-hive/control-plane exec -- node dist/index.js doctor",
+    "serve": "pnpm --filter @the-hive/control-plane exec -- node dist/index.js serve",
+    "infra:up": "docker compose -f infra/compose.local.yml up -d",
+    "infra:down": "docker compose -f infra/compose.local.yml down",
+    "infra:check": "bash infra/scripts/check-prereqs.sh",
+    "precommit": "pnpm typecheck && pnpm lint && pnpm test:unit"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/bun": "^1.2.0",
     "@biomejs/biome": "^1.9.0",
+    "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },
   "engines": {
-    "bun": ">=1.1.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
   }
 }
 ```
 
-### tsconfig.json
+### pnpm-workspace.yaml
+
+```yaml
+packages:
+  - "apps/*"
+  - "services/*"
+  - "packages/*"
+```
+
+### turbo.json
+
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "test:unit": {
+      "dependsOn": ["build"]
+    },
+    "test:integration": {
+      "dependsOn": ["build"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
+```
+
+### tsconfig.base.json
+
+Shared compiler options inherited by all workspace packages.
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2023",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -275,43 +348,29 @@ platform/
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "baseUrl": ".",
-    "paths": {
-      "@core/*": ["src/core/*"],
-      "@data/*": ["src/data/*"],
-      "@cli/*": ["src/cli/*"],
-      "@tracker/*": ["src/tracker/*"],
-      "@orchestration/*": ["src/orchestration/*"],
-      "@communication/*": ["src/communication/*"],
-      "@quality/*": ["src/quality/*"],
-      "@merge/*": ["src/merge/*"],
-      "@runtime/*": ["src/runtime/*"],
-      "@contracts/*": ["src/contracts/*"],
-      "@federation/*": ["src/federation/*"],
-      "@observability/*": ["src/observability/*"]
-    },
-    "types": ["bun-types"]
+    "composite": true,
+    "incremental": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist"]
 }
 ```
 
-### bunfig.toml
+### Example workspace tsconfig.json (apps/control-plane)
 
-```toml
-[install]
-peer = false
-
-[test]
-preload = ["./tests/setup.ts"]
-timeout = 30000
-bail = 1
-
-[run]
-smol = true
+```json
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    { "path": "../../packages/contracts" },
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/sdk" }
+  ]
+}
 ```
 
 ### biome.json
@@ -364,19 +423,19 @@ smol = true
 
 ## 3. Core Type Definitions
 
-Complete contents of `src/core/types.ts`. Every shared interface referenced across the
-platform's five layers is defined here. This is the single source of truth; all modules
-import from `@core/types`.
+Complete contents of `packages/contracts/src/types.ts`. Every shared interface
+referenced across The Hive's five layers is defined here. This is the single source
+of truth; all apps, services, and packages import from `@the-hive/contracts`.
 
 ```typescript
-// src/core/types.ts
+// packages/contracts/src/types.ts
 // ─────────────────────────────────────────────────────────
-// Shared type definitions for the AI agent orchestration platform.
+// Shared type definitions for The Hive.
 // Single source of truth. All modules import from here.
 // ─────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════
-// WORK ITEMS (Layer 4: Work)
+// WORK ITEMS — Cells in The Comb (Layer 4: Work)
 // ═══════════════════════════════════════════════════════════
 
 export type WorkItemStatus =
@@ -414,7 +473,7 @@ export interface WorkItem {
   id: string;
   contentHash: string | null;
   title: string;
-  body: string;
+  description: string; // renamed from body — matches Drizzle schema
   type: WorkItemType;
   specId: string | null;
 
@@ -553,7 +612,7 @@ export interface Dependency {
 }
 
 // ═══════════════════════════════════════════════════════════
-// AGENTS (Layer 2: Orchestration + Layer 5: Runtime)
+// WORKERS — Agents in The Hive (Layer 2: Orchestration + Layer 5: Runtime)
 // ═══════════════════════════════════════════════════════════
 
 export type AgentRole =
@@ -610,7 +669,7 @@ export interface AgentScorecard {
 }
 
 // ═══════════════════════════════════════════════════════════
-// COMMUNICATION (Layer 2: Orchestration)
+// COMMUNICATION — The Airway (Layer 2: Orchestration)
 // ═══════════════════════════════════════════════════════════
 
 export type MessagePriority = "critical" | "high" | "normal" | "low";
@@ -758,7 +817,7 @@ export interface Wisp {
 }
 
 // ═══════════════════════════════════════════════════════════
-// CONVOYS (Layer 2: Orchestration)
+// CONVOYS — Flights (Layer 2: Orchestration)
 // ═══════════════════════════════════════════════════════════
 
 export type ConvoyStatus = "forming" | "active" | "completing" | "completed" | "failed";
@@ -776,7 +835,7 @@ export interface Convoy {
 }
 
 // ═══════════════════════════════════════════════════════════
-// QUALITY (Layer 3: Quality)
+// QUALITY — Inspection (Layer 3: Quality)
 // ═══════════════════════════════════════════════════════════
 
 export interface QAReport {
@@ -821,12 +880,146 @@ export interface QAFinding {
 }
 
 // ═══════════════════════════════════════════════════════════
-// RUNTIME (Layer 5: Runtime)
+// RUN LEDGER — The Trail (Act → Remember)
+// ═══════════════════════════════════════════════════════════
+
+export interface RunLedgerEntry {
+  id: string;
+  agentId: string;
+  sessionId: string;
+  workItemId: string;
+  runtimeId: string;
+  model: string;
+  startedAt: string;
+  endedAt: string | null;
+  status: "running" | "completed" | "failed" | "aborted";
+  inputTokens: number;
+  outputTokens: number;
+  cost: number;
+  toolCalls: number;
+  filesModified: string[];
+  testsRun: number;
+  testsPassed: number;
+  qualityScore: number | null;
+  errorCategory: string | null;
+  metadata: Record<string, unknown>;
+}
+
+// ═══════════════════════════════════════════════════════════
+// WORKER SCORECARDS (Remember → better Decide)
+// ═══════════════════════════════════════════════════════════
+
+export interface WorkerScorecard {
+  agentId: string;
+  runtimeId: string;
+  model: string;
+  period: string; // ISO date range
+  runsCompleted: number;
+  runsFailed: number;
+  totalTokens: number;
+  totalCost: number;
+  averageQualityScore: number;
+  mergeSuccessRate: number;
+  averageRunDurationMs: number;
+  domainScores: Record<string, number>; // domain -> quality score
+  lastUpdated: string;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVIDENCE RECORDS (Layer 3: Quality)
+// ═══════════════════════════════════════════════════════════
+
+export type EvidenceType =
+  | "screenshot"
+  | "log_capture"
+  | "test_result"
+  | "diff"
+  | "qa_report"
+  | "design_audit"
+  | "contract_audit"
+  | "css_computed"
+  | "performance_trace";
+
+export interface EvidenceRecord {
+  id: string;
+  type: EvidenceType;
+  workItemId: string;
+  agentId: string;
+  runId: string; // links to RunLedgerEntry
+  storagePath: string; // filesystem or object store path
+  contentHash: string;
+  mimeType: string;
+  sizeBytes: number;
+  description: string;
+  createdAt: string;
+  metadata: Record<string, unknown>;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PENDING APPROVALS — The Keeper (from API layer)
+// ═══════════════════════════════════════════════════════════
+
+export type ApprovalKind =
+  | "gate"         // QA gate hold
+  | "merge"        // Merge approval
+  | "deploy"       // Deployment approval
+  | "cost_ceiling" // Budget exceeded
+  | "escalation";  // Agent escalation
+
+export type ApprovalStatus = "pending" | "approved" | "rejected" | "expired";
+
+export interface PendingApproval {
+  id: string;
+  kind: ApprovalKind;
+  status: ApprovalStatus;
+  title: string;
+  description: string;
+  requestedBy: string; // agent ID or system
+  requestedAt: string;
+  decidedBy: string | null; // keeper ID
+  decidedAt: string | null;
+  expiresAt: string | null;
+  context: Record<string, unknown>; // approval-specific payload
+  workItemId: string | null;
+  buildId: string | null;
+}
+
+// ═══════════════════════════════════════════════════════════
+// AG-UI EVENT ENVELOPE (Dashboard boundary adapter)
+// ═══════════════════════════════════════════════════════════
+
+export type AgUiEventType =
+  | "lifecycle"       // Agent spawned, state changed, died
+  | "text_message"    // Agent text output (streaming)
+  | "tool_call"       // Agent invoked a tool
+  | "tool_result"     // Tool returned a result
+  | "state_snapshot"  // Full agent state update
+  | "state_delta"     // Incremental agent state update
+  | "run_started"     // New run ledger entry
+  | "run_finished"    // Run completed or failed
+  | "approval_needed" // Keeper attention required
+  | "custom";         // Extension point
+
+export interface AgUiEvent {
+  id: string;
+  type: AgUiEventType;
+  agentId: string | null;
+  sessionId: string | null;
+  buildId: string | null;
+  timestamp: string;
+  data: Record<string, unknown>;
+  // SSE delivery metadata
+  sequence: number;
+  retryMs: number;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RUNTIME — Where Workers Execute (Layer 5: Runtime)
 // ═══════════════════════════════════════════════════════════
 
 export interface RuntimeCapabilities {
   interactive: boolean; // tmux-based TUI
-  headless: boolean; // Bun.spawn with NDJSON
+  headless: boolean; // Node.js child_process with NDJSON
   rpc: boolean; // programmatic API (e.g., Pi CLI)
   subagents: boolean; // can spawn child agents
   maxContextTokens: number;
@@ -879,7 +1072,7 @@ export interface RpcConnection {
 }
 
 // ═══════════════════════════════════════════════════════════
-// SESSIONS (Layer 5: Runtime)
+// SESSIONS — Chambers (Layer 5: Runtime)
 // ═══════════════════════════════════════════════════════════
 
 export type SessionStatus = "active" | "completed" | "crashed" | "handoff";
@@ -908,7 +1101,7 @@ export interface Checkpoint {
 }
 
 // ═══════════════════════════════════════════════════════════
-// EVENTS (Layer 5: Observability)
+// EVENTS — The Airway (Layer 5: Observability)
 // ═══════════════════════════════════════════════════════════
 
 export type EventType =
@@ -935,33 +1128,6 @@ export interface PlatformEvent {
   workItemId: string | null;
   timestamp: string;
   data: Record<string, unknown>;
-}
-
-// ═══════════════════════════════════════════════════════════
-// EVIDENCE (Layer 3: Quality)
-// ═══════════════════════════════════════════════════════════
-
-export type EvidenceType =
-  | "screenshot"
-  | "log_capture"
-  | "test_result"
-  | "diff"
-  | "qa_report"
-  | "design_audit"
-  | "contract_audit"
-  | "css_computed"
-  | "performance_trace";
-
-export interface Evidence {
-  id: string;
-  type: EvidenceType;
-  workItemId: string;
-  agentId: string;
-  path: string; // filesystem path to evidence file
-  contentHash: string;
-  description: string;
-  createdAt: string;
-  metadata: Record<string, unknown>;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1014,12 +1180,23 @@ export interface PlatformConfig {
     name: string;
     version: string;
   };
+  postgres: PostgresConfig;
   dolt: DoltConfig;
-  sqlite: SqliteConfig;
+  valkey: ValkeyConfig;
+  clickhouse: ClickHouseConfig;
   fleet: FleetConfig;
   merge: MergeConfig;
   quality: QualityConfig;
   observability: ObservabilityConfig;
+  server: ServerConfig;
+}
+
+export interface PostgresConfig {
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
 }
 
 export interface DoltConfig {
@@ -1028,13 +1205,20 @@ export interface DoltConfig {
   database: string;
   user: string;
   password: string;
-  autoStart: boolean;
 }
 
-export interface SqliteConfig {
-  dir: string;
-  walMode: boolean;
-  busyTimeoutMs: number;
+export interface ValkeyConfig {
+  host: string;
+  port: number;
+  password: string;
+}
+
+export interface ClickHouseConfig {
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
 }
 
 export interface FleetConfig {
@@ -1061,8 +1245,13 @@ export interface ObservabilityConfig {
   watchdogTiers: string[];
 }
 
+export interface ServerConfig {
+  host: string;
+  port: number;
+}
+
 // ═══════════════════════════════════════════════════════════
-// SKILLS (Layer 1: Skill / Prompt)
+// SKILLS — Blueprints in The Waggle (Layer 1: Skill / Prompt)
 // ═══════════════════════════════════════════════════════════
 
 export interface SkillMetadata {
@@ -1113,172 +1302,163 @@ export interface CognitivePattern {
 
 ## 4. Configuration System
 
-### config.yaml (committed defaults)
+### Environment-based Configuration
 
-```yaml
-platform:
-  name: "my-platform"
-  version: "0.1.0"
-
-dolt:
-  host: "127.0.0.1"
-  port: 3307
-  database: "platform"
-  user: "root"
-  password: ""
-  auto_start: true
-
-sqlite:
-  dir: ".platform/db"
-  wal_mode: true
-  busy_timeout_ms: 5000
-
-fleet:
-  max_agents: 15
-  max_depth: 3
-  default_runtime: "claude-code"
-
-merge:
-  strategy: "batch-then-bisect"
-  max_batch_size: 5
-  max_retries: 3
-
-quality:
-  min_contract_conformance: 3
-  min_security: 3
-  block_on_critical: true
-
-observability:
-  heartbeat_interval_s: 60
-  stale_threshold_s: 300
-  watchdog_tiers:
-    - mechanical
-    - ai_triage
-    - monitor
-```
-
-### config.local.yaml (gitignored, machine-specific overrides)
-
-```yaml
-# Machine-specific overrides. This file is in .gitignore.
-# Copy from config.yaml and change what you need.
-dolt:
-  port: 3307
-  password: ""
-
-fleet:
-  max_agents: 5
-  default_runtime: "claude-code"
-```
+The Hive uses environment variables as the primary configuration mechanism, loaded
+from `.env` files for local development and injected by Docker Compose / Kubernetes
+in deployed environments. No `config.yaml` file — environment variables are the
+single source of runtime configuration.
 
 ### .env.example
 
 ```bash
-# Dolt SQL Server
-PLATFORM_DOLT_HOST=127.0.0.1
-PLATFORM_DOLT_PORT=3307
-PLATFORM_DOLT_USER=root
-PLATFORM_DOLT_PASSWORD=
+# ──────────────────────────────────────
+# The Hive — Environment Configuration
+# Copy to .env and fill in values.
+# ──────────────────────────────────────
+
+# Platform
+HIVE_NAME=my-colony
+HIVE_VERSION=0.1.0
+
+# Server (platform serve)
+HIVE_HOST=127.0.0.1
+HIVE_PORT=3000
+
+# PostgreSQL — The Comb (operational state)
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5432
+POSTGRES_DB=the_hive
+POSTGRES_USER=hive
+POSTGRES_PASSWORD=hive_dev
+
+# Dolt — The Frame (work graph, version-controlled)
+DOLT_HOST=127.0.0.1
+DOLT_PORT=3307
+DOLT_DB=the_frame
+DOLT_USER=root
+DOLT_PASSWORD=
+
+# Valkey — The Airway (event bus + ephemeral state)
+VALKEY_HOST=127.0.0.1
+VALKEY_PORT=6379
+VALKEY_PASSWORD=
+
+# ClickHouse — The Yield (analytics at scale)
+CLICKHOUSE_HOST=127.0.0.1
+CLICKHOUSE_PORT=8123
+CLICKHOUSE_DB=hive_analytics
+CLICKHOUSE_USER=default
+CLICKHOUSE_PASSWORD=
+
+# Fleet
+HIVE_MAX_AGENTS=15
+HIVE_MAX_DEPTH=3
+HIVE_DEFAULT_RUNTIME=claude-code
+
+# Merge
+HIVE_MERGE_STRATEGY=batch-then-bisect
+HIVE_MERGE_MAX_BATCH=5
+HIVE_MERGE_MAX_RETRIES=3
+
+# Quality
+HIVE_MIN_CONTRACT_CONFORMANCE=3
+HIVE_MIN_SECURITY=3
+HIVE_BLOCK_ON_CRITICAL=true
+
+# Observability
+HIVE_HEARTBEAT_INTERVAL_S=60
+HIVE_STALE_THRESHOLD_S=300
+HIVE_LOG_LEVEL=info
+HIVE_LOG_FORMAT=text
 
 # Runtime API keys (never commit real values)
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 GOOGLE_API_KEY=
-
-# Observability
-PLATFORM_LOG_LEVEL=info
-PLATFORM_LOG_FORMAT=text  # text | json
 ```
 
-### Configuration Loader (src/core/config.ts)
+### Configuration Loader (packages/shared/src/config.ts)
 
-Resolution priority: defaults < config.yaml < config.local.yaml < env vars < CLI flags.
+Resolution priority: defaults < `.env` < environment variables < CLI flags.
 
 ```typescript
-// src/core/config.ts
-import { readFileSync, existsSync } from "node:fs";
-import { parse as parseYaml } from "yaml";
-import type { PlatformConfig } from "./types.js";
+// packages/shared/src/config.ts
+import type { PlatformConfig } from "@the-hive/contracts";
 
-const DEFAULT_CONFIG: PlatformConfig = {
-  platform: { name: "my-platform", version: "0.1.0" },
-  dolt: {
-    host: "127.0.0.1",
-    port: 3307,
-    database: "platform",
-    user: "root",
-    password: "",
-    autoStart: true,
-  },
-  sqlite: { dir: ".platform/db", walMode: true, busyTimeoutMs: 5000 },
-  fleet: { maxAgents: 15, maxDepth: 3, defaultRuntime: "claude-code" },
-  merge: { strategy: "batch-then-bisect", maxBatchSize: 5, maxRetries: 3 },
-  quality: { minContractConformance: 3, minSecurity: 3, blockOnCritical: true },
-  observability: {
-    heartbeatIntervalS: 60,
-    staleThresholdS: 300,
-    watchdogTiers: ["mechanical", "ai_triage", "monitor"],
-  },
-};
-
-function snakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const camelKey = key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
-    result[camelKey] =
-      value && typeof value === "object" && !Array.isArray(value)
-        ? snakeToCamel(value as Record<string, unknown>)
-        : value;
-  }
-  return result;
+function env(key: string, fallback: string): string {
+  return process.env[key] ?? fallback;
 }
 
-function deepMerge(
-  target: Record<string, unknown>,
-  source: Record<string, unknown>,
-): Record<string, unknown> {
-  const result = { ...target };
-  for (const [key, value] of Object.entries(source)) {
-    if (
-      value && typeof value === "object" && !Array.isArray(value) &&
-      target[key] && typeof target[key] === "object"
-    ) {
-      result[key] = deepMerge(
-        target[key] as Record<string, unknown>,
-        value as Record<string, unknown>,
-      );
-    } else {
-      result[key] = value;
-    }
-  }
-  return result;
+function envInt(key: string, fallback: number): number {
+  const val = process.env[key];
+  return val ? Number.parseInt(val, 10) : fallback;
 }
 
-export function loadConfig(projectRoot: string = process.cwd()): PlatformConfig {
-  let config = structuredClone(DEFAULT_CONFIG) as unknown as Record<string, unknown>;
+function envBool(key: string, fallback: boolean): boolean {
+  const val = process.env[key];
+  if (!val) return fallback;
+  return val === "true" || val === "1";
+}
 
-  // Layer 1: config.yaml (project defaults)
-  const projectPath = `${projectRoot}/config.yaml`;
-  if (existsSync(projectPath)) {
-    const raw = parseYaml(readFileSync(projectPath, "utf-8")) as Record<string, unknown>;
-    config = deepMerge(config, snakeToCamel(raw));
-  }
-
-  // Layer 2: config.local.yaml (machine overrides, gitignored)
-  const localPath = `${projectRoot}/config.local.yaml`;
-  if (existsSync(localPath)) {
-    const raw = parseYaml(readFileSync(localPath, "utf-8")) as Record<string, unknown>;
-    config = deepMerge(config, snakeToCamel(raw));
-  }
-
-  // Layer 3: environment variables
-  const dolt = config.dolt as Record<string, unknown>;
-  if (process.env.PLATFORM_DOLT_HOST) dolt.host = process.env.PLATFORM_DOLT_HOST;
-  if (process.env.PLATFORM_DOLT_PORT) dolt.port = Number(process.env.PLATFORM_DOLT_PORT);
-  if (process.env.PLATFORM_DOLT_USER) dolt.user = process.env.PLATFORM_DOLT_USER;
-  if (process.env.PLATFORM_DOLT_PASSWORD) dolt.password = process.env.PLATFORM_DOLT_PASSWORD;
-
-  return config as unknown as PlatformConfig;
+export function loadConfig(): PlatformConfig {
+  return {
+    platform: {
+      name: env("HIVE_NAME", "my-colony"),
+      version: env("HIVE_VERSION", "0.1.0"),
+    },
+    postgres: {
+      host: env("POSTGRES_HOST", "127.0.0.1"),
+      port: envInt("POSTGRES_PORT", 5432),
+      database: env("POSTGRES_DB", "the_hive"),
+      user: env("POSTGRES_USER", "hive"),
+      password: env("POSTGRES_PASSWORD", "hive_dev"),
+    },
+    dolt: {
+      host: env("DOLT_HOST", "127.0.0.1"),
+      port: envInt("DOLT_PORT", 3307),
+      database: env("DOLT_DB", "the_frame"),
+      user: env("DOLT_USER", "root"),
+      password: env("DOLT_PASSWORD", ""),
+    },
+    valkey: {
+      host: env("VALKEY_HOST", "127.0.0.1"),
+      port: envInt("VALKEY_PORT", 6379),
+      password: env("VALKEY_PASSWORD", ""),
+    },
+    clickhouse: {
+      host: env("CLICKHOUSE_HOST", "127.0.0.1"),
+      port: envInt("CLICKHOUSE_PORT", 8123),
+      database: env("CLICKHOUSE_DB", "hive_analytics"),
+      user: env("CLICKHOUSE_USER", "default"),
+      password: env("CLICKHOUSE_PASSWORD", ""),
+    },
+    fleet: {
+      maxAgents: envInt("HIVE_MAX_AGENTS", 15),
+      maxDepth: envInt("HIVE_MAX_DEPTH", 3),
+      defaultRuntime: env("HIVE_DEFAULT_RUNTIME", "claude-code"),
+    },
+    merge: {
+      strategy: env("HIVE_MERGE_STRATEGY", "batch-then-bisect") as
+        "batch-then-bisect" | "sequential",
+      maxBatchSize: envInt("HIVE_MERGE_MAX_BATCH", 5),
+      maxRetries: envInt("HIVE_MERGE_MAX_RETRIES", 3),
+    },
+    quality: {
+      minContractConformance: envInt("HIVE_MIN_CONTRACT_CONFORMANCE", 3),
+      minSecurity: envInt("HIVE_MIN_SECURITY", 3),
+      blockOnCritical: envBool("HIVE_BLOCK_ON_CRITICAL", true),
+    },
+    observability: {
+      heartbeatIntervalS: envInt("HIVE_HEARTBEAT_INTERVAL_S", 60),
+      staleThresholdS: envInt("HIVE_STALE_THRESHOLD_S", 300),
+      watchdogTiers: ["mechanical", "ai_triage", "monitor"],
+    },
+    server: {
+      host: env("HIVE_HOST", "127.0.0.1"),
+      port: envInt("HIVE_PORT", 3000),
+    },
+  };
 }
 ```
 
@@ -1286,22 +1466,23 @@ export function loadConfig(projectRoot: string = process.cwd()): PlatformConfig 
 
 ## 5. CLI Framework Setup
 
-### Entry Point (src/index.ts)
+### Entry Point (apps/control-plane/src/index.ts)
 
 ```typescript
-#!/usr/bin/env bun
-// src/index.ts
+#!/usr/bin/env node
+// apps/control-plane/src/index.ts
 import { createCLI } from "./cli/index.js";
 
 const program = createCLI();
 program.parse(process.argv);
 ```
 
-### Commander.js Setup (src/cli/index.ts)
+### Commander.js Setup (apps/control-plane/src/cli/index.ts)
 
 ```typescript
-// src/cli/index.ts
+// apps/control-plane/src/cli/index.ts
 import { Command } from "commander";
+import { registerServeCommand } from "./commands/serve.js";
 import { registerTrackerCommands } from "./commands/tracker.js";
 import { registerFleetCommands } from "./commands/fleet.js";
 import { registerMailCommands } from "./commands/mail.js";
@@ -1310,7 +1491,6 @@ import { registerSlingCommands } from "./commands/sling.js";
 import { registerSkillCommands } from "./commands/skill.js";
 import { registerContractCommands } from "./commands/contract.js";
 import { registerQualityCommands } from "./commands/quality.js";
-import { registerFederationCommands } from "./commands/federation.js";
 import { registerConfigCommands } from "./commands/config.js";
 import { registerDoctorCommands } from "./commands/doctor.js";
 
@@ -1319,28 +1499,30 @@ export function createCLI(): Command {
 
   program
     .name("platform")
-    .description("AI agent orchestration platform")
+    .description("The Hive — AI agent orchestration platform (The Smoker)")
     .version("0.1.0")
     .option("--json", "Output as JSON")
-    .option("--verbose", "Verbose output")
-    .option("--config <path>", "Path to config.yaml");
+    .option("--verbose", "Verbose output");
+
+  // HTTP server
+  registerServeCommand(program);
 
   // Work tracking
   const tracker = program
     .command("tracker")
-    .description("Work item tracking and dependency management");
+    .description("Work item tracking and dependency management (The Comb)");
   registerTrackerCommands(tracker);
 
   // Agent fleet
   const fleet = program
     .command("fleet")
-    .description("Agent fleet lifecycle management");
+    .description("Worker fleet lifecycle management");
   registerFleetCommands(fleet);
 
   // Communication
   const mail = program
     .command("mail")
-    .description("Inter-agent messaging");
+    .description("Inter-agent messaging (The Airway)");
   registerMailCommands(mail);
 
   // Merge queue
@@ -1352,13 +1534,13 @@ export function createCLI(): Command {
   // Work dispatch
   const sling = program
     .command("sling")
-    .description("Dispatch work to agents");
+    .description("Dispatch work to Workers (Swarming)");
   registerSlingCommands(sling);
 
   // Skill management
   const skill = program
     .command("skill")
-    .description("Skill registry and management");
+    .description("Skill registry and management (The Waggle)");
   registerSkillCommands(skill);
 
   // Contracts
@@ -1370,14 +1552,8 @@ export function createCLI(): Command {
   // Quality
   const quality = program
     .command("quality")
-    .description("Quality gates, evals, and audits");
+    .description("Quality gates, evals, and audits (Inspection)");
   registerQualityCommands(quality);
-
-  // Federation
-  const federation = program
-    .command("federation")
-    .description("Cross-instance federation");
-  registerFederationCommands(federation);
 
   // Configuration
   const config = program
@@ -1395,94 +1571,154 @@ export function createCLI(): Command {
 }
 ```
 
-### Example Command Registration (src/cli/commands/tracker.ts)
+### Serve Command (apps/control-plane/src/cli/commands/serve.ts)
 
 ```typescript
-// src/cli/commands/tracker.ts
+// apps/control-plane/src/cli/commands/serve.ts
+import type { Command } from "commander";
+
+export function registerServeCommand(program: Command): void {
+  program
+    .command("serve")
+    .description("Start The Hive HTTP server (Fastify)")
+    .option("-p, --port <port>", "Port number", "3000")
+    .option("-h, --host <host>", "Host address", "127.0.0.1")
+    .option("--tls", "Enable TLS")
+    .option("--cert <path>", "TLS certificate path")
+    .option("--key <path>", "TLS key path")
+    .action(async (opts) => {
+      const { createApp } = await import("../../server.js");
+      const app = await createApp();
+      await app.listen({ port: Number(opts.port), host: opts.host });
+      console.log(`The Hive listening on http://${opts.host}:${opts.port}`);
+    });
+}
+```
+
+### Fastify Server Factory (apps/control-plane/src/server.ts)
+
+```typescript
+// apps/control-plane/src/server.ts
+import Fastify from "fastify";
+import type { FastifyInstance } from "fastify";
+
+export async function createApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: {
+      level: process.env.HIVE_LOG_LEVEL ?? "info",
+    },
+  });
+
+  // Plugins
+  await app.register(import("@fastify/cors"), {
+    origin: process.env.HIVE_CORS_ORIGIN ?? "http://localhost:5173",
+  });
+  await app.register(import("@fastify/jwt"), {
+    secret: process.env.HIVE_JWT_SECRET ?? "dev-secret-change-me",
+  });
+  await app.register(import("@fastify/rate-limit"), {
+    max: 120,
+    timeWindow: "1 minute",
+  });
+
+  // Health check (always available, no auth)
+  app.get("/health", async () => ({ status: "ok", service: "control-plane" }));
+
+  // API routes registered under /api/v1/
+  // TODO: register route modules from ./routes/
+
+  return app;
+}
+```
+
+### Example Command Registration (apps/control-plane/src/cli/commands/tracker.ts)
+
+```typescript
+// apps/control-plane/src/cli/commands/tracker.ts
 import type { Command } from "commander";
 import { formatOutput } from "../output.js";
 
 export function registerTrackerCommands(parent: Command): void {
   parent
     .command("create")
-    .description("Create a new work item")
+    .description("Create a new Cell in The Comb")
     .requiredOption("-t, --title <title>", "Work item title")
     .option("-T, --type <type>", "Work item type", "task")
     .option("-p, --priority <priority>", "Priority (0-4)", "2")
     .option("-a, --assignee <assignee>", "Assignee")
     .option("--parent <parentId>", "Parent work item ID")
-    .option("--body <body>", "Description body")
+    .option("--description <description>", "Description")
     .action(async (opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ status: "created", id: "wi-TODO", ...opts }, parent.parent);
     });
 
   parent
     .command("list")
-    .description("List work items")
+    .description("List Cells")
     .option("-s, --status <status>", "Filter by status")
     .option("-T, --type <type>", "Filter by type")
     .option("-a, --assignee <assignee>", "Filter by assignee")
     .option("--ready", "Show only ready (unblocked) items")
     .option("-n, --limit <n>", "Max results", "20")
     .action(async (opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ items: [] }, parent.parent);
     });
 
   parent
     .command("show <id>")
-    .description("Show work item details")
+    .description("Show Cell details")
     .action(async (id) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ id, status: "TODO" }, parent.parent);
     });
 
   parent
     .command("update <id>")
-    .description("Update a work item")
+    .description("Update a Cell")
     .option("-s, --status <status>", "New status")
     .option("-p, --priority <priority>", "New priority")
     .option("-a, --assignee <assignee>", "New assignee")
-    .option("--body <body>", "Updated description")
+    .option("--description <description>", "Updated description")
     .action(async (id, opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ id, updated: true, ...opts }, parent.parent);
     });
 
   parent
     .command("close <id>")
-    .description("Close a work item")
+    .description("Close a Cell")
     .option("-r, --reason <reason>", "Close reason")
     .action(async (id, opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ id, closed: true, ...opts }, parent.parent);
     });
 
   parent
     .command("deps <id>")
-    .description("Show dependencies for a work item")
+    .description("Show dependencies for a Cell")
     .option("--tree", "Show as dependency tree")
     .action(async (id, opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ id, dependencies: [] }, parent.parent);
     });
 
   parent
     .command("ready")
-    .description("Show work items ready for assignment")
+    .description("Show Cells ready for assignment")
     .option("-n, --limit <n>", "Max results", "10")
     .action(async (opts) => {
-      // TODO: implement via tracker module
+      // TODO: implement via tracker service
       formatOutput({ items: [] }, parent.parent);
     });
 }
 ```
 
-### Output Formatting (src/cli/output.ts)
+### Output Formatting (apps/control-plane/src/cli/output.ts)
 
 ```typescript
-// src/cli/output.ts
+// apps/control-plane/src/cli/output.ts
 import type { Command } from "commander";
 import chalk from "chalk";
 
@@ -1516,13 +1752,59 @@ export function info(message: string): void {
 
 ## 6. Database Module Setup
 
-### Dolt Connection (src/data/dolt/connection.ts)
+### PostgreSQL Connection (packages/shared/src/db/postgres.ts)
+
+PostgreSQL is The Comb's operational store — agents, sessions, messages, events, and
+all mutable platform state that does not require version control.
 
 ```typescript
-// src/data/dolt/connection.ts
+// packages/shared/src/db/postgres.ts
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+import { loadConfig } from "../config.js";
+
+let pool: pg.Pool | null = null;
+
+export function getPostgresPool(): pg.Pool {
+  if (pool) return pool;
+
+  const config = loadConfig();
+  pool = new pg.Pool({
+    host: config.postgres.host,
+    port: config.postgres.port,
+    database: config.postgres.database,
+    user: config.postgres.user,
+    password: config.postgres.password,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+  });
+
+  return pool;
+}
+
+export function getDb() {
+  return drizzle(getPostgresPool());
+}
+
+export async function closePostgres(): Promise<void> {
+  if (pool) {
+    await pool.end();
+    pool = null;
+  }
+}
+```
+
+### Dolt Connection (packages/shared/src/db/dolt.ts)
+
+Dolt is The Frame — the version-controlled work graph. Every work item mutation is a
+Dolt commit, enabling `dolt diff`, `dolt log`, and branch-based task isolation.
+
+```typescript
+// packages/shared/src/db/dolt.ts
 import mysql from "mysql2/promise";
-import { loadConfig } from "@core/config.js";
-import type { DoltConfig } from "@core/types.js";
+import { loadConfig } from "../config.js";
+import type { DoltConfig } from "@the-hive/contracts";
 
 let pool: mysql.Pool | null = null;
 
@@ -1531,11 +1813,6 @@ export async function getDoltConnection(): Promise<mysql.Pool> {
 
   const config = loadConfig();
   const doltConfig = config.dolt;
-
-  // Auto-start Dolt server if configured
-  if (doltConfig.autoStart) {
-    await ensureDoltRunning(doltConfig);
-  }
 
   pool = mysql.createPool({
     host: doltConfig.host,
@@ -1550,46 +1827,6 @@ export async function getDoltConnection(): Promise<mysql.Pool> {
   });
 
   return pool;
-}
-
-async function ensureDoltRunning(config: DoltConfig): Promise<void> {
-  try {
-    const testConn = await mysql.createConnection({
-      host: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      connectTimeout: 2000,
-    });
-    await testConn.end();
-  } catch {
-    // Server not running — attempt auto-start
-    Bun.spawn(
-      ["dolt", "sql-server", "--port", String(config.port), "--host", config.host],
-      { stdout: "ignore", stderr: "ignore" },
-    );
-
-    // Wait for server readiness (up to 10s)
-    for (let i = 0; i < 20; i++) {
-      await new Promise((r) => setTimeout(r, 500));
-      try {
-        const testConn = await mysql.createConnection({
-          host: config.host,
-          port: config.port,
-          user: config.user,
-          password: config.password,
-          connectTimeout: 1000,
-        });
-        await testConn.end();
-        return;
-      } catch {
-        // Not ready yet
-      }
-    }
-    throw new Error(
-      `Dolt server failed to start on ${config.host}:${config.port}`,
-    );
-  }
 }
 
 export async function runMigrations(
@@ -1636,183 +1873,319 @@ export async function closeDoltConnection(): Promise<void> {
 }
 ```
 
-### SQLite Connection (src/data/sqlite/connection.ts)
+### Valkey Connection (packages/shared/src/db/valkey.ts)
+
+Valkey is The Airway — the event bus for inter-agent communication, real-time state
+propagation, and rate limiting. Uses Valkey Streams for durable, ordered event
+delivery.
 
 ```typescript
-// src/data/sqlite/connection.ts
-import Database from "better-sqlite3";
-import { mkdirSync, existsSync } from "node:fs";
-import { loadConfig } from "@core/config.js";
+// packages/shared/src/db/valkey.ts
+import Redis from "ioredis";
+import { loadConfig } from "../config.js";
 
-const databases = new Map<string, Database.Database>();
+let client: Redis | null = null;
+let subscriber: Redis | null = null;
 
-export type SqliteDbName = "mail" | "sessions" | "events" | "metrics";
-
-export function getSqliteDb(name: SqliteDbName): Database.Database {
-  if (databases.has(name)) return databases.get(name)!;
+export function getValkeyClient(): Redis {
+  if (client) return client;
 
   const config = loadConfig();
-  const dir = config.sqlite.dir;
+  client = new Redis({
+    host: config.valkey.host,
+    port: config.valkey.port,
+    password: config.valkey.password || undefined,
+    maxRetriesPerRequest: 3,
+    retryStrategy(times: number) {
+      return Math.min(times * 50, 2000);
+    },
+  });
 
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
-
-  const dbPath = `${dir}/${name}.db`;
-  const db = new Database(dbPath);
-
-  // WAL mode for concurrent access from multiple agent processes
-  if (config.sqlite.walMode) {
-    db.pragma("journal_mode = WAL");
-  }
-  db.pragma(`busy_timeout = ${config.sqlite.busyTimeoutMs}`);
-  db.pragma("foreign_keys = ON");
-
-  databases.set(name, db);
-  return db;
+  return client;
 }
 
-export function closeSqliteDb(name: SqliteDbName): void {
-  const db = databases.get(name);
-  if (db) {
-    db.close();
-    databases.delete(name);
-  }
+export function getValkeySubscriber(): Redis {
+  if (subscriber) return subscriber;
+
+  const config = loadConfig();
+  subscriber = new Redis({
+    host: config.valkey.host,
+    port: config.valkey.port,
+    password: config.valkey.password || undefined,
+  });
+
+  return subscriber;
 }
 
-export function closeAllSqliteDbs(): void {
-  for (const [, db] of databases) {
-    db.close();
+// Airway stream helpers
+export async function publishToAirway(
+  stream: string,
+  data: Record<string, string>,
+): Promise<string> {
+  const valkey = getValkeyClient();
+  return valkey.xadd(stream, "*", ...Object.entries(data).flat());
+}
+
+export async function readFromAirway(
+  stream: string,
+  lastId: string = "0",
+  count: number = 10,
+): Promise<unknown[]> {
+  const valkey = getValkeyClient();
+  const result = await valkey.xread("COUNT", count, "BLOCK", 1000, "STREAMS", stream, lastId);
+  return result ?? [];
+}
+
+export async function closeValkey(): Promise<void> {
+  if (client) {
+    client.disconnect();
+    client = null;
   }
-  databases.clear();
+  if (subscriber) {
+    subscriber.disconnect();
+    subscriber = null;
+  }
 }
 ```
 
-### SQLite Mail Schema (src/data/sqlite/mail.ts)
+### ClickHouse Connection (packages/shared/src/db/clickhouse.ts)
+
+ClickHouse stores The Yield — analytics at scale. Token usage, cost tracking, run
+durations, and aggregated Worker scorecards.
 
 ```typescript
-// src/data/sqlite/mail.ts
-import { getSqliteDb } from "./connection.js";
+// packages/shared/src/db/clickhouse.ts
+import { createClient, type ClickHouseClient } from "@clickhouse/client";
+import { loadConfig } from "../config.js";
 
-export function initMailDb(): void {
-  const db = getSqliteDb("mail");
+let client: ClickHouseClient | null = null;
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS messages (
-      id TEXT PRIMARY KEY,
-      from_agent TEXT NOT NULL,
-      to_agent TEXT NOT NULL,
-      subject TEXT NOT NULL,
-      body TEXT NOT NULL DEFAULT '',
-      priority TEXT NOT NULL DEFAULT 'normal'
-        CHECK (priority IN ('critical', 'high', 'normal', 'low')),
-      protocol TEXT,
-      thread_id TEXT,
-      reply_to TEXT,
-      sent_at TEXT NOT NULL DEFAULT (datetime('now')),
-      read_at TEXT,
-      expires_at TEXT,
-      metadata TEXT NOT NULL DEFAULT '{}'
-    );
+export function getClickHouseClient(): ClickHouseClient {
+  if (client) return client;
 
-    CREATE INDEX IF NOT EXISTS idx_mail_to ON messages (to_agent, read_at);
-    CREATE INDEX IF NOT EXISTS idx_mail_thread ON messages (thread_id);
-    CREATE INDEX IF NOT EXISTS idx_mail_sent ON messages (sent_at);
-  `);
+  const config = loadConfig();
+  client = createClient({
+    url: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+    username: config.clickhouse.user,
+    password: config.clickhouse.password,
+    database: config.clickhouse.database,
+  });
+
+  return client;
 }
-```
 
-### SQLite Sessions Schema (src/data/sqlite/sessions.ts)
-
-```typescript
-// src/data/sqlite/sessions.ts
-import { getSqliteDb } from "./connection.js";
-
-export function initSessionsDb(): void {
-  const db = getSqliteDb("sessions");
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS sessions (
-      id TEXT PRIMARY KEY,
-      agent_id TEXT NOT NULL,
-      runtime_id TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'completed', 'crashed', 'handoff')),
-      started_at TEXT NOT NULL DEFAULT (datetime('now')),
-      ended_at TEXT,
-      tokens_used INTEGER NOT NULL DEFAULT 0,
-      cost REAL NOT NULL DEFAULT 0.0,
-      handoff_checkpoint TEXT
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_sessions_agent ON sessions (agent_id);
-    CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions (status);
-  `);
-}
-```
-
-### SQLite Events Schema (src/data/sqlite/events.ts)
-
-```typescript
-// src/data/sqlite/events.ts
-import { getSqliteDb } from "./connection.js";
-
-export function initEventsDb(): void {
-  const db = getSqliteDb("events");
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS events (
-      id TEXT PRIMARY KEY,
-      type TEXT NOT NULL,
-      agent_id TEXT,
-      session_id TEXT,
-      work_item_id TEXT,
-      timestamp TEXT NOT NULL DEFAULT (datetime('now')),
-      data TEXT NOT NULL DEFAULT '{}'
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_events_type ON events (type);
-    CREATE INDEX IF NOT EXISTS idx_events_agent ON events (agent_id);
-    CREATE INDEX IF NOT EXISTS idx_events_session ON events (session_id);
-    CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events (timestamp);
-  `);
-}
-```
-
-### SQLite Metrics Schema (src/data/sqlite/metrics.ts)
-
-```typescript
-// src/data/sqlite/metrics.ts
-import { getSqliteDb } from "./connection.js";
-
-export function initMetricsDb(): void {
-  const db = getSqliteDb("metrics");
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS token_usage (
-      id TEXT PRIMARY KEY,
-      agent_id TEXT NOT NULL,
-      session_id TEXT NOT NULL,
-      runtime_id TEXT NOT NULL,
-      model TEXT NOT NULL,
-      input_tokens INTEGER NOT NULL DEFAULT 0,
-      output_tokens INTEGER NOT NULL DEFAULT 0,
-      cost REAL NOT NULL DEFAULT 0.0,
-      recorded_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_tokens_agent ON token_usage (agent_id);
-    CREATE INDEX IF NOT EXISTS idx_tokens_session ON token_usage (session_id);
-    CREATE INDEX IF NOT EXISTS idx_tokens_recorded ON token_usage (recorded_at);
-  `);
+export async function closeClickHouse(): Promise<void> {
+  if (client) {
+    await client.close();
+    client = null;
+  }
 }
 ```
 
 ---
 
-## 7. CLAUDE.md for Self-Building
+## 7. Docker Compose (Local Development)
 
-This is the platform's own CLAUDE.md, written so the agent team can build the
+### infra/compose.local.yml
+
+```yaml
+# The Hive — Local Development Infrastructure
+# Start: docker compose -f infra/compose.local.yml up -d
+# Stop:  docker compose -f infra/compose.local.yml down
+
+name: the-hive
+
+services:
+  # ──────────────────────────────────────
+  # PostgreSQL — The Comb (operational state)
+  # ──────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: hive-postgres
+    environment:
+      POSTGRES_DB: the_hive
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - hive-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive -d the_hive"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hive-net
+
+  # ──────────────────────────────────────
+  # Valkey 8 — The Airway (event bus)
+  # ──────────────────────────────────────
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: hive-valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - hive-valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hive-net
+
+  # ──────────────────────────────────────
+  # ClickHouse — The Yield (analytics)
+  # ──────────────────────────────────────
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: hive-clickhouse
+    environment:
+      CLICKHOUSE_DB: hive_analytics
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ""
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9000:9000"   # Native protocol
+    volumes:
+      - hive-ch-data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hive-net
+
+  # ──────────────────────────────────────
+  # Dolt — The Frame (version-controlled work graph)
+  # ──────────────────────────────────────
+  dolt:
+    image: dolthub/dolt-sql-server:latest
+    container_name: hive-dolt
+    command: >
+      -l debug
+      --host 0.0.0.0
+      --port 3307
+    ports:
+      - "3307:3307"
+    volumes:
+      - hive-dolt-data:/var/lib/dolt
+    healthcheck:
+      test: ["CMD-SHELL", "dolt sql -q 'SELECT 1' 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - hive-net
+
+volumes:
+  hive-pg-data:
+  hive-valkey-data:
+  hive-ch-data:
+  hive-dolt-data:
+
+networks:
+  hive-net:
+    driver: bridge
+```
+
+---
+
+## 8. Infrastructure Scripts
+
+### infra/scripts/check-prereqs.sh
+
+```bash
+#!/usr/bin/env bash
+# Check prerequisites for The Hive local development.
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+errors=0
+
+check() {
+  local cmd="$1"
+  local min_version="$2"
+  local install_hint="$3"
+
+  if command -v "$cmd" &>/dev/null; then
+    local version
+    version=$("$cmd" --version 2>&1 | head -1)
+    echo -e "${GREEN}[ok]${NC} $cmd found: $version"
+  else
+    echo -e "${RED}[missing]${NC} $cmd not found. Install: $install_hint"
+    errors=$((errors + 1))
+  fi
+}
+
+echo "Checking The Hive prerequisites..."
+echo ""
+
+check "node" "22.0.0" "https://nodejs.org/ (v22+)"
+check "pnpm" "9.0.0" "npm install -g pnpm"
+check "docker" "24.0.0" "https://docs.docker.com/get-docker/"
+check "docker" "compose" "Included with Docker Desktop"
+
+echo ""
+if [ "$errors" -gt 0 ]; then
+  echo -e "${RED}$errors prerequisite(s) missing.${NC}"
+  exit 1
+else
+  echo -e "${GREEN}All prerequisites met.${NC}"
+fi
+```
+
+### infra/scripts/dev-up.sh
+
+```bash
+#!/usr/bin/env bash
+# Start The Hive local development infrastructure.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Starting The Hive infrastructure..."
+docker compose -f "$INFRA_DIR/compose.local.yml" up -d
+
+echo "Waiting for services to be healthy..."
+docker compose -f "$INFRA_DIR/compose.local.yml" ps
+
+echo ""
+echo "Infrastructure ready. Services:"
+echo "  PostgreSQL (The Comb):   localhost:5432"
+echo "  Valkey (The Airway):     localhost:6379"
+echo "  ClickHouse (The Yield):  localhost:8123"
+echo "  Dolt (The Frame):        localhost:3307"
+```
+
+### infra/scripts/dev-down.sh
+
+```bash
+#!/usr/bin/env bash
+# Stop The Hive local development infrastructure.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INFRA_DIR="$(dirname "$SCRIPT_DIR")"
+
+echo "Stopping The Hive infrastructure..."
+docker compose -f "$INFRA_DIR/compose.local.yml" down
+
+echo "Infrastructure stopped."
+```
+
+---
+
+## 9. CLAUDE.md for Self-Building
+
+This is The Hive's own CLAUDE.md, written so the Worker team can build the
 platform itself. It lives at the repo root.
 
 ```markdown
@@ -1820,81 +2193,103 @@ platform itself. It lives at the repo root.
 
 ## What This Is
 
-AI agent orchestration platform. TypeScript + Bun. Dolt SQL for work state,
-SQLite for operational data. Commander.js CLI.
+The Hive — AI agent orchestration platform. TypeScript / Node.js / Fastify.
+PostgreSQL for operational state (The Comb), Dolt for version-controlled work
+graph (The Frame), Valkey Streams for event bus (The Airway), ClickHouse for
+analytics (The Yield). Turborepo/pnpm monorepo.
 
 ## Commands
 
-    bun install          # Install dependencies
-    bun run build        # Build to dist/
-    bun run dev          # Watch mode
-    bun test             # All tests
-    bun run test:unit    # Unit tests only
-    bun run typecheck    # TypeScript strict check
-    bun run lint         # Biome check
-    bun run lint:fix     # Biome auto-fix
-    bun run format       # Biome format
+    pnpm install          # Install all workspace dependencies
+    pnpm build            # Build all packages (Turborepo)
+    pnpm dev              # Watch mode across all packages
+    pnpm test             # All tests (vitest)
+    pnpm test:unit        # Unit tests only
+    pnpm typecheck        # TypeScript strict check
+    pnpm lint             # Biome check
+    pnpm lint:fix         # Biome auto-fix
+    pnpm format           # Biome format
+    pnpm infra:up         # Start Docker Compose (Postgres, Valkey, ClickHouse, Dolt)
+    pnpm infra:down       # Stop Docker Compose
+    pnpm serve            # Start Fastify server (platform serve)
 
 ## Architecture
 
-Five layers. Each layer has a src/ directory and exposes interfaces consumed
-by adjacent layers. The orchestration layer (L2) is the hub.
+Service-hosted monorepo. Five layers, each mapped to workspace packages.
 
-| Layer | Directory | Responsibility |
-|-------|-----------|---------------|
-| Skill / Prompt | `skills/`, `templates/` | What agents know |
-| Orchestration | `src/orchestration/`, `src/communication/` | Who does what |
-| Quality | `src/quality/`, `src/contracts/` | Whether work is good |
-| Work | `src/tracker/`, `src/merge/` | What needs doing |
-| Runtime | `src/runtime/` | Where agents execute |
+| Layer | Packages | Responsibility |
+|-------|----------|---------------|
+| Skill / Prompt | `skills/`, `templates/` | What Workers know (Blueprints in The Waggle) |
+| Orchestration | `apps/control-plane`, `services/runtime-orchestrator` | Who does what (The Queen) |
+| Quality | `services/review-engine`, `services/browser-automation` | Whether work is good (Inspection) |
+| Work | `apps/control-plane` (tracker routes) | What needs doing (The Comb) |
+| Runtime | `services/runtime-orchestrator/adapters/`, `services/router` | Where Workers execute |
+
+### Data Stores
+
+| Store | Hive Name | Purpose | Connection |
+|-------|-----------|---------|------------|
+| PostgreSQL | The Comb | Operational state — agents, sessions, messages, events | `packages/shared/src/db/postgres.ts` |
+| Dolt | The Frame | Version-controlled work graph — work items, dependencies | `packages/shared/src/db/dolt.ts` |
+| Valkey | The Airway | Event bus, ephemeral state, rate limiting | `packages/shared/src/db/valkey.ts` |
+| ClickHouse | The Yield | Analytics — token usage, cost, run durations | `packages/shared/src/db/clickhouse.ts` |
+
+## Workspace Structure
+
+    apps/control-plane/       — The Queen: Fastify API + CLI (The Smoker)
+    apps/operator-console/    — The Glass: React SPA dashboard
+    services/runtime-orchestrator/ — Worker spawning, lifecycle, worktrees
+    services/browser-automation/   — Browse CLI (Playwright)
+    services/review-engine/        — Quality intelligence, contracts
+    services/router/               — Capability-based Worker routing
+    packages/contracts/       — Shared types + JSON schemas (single source of truth)
+    packages/sdk/             — Client SDK for inter-service calls
+    packages/shared/          — Common utilities, DB connections, config, logging
 
 ## File Ownership Map
 
-    src/core/           — shared (all agents read, coordinator writes)
-    src/cli/            — CLI agent
-    src/data/dolt/      — data agent
-    src/data/sqlite/    — data agent
-    src/tracker/        — tracker agent
-    src/orchestration/  — orchestration agent
-    src/communication/  — communication agent
-    src/quality/        — quality agent
-    src/merge/          — merge agent
-    src/runtime/        — runtime agent
-    src/contracts/      — contracts agent
-    src/federation/     — federation agent
-    src/observability/  — observability agent
-    skills/             — skill-writer agent
-    templates/          — orchestration agent
-    formulas/           — tracker agent
-    tests/unit/         — mirrors src/ ownership
-    tests/integration/  — quality agent
-    tests/e2e/          — quality agent
+    packages/contracts/       — shared (all Workers read, coordinator writes)
+    packages/shared/          — shared utilities (infrastructure Worker)
+    packages/sdk/             — SDK Worker
+    apps/control-plane/       — control-plane Worker
+    apps/operator-console/    — frontend Worker
+    services/runtime-orchestrator/ — orchestration Worker
+    services/browser-automation/   — browse Worker
+    services/review-engine/        — quality Worker
+    services/router/               — routing Worker
+    skills/                   — skill-writer Worker
+    templates/                — orchestration Worker
+    formulas/                 — tracker Worker
+    infra/                    — infrastructure Worker
+    tests/unit/               — mirrors package ownership
+    tests/integration/        — quality Worker
+    tests/e2e/                — quality Worker
 
 ## Coding Standards
 
 - TypeScript strict mode. No `any` without a comment explaining why.
 - All public functions have JSDoc comments.
-- Imports use path aliases (@core/types, @data/dolt/connection).
+- Imports use workspace package names (@the-hive/contracts, @the-hive/shared).
 - Every CLI command supports --json for machine-readable output.
-- Errors use typed error classes from src/core/errors.ts.
-- Tests use bun test (Jest-compatible API).
+- Errors use typed error classes from @the-hive/shared.
+- Tests use vitest (Jest-compatible API).
 - Prefer const over let. Never use var.
 - Functions over classes unless state management requires it.
 
 ## How To Add a New CLI Command
 
-1. Create src/cli/commands/{name}.ts
+1. Create apps/control-plane/src/cli/commands/{name}.ts
 2. Export registerXCommands(parent: Command): void
-3. Import and register in src/cli/index.ts
-4. Add tests in tests/unit/cli/{name}.test.ts
+3. Import and register in apps/control-plane/src/cli/index.ts
+4. Add tests in tests/unit/control-plane/{name}.test.ts
 5. Every command must handle --json via formatOutput()
 
 ## How To Add a Runtime Adapter
 
-1. Create src/runtime/adapters/{name}.ts
-2. Implement RuntimeAdapter interface from @core/types
-3. Register in src/runtime/detect.ts adapter map
-4. Add tests in tests/unit/runtime/{name}.test.ts
+1. Create services/runtime-orchestrator/src/adapters/{name}.ts
+2. Implement RuntimeAdapter interface from @the-hive/contracts
+3. Register in services/runtime-orchestrator/src/adapters/detect.ts
+4. Add tests in tests/unit/runtime-orchestrator/{name}.test.ts
 
 ## How To Add a Skill
 
@@ -1905,62 +2300,68 @@ by adjacent layers. The orchestration layer (L2) is the hub.
 
 ## How To Modify the Data Model
 
-1. Create new migration: src/data/dolt/migrations/NNN-description.sql
-2. Number sequentially (e.g., 006-new-table.sql)
-3. Update src/core/types.ts with corresponding TypeScript types
-4. Run: bun run src/index.ts doctor --fix
+1. For Dolt (The Frame): create new migration in a migrations/ directory
+2. For PostgreSQL (The Comb): create a Drizzle schema migration
+3. Update packages/contracts/src/types.ts with corresponding TypeScript types
+4. Run: pnpm serve -- doctor --fix
 ```
 
 ---
 
-## 8. Dev Environment Setup
+## 10. Dev Environment Setup
 
 ### Prerequisites
 
 ```bash
-# Bun (>= 1.1)
-curl -fsSL https://bun.sh/install | bash
-bun --version
+# Node.js (>= 22)
+# macOS:
+brew install node
+# Or use a version manager:
+fnm install 22
+fnm use 22
 
-# Dolt (>= 1.0)
+# pnpm (>= 9)
+npm install -g pnpm
+
+# Docker (>= 24, with Compose v2)
+# macOS: Docker Desktop
+# Linux: https://docs.docker.com/engine/install/
+
+# Dolt (>= 1.0) — for direct CLI access to The Frame
 # macOS:
 brew install dolt
 # Linux:
 sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/download/install.sh | bash'
-dolt version
 
-# Verify both
-bun --version  # expect >= 1.1.0
-dolt version   # expect >= 1.0.0
+# Verify prerequisites
+bash infra/scripts/check-prereqs.sh
 ```
 
 ### First Run
 
 ```bash
 # Clone and install
-git clone <repo-url> platform
-cd platform
-bun install
+git clone <repo-url> the-hive
+cd the-hive
+pnpm install
 
-# Initialize Dolt database
-mkdir -p .platform/dolt-data
-cd .platform/dolt-data
-dolt init
-dolt sql-server --port 3307 &
-cd ../..
+# Start infrastructure (PostgreSQL, Valkey, ClickHouse, Dolt)
+pnpm infra:up
 
-# Run migrations
-bun run src/index.ts doctor --fix
+# Build all packages
+pnpm build
 
 # Verify
-bun run typecheck
-bun run lint
-bun test
+pnpm typecheck
+pnpm lint
+pnpm test
 
 # Start development
-bun run dev    # watch mode
+pnpm dev              # watch mode across all packages
 # or
-bun run src/index.ts --help
+pnpm serve            # start Fastify server
+# or
+node apps/control-plane/dist/index.js --help
 ```
 
 ### .gitignore
@@ -1971,10 +2372,10 @@ node_modules/
 
 # Build output
 dist/
+.turbo/
 
 # Platform runtime data
 .platform/
-config.local.yaml
 
 # Environment
 .env
@@ -1994,13 +2395,15 @@ Thumbs.db
 
 # Test artifacts
 coverage/
+
+# Docker volumes (local only)
+.docker-data/
 ```
 
 ### .gitattributes
 
 ```gitattributes
 # Merge strategies for state files
-config.yaml merge=union
 formulas/*.toml merge=union
 
 # Binary files
@@ -2009,12 +2412,12 @@ formulas/*.toml merge=union
 *.ico binary
 
 # Lock files
-bun.lockb binary
+pnpm-lock.yaml -diff
 ```
 
 ---
 
-## 9. CI/CD Setup
+## 11. CI/CD Setup
 
 ### .github/workflows/ci.yml
 
@@ -2027,117 +2430,235 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
-      - run: bun install
-      - run: bun run typecheck
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
-      - run: bun install
-      - run: bun run lint
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
 
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
-      - run: bun install
-      - run: bun run test:unit
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:unit
 
   integration-tests:
     runs-on: ubuntu-latest
     needs: [typecheck, lint, unit-tests]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: the_hive
+          POSTGRES_USER: hive
+          POSTGRES_PASSWORD: hive_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hive -d the_hive"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+      valkey:
+        image: valkey/valkey:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
 
-      # Install Dolt
+      # Install Dolt for The Frame tests
       - name: Install Dolt
         run: |
           sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/download/install.sh | bash'
           dolt version
 
-      - run: bun install
-
-      # Initialize and start Dolt
       - name: Start Dolt Server
         run: |
-          mkdir -p .platform/dolt-data
-          cd .platform/dolt-data
+          mkdir -p /tmp/dolt-data && cd /tmp/dolt-data
           dolt init
-          dolt sql-server --port 3307 &
-          cd ../..
+          dolt sql-server --port 3307 --host 0.0.0.0 &
           sleep 3
 
-      - run: bun run test:integration
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      - name: Run integration tests
+        env:
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: the_hive
+          POSTGRES_USER: hive
+          POSTGRES_PASSWORD: hive_dev
+          VALKEY_HOST: 127.0.0.1
+          VALKEY_PORT: 6379
+          DOLT_HOST: 127.0.0.1
+          DOLT_PORT: 3307
+          DOLT_USER: root
+        run: pnpm test:integration
 
   e2e-tests:
     runs-on: ubuntu-latest
     needs: [integration-tests]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: the_hive
+          POSTGRES_USER: hive
+          POSTGRES_PASSWORD: hive_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hive -d the_hive"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+      valkey:
+        image: valkey/valkey:8-alpine
+        ports:
+          - 6379:6379
+
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
 
       - name: Install Dolt
         run: |
           sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/download/install.sh | bash'
 
-      - run: bun install
-
       - name: Start Dolt Server
         run: |
-          mkdir -p .platform/dolt-data
-          cd .platform/dolt-data
+          mkdir -p /tmp/dolt-data && cd /tmp/dolt-data
           dolt init
-          dolt sql-server --port 3307 &
-          cd ../..
+          dolt sql-server --port 3307 --host 0.0.0.0 &
           sleep 3
 
-      - run: bun run test:e2e
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      - name: Run E2E tests
+        env:
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: the_hive
+          POSTGRES_USER: hive
+          POSTGRES_PASSWORD: hive_dev
+          VALKEY_HOST: 127.0.0.1
+          VALKEY_PORT: 6379
+          DOLT_HOST: 127.0.0.1
+          DOLT_PORT: 3307
+          DOLT_USER: root
+        run: pnpm test:e2e
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [integration-tests]
+    strategy:
+      matrix:
+        service: [control-plane, runtime-orchestrator, review-engine, router, browser-automation]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          if [ -f "apps/${{ matrix.service }}/Dockerfile" ]; then
+            docker build -f apps/${{ matrix.service }}/Dockerfile -t the-hive/${{ matrix.service }}:ci .
+          elif [ -f "services/${{ matrix.service }}/Dockerfile" ]; then
+            docker build -f services/${{ matrix.service }}/Dockerfile -t the-hive/${{ matrix.service }}:ci .
+          else
+            echo "No Dockerfile for ${{ matrix.service }} — skipping (Phase 5+)"
+          fi
 ```
 
 ---
 
-## 10. Contributing Guidelines
+## 12. Contributing Guidelines
 
 ### Adding a New CLI Command
 
-1. Create `src/cli/commands/{name}.ts`.
+1. Create `apps/control-plane/src/cli/commands/{name}.ts`.
 2. Export a `register{Name}Commands(parent: Command): void` function.
-3. Import and register the function in `src/cli/index.ts` under the appropriate
-   command group.
+3. Import and register the function in `apps/control-plane/src/cli/index.ts`
+   under the appropriate command group.
 4. Every action handler must call `formatOutput(data, parent.parent)` to respect
    the `--json` flag.
-5. Add unit tests in `tests/unit/cli/{name}.test.ts`.
+5. Add unit tests in `tests/unit/control-plane/{name}.test.ts`.
 6. Update the `platform {group} --help` output if the command group is new.
+
+### Adding a New Service
+
+1. Create `services/{name}/` with `package.json`, `tsconfig.json`, and `src/index.ts`.
+2. The `package.json` name must follow `@the-hive/{name}` convention.
+3. Add `@the-hive/contracts` and `@the-hive/shared` as workspace dependencies.
+4. Register the service in `pnpm-workspace.yaml` (already covered by `services/*`).
+5. Add a health check endpoint at `GET /health`.
+6. Add unit tests in `tests/unit/{name}/`.
+7. Add a Dockerfile when the service is ready for containerized deployment (Phase 5+).
 
 ### Adding a New Runtime Adapter
 
-1. Create `src/runtime/adapters/{name}.ts`.
-2. Implement the `RuntimeAdapter` interface from `src/core/types.ts`. Required
+1. Create `services/runtime-orchestrator/src/adapters/{name}.ts`.
+2. Implement the `RuntimeAdapter` interface from `@the-hive/contracts`. Required
    methods: `buildSpawnCommand`, `deployConfig`, `detectReady`,
    `parseTranscript`, `buildEnv`.
-3. Add the adapter to the registry map in `src/runtime/detect.ts`.
+3. Add the adapter to the registry map in `services/runtime-orchestrator/src/adapters/detect.ts`.
 4. Document runtime-specific environment variables in `.env.example`.
-5. Add unit tests in `tests/unit/runtime/{name}.test.ts`. Test at minimum:
+5. Add unit tests in `tests/unit/runtime-orchestrator/{name}.test.ts`. Test at minimum:
    spawn command generation, config deployment, env building.
 6. Add an integration test that verifies readiness detection if the runtime is
    available in CI.
@@ -2163,22 +2684,21 @@ jobs:
 
 ### Modifying the Data Model
 
-1. Create `src/data/dolt/migrations/{NNN}-{description}.sql`, numbered
-   sequentially.
-2. Write both the `CREATE/ALTER` statements and any required `CREATE INDEX`.
-3. Update `src/core/types.ts` with corresponding TypeScript interfaces.
-4. Run `bun run src/index.ts doctor --fix` to apply migrations.
+1. For Dolt (The Frame): create `migrations/{NNN}-{description}.sql`, numbered
+   sequentially. Write both the `CREATE/ALTER` statements and required indexes.
+2. For PostgreSQL (The Comb): update or create a Drizzle schema file in the
+   relevant service, then run `pnpm drizzle-kit generate` to produce a migration.
+3. Update `packages/contracts/src/types.ts` with corresponding TypeScript interfaces.
+4. Run `platform doctor --fix` to apply pending migrations.
 5. Write a unit test that verifies the migration applies cleanly.
-6. For SQLite schema changes, update the corresponding init function in
-   `src/data/sqlite/{db}.ts`.
 
 ### Code Review Standards
 
 - **Type safety:** No untyped `any` without a justifying comment.
 - **Error handling:** All async operations must have error handling. Use typed
-  error classes from `src/core/errors.ts`.
-- **Testing:** Every new function needs at least one unit test. Integration
-  tests required for database operations.
+  error classes from `@the-hive/shared`.
+- **Testing:** Every new function needs at least one unit test (vitest).
+  Integration tests required for database operations.
 - **CLI consistency:** All commands support `--json`. Output formats are
   consistent across command groups.
 - **Documentation:** Public functions have JSDoc. Non-obvious logic has inline
@@ -2186,86 +2706,87 @@ jobs:
 
 ---
 
-## 11. How ATSA Skills Integrate
+## 13. How ATSA Skills Integrate
 
 ### ATSA as the Skill/Prompt Layer
 
-The existing AllTheSkillsAllTheAgents (ATSA) repository contains 17 skills
-across 44 files. These skills serve as the initial Skill/Prompt Layer (Layer 1)
-for the platform. The relationship is structural, not incidental:
+The existing AllTheSkillsAllTheAgents (ATSA) repository contains 21 skills
+across 48+ files. These skills serve as the initial Skill/Prompt Layer (Layer 1)
+for The Hive. The relationship is structural, not incidental:
 
-**ATSA skills are the prompt templates that define agent behavior.** The
-platform's orchestration, work, quality, and runtime layers execute agents; ATSA
-skills define what those agents know and how they think. The platform loads ATSA
-skills via the skill system module and injects them into agent sessions at spawn
+**ATSA skills are the Blueprints that define Worker behavior.** The Hive's
+orchestration, work, quality, and runtime layers execute Workers; ATSA skills
+define what those Workers know and how they think. The Hive loads ATSA skills
+via The Waggle (skill registry) and injects them into Worker sessions at spawn
 time.
 
 ### Integration Mechanism
 
 ```
-Platform boots
-  --> Skill registry scans skills/**/SKILL.md
+The Hive boots
+  --> The Waggle scans skills/**/SKILL.md
     --> Parses YAML frontmatter (Stage 1: metadata, ~100 tokens each)
     --> Builds indexes: by name, by role, by domain, ownership map
-  --> Orchestrator requests agent spawn
-    --> Dispatcher resolves skill for agent role + domain
+  --> The Queen requests Worker spawn
+    --> Dispatcher resolves Blueprint for Worker role + domain
     --> Loads full SKILL.md body (Stage 2: ~500 lines)
     --> Overlay generator injects project state (Stage 3: dynamic)
-    --> Combined prompt deployed to agent worktree
-  --> Agent reads references on demand (Stage 3: unlimited)
+    --> Combined prompt deployed to Worker worktree
+  --> Worker reads references on demand (Stage 3: unlimited)
 ```
 
-### Dogfooding: Building the Platform with Its Own Skills
+### Dogfooding: Building The Hive with Its Own Skills
 
-The platform uses its own skills to build itself. This is the ultimate
-validation of the skill system. The following mapping shows how platform skills
+The Hive uses its own skills to build itself. This is the ultimate
+validation of The Waggle. The following mapping shows how Blueprints
 correspond to implementation work:
 
-| Skill | Builds | Owns |
-|-------|--------|------|
-| `coordinator` | Project orchestration | config.yaml, formulas/ |
+| Blueprint | Builds | Owns |
+|-----------|--------|------|
+| `coordinator` | The Queen orchestration | formulas/ |
 | `lead` | Team decomposition | N/A (coordination only) |
-| `builder` (backend domain) | src/tracker/, src/data/, src/merge/ | Backend implementation |
-| `builder` (infra domain) | src/runtime/, src/orchestration/ | Infrastructure implementation |
-| `builder` (comms domain) | src/communication/ | Communication module |
+| `builder` (backend domain) | apps/control-plane, packages/* | Backend implementation |
+| `builder` (infra domain) | services/runtime-orchestrator, infra/ | Infrastructure implementation |
+| `builder` (quality domain) | services/review-engine, services/browser-automation | Quality services |
+| `builder` (frontend domain) | apps/operator-console | The Glass |
 | `reviewer` | Code review | Read-only |
 | `scout` | Codebase exploration | Read-only |
 | `merger` | Conflict resolution | Merge scope only |
 
 ### Progressive Disclosure in Practice
 
-The token budget for skill loading during a platform build session:
+The token budget for skill loading during a Hive build session:
 
 ```
-Metadata for 6 skills x ~100 tokens     =    ~600 tokens
-Active skill body (1 builder)            =  ~2,000 tokens
-2 reference files loaded on demand       =  ~1,000 tokens
-Dynamic overlay (project state)          =    ~500 tokens
-                                           ────────────
-Total skill overhead per agent            ~4,100 tokens  (< 2% of 200k)
+Metadata for 6 Blueprints x ~100 tokens     =    ~600 tokens
+Active Blueprint body (1 builder)            =  ~2,000 tokens
+2 reference files loaded on demand           =  ~1,000 tokens
+Dynamic overlay (project state)              =    ~500 tokens
+                                               ────────────
+Total skill overhead per Worker               ~4,100 tokens  (< 2% of 200k)
 ```
 
-This leaves over 98% of the context window for actual work -- code, errors,
-git output, test results. The platform's skill loading adds negligible overhead.
+This leaves over 98% of the context window for actual work — code, errors,
+git output, test results. The Hive's skill loading adds negligible overhead.
 
 ### Skill-to-Platform Mapping
 
-ATSA skills from the source repository map to platform concepts:
+ATSA skills from the source repository map to Hive concepts:
 
-| ATSA Skill | Platform Equivalent | Notes |
-|------------|-------------------|-------|
-| orchestrator | Coordinator loop | ATSA's 14-phase playbook becomes the coordinator skill |
-| backend-agent | Builder (backend domain) | File scope + cognitive patterns define the specialization |
-| frontend-agent | Builder (frontend domain) | Same role, different domain config |
-| qe-agent | Quality Auditor | QA report schema and gate logic carry over directly |
+| ATSA Skill | Hive Equivalent | Notes |
+|------------|----------------|-------|
+| orchestrator | The Queen (Coordinator loop) | ATSA's 14-phase playbook becomes the coordinator Blueprint |
+| backend-agent | Builder (backend Caste) | File scope + cognitive patterns define the specialization |
+| frontend-agent | Builder (frontend Caste) | Same role, different domain config |
+| qe-agent | Quality Auditor | QA report schema and Inspection logic carry over directly |
 | contract-author | Contract system | Template-driven contract generation |
 | contract-auditor | Contract auditor | Conformance checking against implementations |
-| skill-writer | Meta skill | Generates new skills following the frontmatter spec |
+| skill-writer | Meta skill | Generates new Blueprints following the frontmatter spec |
 | project-profiler | Profile system | Codebase analysis for project-specific adaptation |
 | context-manager | Handoff protocol | Checkpoint-based context handoff at ~80% usage |
 
-ATSA's existing skills are not discarded -- they are the starting point for the
-platform's skill library. As the platform matures, skills evolve via the
+ATSA's existing skills are not discarded — they are the starting point for The
+Hive's Blueprint library. As The Hive matures, Blueprints evolve via the
 template generation system (see `08-skill-system.md` section 5), but the core
-anatomy -- YAML frontmatter, markdown body, reference directory -- remains
+anatomy — YAML frontmatter, markdown body, reference directory — remains
 identical.

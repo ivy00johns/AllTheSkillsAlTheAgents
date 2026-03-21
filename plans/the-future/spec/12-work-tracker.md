@@ -70,6 +70,37 @@ CALL DOLT_COMMIT('-m', 'message');   -- create versioned commit
 
 Critical: SQL transaction commits BEFORE `DOLT_COMMIT`. This prevents data loss for ephemeral items (wisps) when `DOLT_COMMIT` finds nothing to stage.
 
+### Known Dolt Limitations
+
+**mergeJoinIter panic.** Dolt's query planner can panic on certain complex JOIN operations. Use `LEFT JOIN` instead of `JOIN` in queries that combine multiple CTEs or recursive subqueries. This is a known Dolt bug, not a SQL logic error.
+
+**GH#2455 -- DOLT_COMMIT staging sweep.** NEVER use `DOLT_COMMIT('-Am', ...)`. The `-Am` flag has a data loss bug where unstaged changes in other tables can be silently dropped. Always stage explicitly:
+
+```sql
+CALL DOLT_ADD('work_items');
+CALL DOLT_ADD('events');
+CALL DOLT_COMMIT('-m', 'commit message', '--author', 'agent <agent@platform>');
+```
+
+**Wisp data loss.** Always `COMMIT` the SQL transaction BEFORE calling `DOLT_COMMIT()`. If `DOLT_COMMIT` runs before the SQL `COMMIT`, and the transaction is later rolled back or lost, the Dolt commit will reference rows that no longer exist. This is especially dangerous for wisps, where the ephemeral data may never be recoverable.
+
+**Production sizing.** Set `max_connections >= 100` for any deployment with more than 5 concurrent agents. Run fewer than 5 databases per Dolt server instance -- each database consumes its own memory pool and lock table. Beyond 5 databases, latency and lock contention degrade significantly.
+
+**Shadow database prevention.** The auto-start daemon must be disabled in three situations to prevent accidentally starting a second Dolt server against the same data directory: (1) in test mode (tests use their own isolated databases), (2) when an explicit port is configured via `PLATFORM_DOLT_PORT` (assumes an externally managed server), and (3) when another Dolt server is detected on the expected port.
+
+### Redirect Files for Multi-Worktree
+
+When Workers operate in git worktrees (created by `git worktree add`), the `.hive/` directory exists only in the main worktree. Child worktrees contain a `.hive/redirect` file -- a single line with the absolute path to the canonical `.hive/` directory.
+
+**Discovery algorithm:**
+
+1. Walk up the directory tree from the current working directory
+2. At each level, check for `.hive/redirect` (a file) or `.hive/` (a directory)
+3. If `.hive/redirect` is found, read its contents as the path to the real `.hive/` directory
+4. If `.hive/` is found directly, use it
+
+This means every Worker in any worktree transparently uses the shared tracker database, shared configuration, and shared memory -- without absolute path configuration or environment variables. The redirect file is the only coupling between a worktree and the canonical project state.
+
 ---
 
 ## 3. Complete Work Item Schema
@@ -365,6 +396,29 @@ CREATE TABLE dependencies (
 
 No FK on `depends_on_id` — deliberately dropped to allow cross-project references using the `external:<project>:<id>` format.
 
+### Cross-Project Dependency Resolution
+
+Dependencies with `external:<project>:<id>` targets require a routing mechanism to resolve across project boundaries. The `routes.jsonl` file maps Cell ID prefixes to project paths:
+
+```json
+{"prefix": "backend", "path": "/home/user/projects/backend", "remote": "", "protocol": "local", "creds": "", "timeout": 5000, "retries": 2}
+{"prefix": "infra", "path": "", "remote": "ssh://git@host/infra.git", "protocol": "git-protocol", "creds": "ssh-key", "timeout": 30000, "retries": 3}
+{"prefix": "partner", "path": "", "remote": "https://hub.example.com/partner", "protocol": "https", "creds": "token:xxx", "timeout": 15000, "retries": 2}
+```
+
+**Schema:** `{prefix, path, remote, protocol, creds, timeout, retries}`
+
+**Protocol routing:**
+
+| Protocol | Resolution Path | Credential Handling |
+|----------|----------------|---------------------|
+| `local` | Open project database directly at `path` | None (filesystem permissions) |
+| `git-protocol` | CLI subprocess (`dolt fetch` / `dolt pull`) | SSH keys inherited from environment |
+| `https` with creds | CLI subprocess with credentials in `cmd.Env` | Credentials from `creds` field |
+| (other) | SQL stored procedure (`CALL DOLT_PULL(...)`) | Connection-level auth |
+
+Without this routing table, `external:<project>:<id>` references in dependencies cannot resolve, and cross-project blocking relationships are invisible to the ready queue algorithm.
+
 ### Hard Blockers (Affect Ready Queue)
 
 These 4 types prevent work from being scheduled. They are checked by `AffectsReadyWork()` and drive the `ready_items` view.
@@ -580,6 +634,27 @@ WHERE id = :item_id
 
 The conditional UPDATE is a compare-and-swap. Cell-level merge in Dolt ensures two concurrent claims see exactly one succeed. The loser gets `RowsAffected=0` and can immediately try the next ready item.
 
+### 5-Attempt Atomic Claim Retry Loop
+
+Between the SELECT (finding a candidate item from the ready queue) and the UPDATE (claiming it), another Worker may claim the same Cell. This is a natural race condition at even modest concurrency levels. The platform handles this with a retry loop:
+
+```
+FOR attempt = 1 TO 5:
+    1. SELECT candidate from ready_items (priority-sorted, filtered by role)
+    2. UPDATE work_items
+       SET assignee = :worker_id, status = 'active'
+       WHERE id = :candidate_id
+         AND status IN ('open', 'assigned')
+         AND (assignee IS NULL OR assignee = '' OR assignee = :worker_id)
+    3. IF RowsAffected == 1 → claim succeeded, return item
+    4. IF RowsAffected == 0 → another Worker claimed it, retry from step 1
+
+AFTER 5 FAILURES:
+    return no_cells_available
+```
+
+The `status IN ('open', 'assigned')` predicate handles two cases: unclaimed items (`open`) and items pre-assigned to this specific Worker (`assigned`). The `assignee` check prevents stealing items already claimed by another Worker. This pattern was proven at scale by Mission Control, where 10+ concurrent Workers contended for the same queue without deadlocks or double-dispatch.
+
 ### Release Operation
 
 ```sql
@@ -684,6 +759,61 @@ waits_for = "all-children"
 | `workflow` | Standard step sequence that becomes an item hierarchy (default) |
 | `expansion` | Reusable macro with target placeholders (`{target}`, `{target.title}`) |
 | `aspect` | Cross-cutting concern with before/after/around advice rules (AOP) |
+
+### Advice Rules (Aspect Formulas)
+
+Aspect formulas use `AdviceRule` to attach cross-cutting steps to matching targets:
+
+```toml
+[[advice]]
+kind = "before"          # before | after | around
+target = "steps.*.test"  # glob matching against step IDs
+```
+
+- **before:** Inserts advice steps before the matched target step
+- **after:** Inserts advice steps after the matched target step
+- **around:** Wraps the target -- advice steps execute before AND after, with the target in between
+
+Target matching uses glob syntax against step IDs within the formula. A self-matching prevention rule ensures an advice step cannot match itself (prevents infinite recursion during cooking).
+
+### OnCompleteSpec (Runtime Expansion)
+
+Steps can declare an `on_complete` block that dynamically generates new steps at runtime based on the output of the completed step:
+
+```toml
+[[steps]]
+id = "discover"
+title = "Discover services"
+
+  [steps.on_complete]
+  for_each = "output.services"
+  expand = "deploy-service"
+  var_map = { service_name = "item.name", service_port = "item.port" }
+```
+
+When the `discover` step completes, the formula engine iterates over `output.services` and expands the `deploy-service` template once per item. This enables dynamic step generation -- the number of steps is not known at cook time.
+
+### Two Cooking Modes
+
+The formula engine supports two substitution modes:
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| **Compile-time** | Keeps `{{variable}}` placeholders intact in the output | Templates that will be instantiated later (protomolecules) |
+| **Runtime** | Substitutes all `{{variable}}` references with actual values | Live molecules and wisps being executed now |
+
+Compile-time mode produces reusable templates. Runtime mode produces executable work items.
+
+### Compaction Parameters
+
+Formula-generated work items follow the same compaction strategy as regular items, with tunable parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Tier 1 cutoff | 30 days | Closed items older than this are eligible (~70% size reduction) |
+| Tier 2 cutoff | 90 days | Items already at Tier 1, older than this, get further reduction |
+| Concurrency semaphore | 5 | Max parallel compaction goroutines (prevents LLM API saturation) |
+| Batch size | 50 | Items processed per compaction run |
 
 ### Built-in Formulas
 
@@ -935,7 +1065,60 @@ Compaction runs in a semaphore-bounded goroutine pool (default concurrency: 5). 
 
 ---
 
-## 13. CLI Reference
+## 13. Memory System
+
+Workers need persistent context that survives session boundaries without creating Cells (work items). The memory system provides key-value storage for project-level knowledge that is too small for a work item and too important to lose when a session ends.
+
+### Storage
+
+Memories are stored in the `config` table with a `kv.memory.` prefix:
+
+```sql
+-- Example memory entries in config table
+INSERT INTO config (`key`, value) VALUES ('kv.memory.db_password_location', 'Stored in 1Password vault "Platform Dev"');
+INSERT INTO config (`key`, value) VALUES ('kv.memory.test_user_email', 'test@example.com (seeded in dev DB)');
+INSERT INTO config (`key`, value) VALUES ('kv.memory.deploy_branch', 'Always deploy from release/* branches, never main');
+```
+
+### Commands
+
+```bash
+# Store a memory
+platform tracker remember <key> <value>
+# Example: platform tracker remember deploy_target "staging.example.com port 8443"
+
+# List all memories
+platform tracker memories
+# Output:
+#   KEY                    VALUE
+#   db_password_location   Stored in 1Password vault "Platform Dev"
+#   test_user_email        test@example.com (seeded in dev DB)
+#   deploy_branch          Always deploy from release/* branches, never main
+
+# Recall a specific memory
+platform tracker recall <key>
+
+# Remove a memory
+platform tracker forget <key>
+```
+
+### Scope
+
+Memories are per-project -- all Workers in a project share the same memory store. This means a backend Worker can store a convention discovered during implementation, and a QE Worker starting a new session will have access to it.
+
+### Integration with Session Prime
+
+The prime hook (executed when a Worker session starts) loads relevant memories into the Worker's context:
+
+1. Query all `kv.memory.*` entries from the config table
+2. Format as a "Project Memories" section
+3. Inject into the Worker's system prompt alongside role instructions and contract references
+
+This ensures that accumulated project knowledge is available to every Worker from the start of their session, without consuming work item slots or polluting the dependency graph.
+
+---
+
+## 14. CLI Reference
 
 ### CRUD Operations
 
@@ -1164,7 +1347,7 @@ platform tracker query "label=urgent AND priority=0"
 
 ---
 
-## 14. Two-Tier Architecture
+## 15. Two-Tier Architecture
 
 The work tracker operates at two levels, each with its own Dolt database. This separates fleet-wide coordination from project-specific work while enabling cross-tier queries for full visibility.
 

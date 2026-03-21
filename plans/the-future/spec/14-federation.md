@@ -177,6 +177,12 @@ This routing is transparent to the user. The CLI commands behave identically reg
 
 Sovereignty tiers define the data-sharing relationship between two instances. Each peer relationship has a tier, and the tier governs what data flows and in which direction.
 
+### Enforcement Timing
+
+Phase 1 of the platform implements peer registration and selective table sync ONLY. Full sovereignty tier enforcement is deferred to Phase 2. The rationale: getting data flowing between instances is more valuable than perfecting the access control model. Enforce later, with production data to validate against.
+
+**Tier 4 (anonymous/content-addressed) is explicitly deferred.** It requires a content-addressed identity system that has not been designed. The only production system with sovereignty tiers (Beads) has T4 marked as "NOT IMPLEMENTED." The Hive should implement Tiers 1-3 first, validate them at scale with real federation traffic, and then design T4 based on observed needs.
+
 ### Tier 1: Sovereign
 
 Full local control. The instance shares nothing by default and selectively pushes specific tables or branches to specific peers.
@@ -838,7 +844,56 @@ CREATE TABLE federation_peers (
 
 ---
 
-## 15. Operational Concerns
+## 15. Distributed Reputation (Stamps)
+
+### What Stamps Are
+
+Stamps are multi-dimensional reputation attestations. When a Worker completes work and that work is reviewed, the reviewer (or coordinator) can stamp the Worker's contribution with a quality assessment. Unlike simple numeric scores, stamps capture which dimension of quality is being attested (code quality, speed, correctness, collaboration) and link to specific evidence.
+
+### Yearbook Constraint
+
+A Worker cannot stamp its own work. This is enforced at the database level:
+
+```sql
+CREATE TABLE stamps (
+    id              CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    stamper_id      VARCHAR(255) NOT NULL,
+    stampee_id      VARCHAR(255) NOT NULL,
+    cell_id         VARCHAR(255) NOT NULL,      -- the work item being attested
+    dimension       VARCHAR(64) NOT NULL,        -- 'quality', 'speed', 'correctness', 'collaboration'
+    score           REAL NOT NULL CHECK (score BETWEEN 0.0 AND 1.0),
+    evidence_id     VARCHAR(255),                -- link to review, merge, or audit record
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CHECK (stamper_id != stampee_id),            -- yearbook constraint
+    INDEX idx_stamps_stampee (stampee_id),
+    INDEX idx_stamps_cell (cell_id),
+    INDEX idx_stamps_dimension (dimension)
+);
+```
+
+The `CHECK (stamper_id != stampee_id)` constraint is the yearbook rule -- named because you cannot sign your own yearbook. This prevents reputation inflation and ensures that all reputation is externally validated.
+
+### Trust Levels
+
+Stamps accumulate into trust levels that determine an agent's privileges in federated operations:
+
+| Level | Name | Criteria | Privileges |
+|-------|------|----------|------------|
+| 0 | Registered | Agent exists in the system | Can claim local work only |
+| 1 | Participant | 5+ stamps with avg score > 0.3 | Can receive routed work from peers |
+| 2 | Contributor | 20+ stamps with avg score > 0.5 | Can route work to other instances |
+| 3 | Maintainer | 50+ stamps with avg score > 0.7, no security violations | Can approve cross-instance merges |
+
+Trust levels are computed, not assigned. When stamps sync via federation, trust levels are recalculated at the receiving instance using its own thresholds.
+
+### Phase 1 Bootstrapping
+
+In Phase 1, stamps are local-only claims. They are stored in the stamps table, which is in the federated table set, but cross-Colony propagation happens only via explicit Dolt push/pull operations. There is no automatic stamp gossip protocol. This is intentional -- reputation propagation at scale requires careful design around Sybil resistance and trust transitivity, which are Phase 2 concerns.
+
+---
+
+## 16. Operational Concerns
 
 ### Automatic Sync Scheduling
 

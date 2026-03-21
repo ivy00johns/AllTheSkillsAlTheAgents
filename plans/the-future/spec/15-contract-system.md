@@ -399,6 +399,36 @@ indexes:
 
 The data layer contract prevents a common class of integration failure: the API handler assumes `getUserByEmail` returns a promise, but the implementation returns a synchronous result. Or the handler assumes deletion cascades to sessions, but the implementation does not. The contract makes these semantics explicit.
 
+### Rate Limiting as API Contract Surface
+
+Rate limits are part of the API contract, not an implementation detail. Each endpoint declares its rate limit tier in the OpenAPI specification (defined in `18-the-glass.md`):
+
+| Tier | Limit | Window | Applies To |
+|------|-------|--------|------------|
+| `login` | 5 requests/min | Per IP | Authentication endpoints (critical security) |
+| `mutation` | 60 requests/min | Per API key | POST/PUT/PATCH/DELETE operations |
+| `heavy` | 10 requests/min | Per API key | Resource-intensive queries (search, export, reports) |
+| `read` | 120 requests/min | Per API key | GET operations (default) |
+
+Rate limit tier is specified per endpoint in the OpenAPI contract using the `x-rate-limit-tier` extension:
+
+```yaml
+paths:
+  /auth/login:
+    post:
+      x-rate-limit-tier: login
+  /work-items:
+    get:
+      x-rate-limit-tier: read
+    post:
+      x-rate-limit-tier: mutation
+  /work-items/search:
+    post:
+      x-rate-limit-tier: heavy
+```
+
+Implementing agents MUST respect these tiers. The contract-auditor verifies that rate limiting middleware is applied with the correct tier per endpoint. Rate limit responses use the standard error envelope with code `RATE_LIMITED` and include `Retry-After` headers.
+
 ---
 
 ## 3. Contract Lifecycle
@@ -470,6 +500,10 @@ Each implementing agent receives the relevant subset of contracts:
 - Infrastructure builder receives: AsyncAPI spec (if applicable)
 
 Contracts are loaded as part of the dynamic overlay (`prime` command). The agent sees: "These are the interfaces you must implement."
+
+**Distribution mechanism:** Contracts are committed to the repo in the `contracts/` directory. During sling dispatch (step 4: write CLAUDE.md overlay), the relevant contract file paths are referenced by path in the overlay. Workers read contracts from the worktree -- there is no separate registry, no copy mechanism, and no contract server. The worktree IS the distribution channel.
+
+**Contract change propagation:** When a contract is updated (version bumped by the contract-author), all active Workers consuming that contract receive a notification via the mail protocol. The notification includes the contract ID, old version, new version, and a summary of changes. Workers are expected to re-read the contract from the worktree and adjust their implementation accordingly. Breaking changes (MAJOR version bumps) follow the full breaking change protocol defined in Section 7.
 
 ### Phase 4: Implement
 
@@ -592,6 +626,26 @@ interface OwnershipMap {
 ```
 
 The `resolve()` method applies the precedence rules to determine the owner of any given file path. The `checkOverlap()` method validates a new ownership claim against all existing claims before a spawn is approved.
+
+### Runtime File Ownership Registry
+
+The static ownership map (computed from skill frontmatter) is supplemented by a live `filePath -> workerId` map materialized at runtime. This registry tracks which Worker is actively responsible for which files at any given moment.
+
+**Updated when:**
+
+1. A Worker claims a Cell -- the Cell's relevant files (from the work item's scope or the Worker's skill declaration) are registered
+2. Sling deploys guard rules -- the guard rule enforcement writes the active ownership into the registry
+3. A Worker session ends -- its file ownership entries are cleared
+
+**Exposed via API:**
+
+```
+GET /api/contracts/:id/compliance
+```
+
+Returns the current compliance state of a contract: which files are owned by which Workers, whether any ownership violations exist, and whether all contracted interfaces have active implementers.
+
+**Violations surfaced on The Airway:** When a Worker modifies a file it does not own (detected at edit time or merge time), the violation is emitted as an event on The Airway (Valkey Streams). The Comb block in The Glass displays file ownership state and highlights violations in real time.
 
 ---
 

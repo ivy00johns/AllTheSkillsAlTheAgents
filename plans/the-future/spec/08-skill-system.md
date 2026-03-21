@@ -560,9 +560,103 @@ When a skill declares `cognitive_patterns: [brooks-mythical-man-month, beck-tdd]
 
 If a referenced pattern is not found, the platform warns but does not fail — graceful degradation over hard failure.
 
+### Cognitive Pattern YAML Format
+
+Each cognitive pattern is a standalone YAML file stored in `skills/patterns/{mode}/`. The format supports weighted activation based on context matching:
+
+```yaml
+pattern:
+  name: first-principles-decomposition
+  mode: engineering  # ceo | engineering | design
+  activation: "complex system design, architecture decisions"
+  prompt: |
+    Before solving, decompose the problem into fundamental truths.
+    What are the base constraints? What must be true regardless of approach?
+    Build up from these constraints rather than reasoning by analogy.
+  weight: 0.8  # 0-1, likelihood of activation when context matches
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Unique identifier, kebab-case |
+| `mode` | enum | Yes | One of: `ceo`, `engineering`, `design` |
+| `activation` | string | Yes | Comma-separated context triggers describing when this pattern applies |
+| `prompt` | string | Yes | The instruction text injected into the agent's context when activated |
+| `weight` | float | Yes | 0-1 probability of activation when context matches. Higher weight = more likely to activate |
+
+**Storage:** `skills/patterns/{mode}/*.yaml` — e.g., `skills/patterns/engineering/first-principles-decomposition.yaml`
+
+**Loading:** Patterns are loaded at agent initialization based on the Caste (role) assignment. A Builder with `cognitive_patterns: [brooks-mythical-man-month, beck-tdd]` loads those specific patterns from the engineering mode directory.
+
+**Multiple activation:** Multiple patterns can activate per turn. When the agent's current context matches multiple pattern activation strings, each matching pattern is independently selected based on its weight (weighted random selection). This allows complementary frameworks to compose — e.g., Brooks (conceptual integrity) + Beck (make the change easy) activating simultaneously on an architecture task.
+
 ---
 
-## 12. Design Decision Summary
+## 12. Security and Provenance
+
+### External Skill Import Pipeline
+
+Skills imported from external registries pass through a three-layer security pipeline before activation:
+
+```
+fetch → hash → static scan → review gate → activate
+```
+
+| Stage | Action | Blocks On |
+|-------|--------|-----------|
+| **Fetch** | Download skill package from registry | Network failure, invalid URL |
+| **Hash** | SHA-256 content hash, compare against registry manifest | Hash mismatch (tampered content) |
+| **Static Scan** | Automated analysis for dangerous patterns | Any flagged pattern (see below) |
+| **Review Gate** | Human or AI review of scan results | Operator rejection |
+| **Activate** | Install to `skills/` and register in the skill registry | — |
+
+First-party skills (those developed within the project) are exempt from this pipeline — they are already under version control and code review.
+
+### Cryptographic Provenance
+
+Skills imported from external registries require **Sigstore cryptographic provenance**. Each published skill includes a Sigstore signature bundle that proves:
+
+- **Who** published the skill (identity binding via OIDC)
+- **When** it was published (timestamped by Sigstore's transparency log)
+- **What** was published (content hash matches the signed digest)
+
+First-party skills are exempt. The provenance requirement applies only to skills crossing trust boundaries.
+
+### Static Analysis Flags
+
+The static scan stage flags the following patterns for review:
+
+| Flag | Pattern | Risk |
+|------|---------|------|
+| **Shell commands** | `bash`, `sh -c`, `exec`, backticks in skill body | Arbitrary code execution |
+| **External URL fetches** | `curl`, `wget`, `fetch`, `http://`, `https://` in skill body | Data exfiltration, payload download |
+| **Base64-encoded payloads** | Base64 strings > 100 chars in skill body or references | Obfuscated malicious content |
+| **Prompt injection patterns** | "ignore previous instructions", "system prompt:", role override attempts | Skill hijacking |
+| **Unicode Tag codepoints** | Characters in U+E0000-U+E007F range | Invisible instruction injection (tag characters render as zero-width but are processed by LLMs) |
+
+Any flagged pattern triggers the review gate. The scan is conservative — false positives are acceptable; false negatives are not.
+
+### The Lethal Trifecta
+
+No single Worker may simultaneously:
+
+1. **Access sensitive data** (credentials, API keys, user data)
+2. **Process untrusted skill content** (external skills, user-provided patterns)
+3. **Have unrestricted external communication** (network access, outbound HTTP)
+
+Any two of these three are acceptable. All three together create an exfiltration vector. The platform enforces this constraint at spawn time by checking the intersection of the Worker's data scope, skill provenance, and network permissions.
+
+### Session-Boundary Migration
+
+When a skill is updated while Workers are actively using it, the running Workers keep their current skill version until their Cell completes. Only new spawns receive the updated skill. This prevents mid-session instruction changes that could invalidate work in progress or introduce inconsistent behavior.
+
+### Security Advisory: CVE-2025-6514
+
+`mcp-remote` versions ≤0.1.15 have a **CVSS 9.6** OS command injection vulnerability. Any skill that uses MCP remote transport must pin `mcp-remote ≥0.1.16`. The static scan stage flags imports of `mcp-remote` below this version.
+
+---
+
+## 13. Design Decision Summary
 
 | Decision | Rationale |
 |----------|-----------|

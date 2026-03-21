@@ -404,6 +404,16 @@ specificity and intentionality."
 - Machine-readable diagnostics: `exit_reason`, `timeout_at_turn`, `last_tool_call`
 - Non-fatal I/O: observability writes never cause tests to fail
 
+**Tier 2 cost and diagnostics:**
+- Target cost: **$3.85 per full E2E eval run**
+- Diagnostic output fields on every eval result:
+  - `exit_reason`: why the eval terminated (success, timeout, error, crash)
+  - `timeout_at_turn`: which conversation turn hit the timeout (null if no timeout)
+  - `last_tool_call`: the final tool invocation before exit (for debugging stuck evals)
+- **Atomic write** for eval results: results are written to a temp file and renamed
+  atomically (`rename()` is atomic on POSIX). This prevents corruption if the eval
+  runner crashes mid-write.
+
 ### Tier 3: LLM-as-Judge
 
 **Cost:** ~$0.15 per run. **Speed:** 10-30 seconds. **Run:** On merge request, on quality audit request.
@@ -465,6 +475,37 @@ a change has cross-cutting effects that touchfiles don't capture.
 **Forms:** fill_form (multi-field), file_upload
 **Evaluation:** evaluate (arbitrary JS), run_code (multi-statement)
 **Management:** tabs, resize, close, handle_dialog
+
+### The Ref System (Core Innovation)
+
+The Browse CLI's ref system is the core innovation that makes browser automation usable
+for AI agents. Without it, CSS selectors are brittle -- they break on minor DOM changes,
+require deep knowledge of the page structure, and produce opaque errors when stale.
+
+**How it works:**
+
+1. **Accessibility tree snapshot** -- the Browse CLI captures the page's accessibility
+   tree (not the raw DOM), producing a semantic representation of interactive elements
+2. **Sequential @e refs** -- each element in the snapshot receives a sequential reference
+   (`@e1`, `@e2`, `@e3`, ...) that the agent uses to target interactions
+3. **Playwright Locators** -- internally, each @e ref maps to a Playwright Locator that
+   resolves the element at interaction time
+4. **Staleness detection** -- before using a ref, the system runs an `async count()`
+   check (~5ms) to verify the element still exists. This is dramatically faster than
+   Playwright's default 30-second timeout on stale selectors, and provides instant
+   feedback when a page has navigated away or re-rendered.
+
+**Ref lifecycle:**
+- Refs are assigned sequentially per snapshot -- they reset on page navigation
+- A new snapshot invalidates all previous refs
+- Agents must take a fresh snapshot after any navigation or significant DOM mutation
+
+**Security model:**
+- Localhost-only binding (127.0.0.1, never 0.0.0.0)
+- Random port assignment on startup
+- Bearer token authentication (UUID4 generated per session)
+- Token file written with `chmod 600` (owner-only read/write)
+- No remote access possible -- the daemon is a local tool, not a network service
 
 ### Quality-Specific Capabilities
 
@@ -577,6 +618,68 @@ Claiming "pre-existing" without proof is prohibited. Prove it or investigate.
 
 ---
 
+## 8b. Review Readiness State Machine
+
+Every branch tracks its review readiness through a per-gate state machine. This provides
+a clear, queryable answer to "is this branch ready to ship?"
+
+### Gate States
+
+Each gate on a branch is in one of three states:
+
+| State | Meaning |
+|-------|---------|
+| `CLEAR` | Gate has passed -- no issues found, or issues resolved |
+| `PENDING` | Gate has not yet been evaluated, or evaluation is in progress |
+| `FAILED` | Gate has been evaluated and found issues that must be addressed |
+
+### Gate Classification
+
+Gates are classified as **mandatory** or **informational**:
+
+- **Mandatory gates** block ship. If any mandatory gate is in `FAILED` state, the branch
+  cannot merge. Examples: Engineering Review, Security Review, QA Gate, CI Pipeline.
+- **Informational gates** are visible but non-blocking. A `FAILED` informational gate
+  produces a warning but does not prevent merge. Examples: Design Review (when no UI
+  changes), Performance Review (when within budget).
+
+### Override Model
+
+Admins can override a failed mandatory gate with a reason. The override is persisted
+in a JSONL audit log:
+
+```jsonl
+{"gate":"engineering-review","branch":"builder-alpha/wi-a1b2c3","action":"override","reason":"Known flaky test, tracked in ISSUE-123","admin":"john","timestamp":"2026-03-18T20:15:00Z"}
+```
+
+Overrides are never silent. They appear in the QA report, the merge commit message,
+and the expertise store (so the platform learns which gates are frequently overridden
+and may need recalibration).
+
+### CLI
+
+```bash
+# Check review readiness for current branch
+platform review status
+
+# Output:
+#   Branch: builder-alpha/wi-a1b2c3
+#   ┌──────────────────┬───────────┬────────────┐
+#   │ Gate             │ Status    │ Type       │
+#   ├──────────────────┼───────────┼────────────┤
+#   │ CI Pipeline      │ CLEAR     │ mandatory  │
+#   │ Engineering Review│ PENDING  │ mandatory  │
+#   │ QA Gate          │ CLEAR     │ mandatory  │
+#   │ Design Review    │ FAILED    │ info       │
+#   └──────────────────┴───────────┴────────────┘
+#   Verdict: NOT READY (1 mandatory gate pending)
+
+# Override a failed gate
+platform review override --gate engineering-review --reason "Approved in sync, reviewer offline"
+```
+
+---
+
 ## 9. "Boil the Lake" Completeness Principle
 
 ### The Philosophical Foundation
@@ -628,6 +731,34 @@ Not everything should be boiled. The distinction:
 
 The test: can AI compression reduce this to under an hour? If yes, it's a lake. If no,
 it's an ocean that requires planning, phasing, and incremental execution.
+
+### Completeness Score UX
+
+When the platform presents completeness estimates to the operator, it always shows both
+dimensions: a score and a time estimate.
+
+**Display format:** Score 1-10 alongside time estimate and compression ratio.
+
+```
+Completeness Assessment: 8/10
+  Missing: edge case tests for pagination, error boundary on settings page
+
+  Estimated effort to reach 10/10:
+    Human team:  3 weeks
+    The Hive:    4 hours
+    Compression: 18x
+
+  Recommendation: Complete. The delta is 4 hours of agent time.
+```
+
+The dual time estimate (human-team time AND AI+platform time) is always shown together.
+This makes the compression ratio visceral -- the operator sees "3 weeks vs. 4 hours" and
+the decision to complete becomes obvious. Showing only the AI time ("4 hours") loses the
+context that makes thoroughness rational.
+
+When the platform asks the operator questions (scope decisions, ambiguity resolution),
+the completeness score and time estimate are displayed alongside each option so the
+operator can make informed tradeoffs.
 
 ### The Caveat
 
@@ -694,3 +825,134 @@ Every quality finding detected becomes a prevention input for future work. Every
 successful pattern becomes a template for future builders. Every conflict resolution
 becomes a routing signal for future coordination. The system does not just enforce
 quality -- it learns what quality means for this specific codebase, team, and domain.
+
+---
+
+## 11. Platform Test Architecture
+
+The platform itself needs a rigorous testing strategy. Agent-based systems have unique
+testing challenges: nondeterministic outputs, tool-use variability, and the gap between
+"works in demo" and "works reliably in production." The evaluation harness is a
+**Phase 1 deliverable** -- not deferred to Phase 3.
+
+### Five-Layer Testing Pyramid
+
+```
+Layer 5: E2E Scenario Tests (LLM-as-judge, majority vote)
+Layer 4: Trajectory Evaluation (tool selection, step efficiency)
+Layer 3: Integration Tests (full Cell lifecycle, stubbed LLM)
+Layer 2: Component Tests (recorded LLM fixture replay)
+Layer 1: Deterministic Unit Tests (Vitest)
+```
+
+**Layer 1: Deterministic Unit Tests (Vitest)**
+- Routing logic, config parsing, schema validation, template rendering
+- Zero LLM calls -- pure functions with deterministic inputs/outputs
+- Run in <10 seconds, on every commit
+- Target: 100% coverage for non-LLM code paths
+
+**Layer 2: Component Tests with Recorded LLM Fixture Replay**
+- Record actual LLM responses during development, replay during testing
+- Reproducible (same input always produces same fixture), not mocked (fixtures are real
+  LLM output, not hand-written stubs)
+- Tests validate that the platform correctly handles real LLM response formats
+- Fixtures stored in `tests/fixtures/llm-responses/` as JSONL
+- When the LLM API changes formats, re-record fixtures and verify tests still pass
+
+**Layer 3: Integration Tests for Full Cell Lifecycle**
+- Stubbed LLM providers return canned responses for multi-turn workflows
+- Tests cover: Cell creation → dispatch → Worker execution → quality gate → merge
+- Verifies database state transitions, mail delivery, event recording
+- Uses in-memory SQLite for speed, real Dolt for schema validation tests
+
+**Layer 4: Trajectory Evaluation**
+- Uses the `agentevals` library to evaluate agent behavior quality
+- Metrics:
+  - **Tool selection accuracy**: did the agent use the right tool for each step?
+  - **Step efficiency**: how many turns to complete vs. optimal path?
+  - **Error recovery**: did the agent recover from tool failures gracefully?
+- Scored against golden trajectories from `tests/golden/{caste}/*.jsonl`
+- Each Caste (Builder, Reviewer, Scout, etc.) has 20-50 golden examples
+
+**Layer 5: End-to-End Scenario Tests (LLM-as-Judge)**
+- Full agent execution with live LLM calls
+- Block's majority-vote protocol: **3 runs + tiebreaker** if results diverge
+- LLM-as-judge evaluates output quality against a rubric
+- Expensive (~$3.85/run) -- runs on merge request, not every commit
+
+### Golden Datasets
+
+```
+tests/golden/
+├── builder/
+│   ├── auth-module.jsonl          # 25 examples: auth implementation patterns
+│   ├── api-routes.jsonl           # 20 examples: REST API implementation
+│   └── database-migration.jsonl   # 15 examples: migration patterns
+├── reviewer/
+│   ├── security-review.jsonl      # 30 examples: security finding detection
+│   └── code-quality.jsonl         # 20 examples: quality issue identification
+├── scout/
+│   ├── codebase-analysis.jsonl    # 25 examples: exploration patterns
+│   └── dependency-audit.jsonl     # 15 examples: dependency analysis
+└── coordinator/
+    ├── decomposition.jsonl        # 20 examples: task decomposition quality
+    └── dispatch-decisions.jsonl   # 15 examples: optimal dispatch choices
+```
+
+### pass^k vs. pass@k
+
+For production reliability, **pass^k > pass@k**:
+
+- `pass@k` = probability that at least 1 of k attempts succeeds (optimistic)
+- `pass^k` = probability that ALL of k consecutive attempts succeed (pessimistic)
+
+A system with 90% pass@1 has only **57% pass^8** -- meaning that across 8 consecutive
+production runs, nearly half will have at least one failure. The platform targets pass^k
+metrics for production reliability assessment, using pass@k only during development
+iteration.
+
+| pass@1 | pass^4 | pass^8 | Production Viability |
+|--------|--------|--------|---------------------|
+| 99%    | 96%    | 92%    | Production-ready    |
+| 95%    | 81%    | 66%    | Acceptable with monitoring |
+| 90%    | 66%    | 43%    | Not production-ready |
+| 80%    | 41%    | 17%    | Prototype only      |
+
+---
+
+## 12. Regression Detection
+
+The platform continuously monitors for quality regressions by comparing performance
+across time windows.
+
+### Metrics
+
+- **Latency**: p50 and p95 of Cell completion time (`created_at` → `completed_at`)
+- **Intervention rate**: percentage of Cells requiring human intervention or escalation
+- **Success rate**: percentage of Cells that pass QA gate on first submission
+- **Convergence score**: derived from success rate trend over a sliding window --
+  improving (converging), stable, or degrading (diverging)
+
+### Baseline vs. Post Windows
+
+```
+Baseline window: last 7 days (or last 50 completed Cells, whichever is larger)
+Post window: last 24 hours (or last 10 completed Cells)
+
+If post.p95_latency > baseline.p95_latency * 1.5 → REGRESSION WARNING
+If post.intervention_rate > baseline.intervention_rate * 2.0 → REGRESSION WARNING
+If post.success_rate < baseline.success_rate * 0.8 → REGRESSION ALERT
+```
+
+### Convergence Score
+
+The convergence score is a single number (0.0 to 1.0) derived from the success rate
+trend over the last N Cells:
+
+- **1.0**: success rate strictly increasing (system improving)
+- **0.5**: success rate stable (system steady-state)
+- **0.0**: success rate strictly decreasing (system degrading)
+
+A convergence score below 0.3 for more than 24 hours triggers a coordinator-level
+alert recommending investigation: "Quality convergence score is 0.2 -- the system is
+getting worse, not better. Investigate recent changes to prompts, models, or eval criteria."

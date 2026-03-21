@@ -345,24 +345,53 @@ runtime after Claude Code.
 | Context | Varies by underlying model |
 | Cost tier | budget to standard |
 
-**RPC protocol:**
+**RPC protocol (JSON-RPC 2.0 over stdin/stdout):**
 
-Pi's RPC connection provides the cleanest integration path. The `connect()`
-method returns a `RuntimeConnection` that supports:
+Pi uses **subprocess RPC, NOT tmux**. The adapter spawns Pi as a child process
+and communicates via piped JSON-RPC 2.0 messages on stdin/stdout. This is a
+fundamentally different session model from Claude Code's tmux-based approach.
+
+The `RuntimeConnection` interface provides four methods:
 
 ```typescript
-const conn = adapter.connect(process);
+interface RuntimeConnection {
+  sendPrompt(text: string): Promise<void>;     // initial task delivery
+  followUp(text: string): Promise<void>;       // mid-session message injection
+  abort(): Promise<void>;                       // clean shutdown
+  getState(): Promise<ConnectionState>;         // health check (replaces tmux capture-pane)
+  close(): void;                                // release file handles and resources
+}
+```
+
+**Usage:**
+
+```typescript
+// Spawn Pi as subprocess with piped stdin/stdout
+const proc = Bun.spawn(["pi", "--mode", "chat", "--model", model], {
+  stdin: "pipe",
+  stdout: "pipe",
+  cwd: worktreePath
+});
+
+// Establish RPC connection
+const conn = adapter.connect(proc);
 await conn.sendPrompt("Implement the user service...");
+
 // ... later, inject a message mid-session:
 await conn.followUp("Builder-2 has merged shared types. Rebase and continue.");
+
+// Check state without tmux
 const state = await conn.getState(); // { status: "processing", elapsed: 45000 }
-await conn.abort(); // clean shutdown
+
+// Clean shutdown
+await conn.abort();
 conn.close();
 ```
 
 This replaces tmux send-keys for prompt delivery, tmux capture-pane for state
 checking, and process signals for shutdown. The orchestrator detects `connect`
-on the adapter and uses RPC for all communication.
+on the adapter and uses RPC for all communication. The JSON-RPC 2.0 framing
+provides structured error handling that tmux text scraping cannot match.
 
 **Config deployment:**
 
@@ -701,14 +730,24 @@ than IDE-embedded alternatives.
 
 Runtime selection follows a priority chain with multiple override points.
 
-### Selection Priority
+### Selection Priority (4-Level Chain)
 
 ```
 1. Explicit --runtime flag on sling command     (highest priority)
-2. Per-capability config in config.yaml
-3. Default runtime in config.yaml
-4. Auto-detection via filesystem probing         (lowest priority)
+2. Per-capability config in config.yaml         (role-based routing)
+3. Default runtime in config.yaml               (project default)
+4. Auto-detection via filesystem probing         (lowest priority — "claude" fallback)
 ```
+
+**Per-capability routing** (level 2) is the key enabler for mixed fleets without
+explicit flags on every sling call. When `config.yaml` maps `builder: "pi-cli"` and
+`reviewer: "claude-code"`, every `platform sling` automatically selects the right
+runtime based on the target agent's role. The operator only uses `--runtime` (level 1)
+for one-off overrides.
+
+If no runtime is resolved through levels 1-3, auto-detection (level 4) probes the
+filesystem for installed runtimes and falls back to `"claude"` if at least Claude Code
+is installed. If no runtime is detected at all, see the fallback behavior below.
 
 ### Auto-Detection Implementation
 
@@ -777,6 +816,13 @@ async function detectRuntime(): Promise<RuntimeAdapter> {
     }
   }
 
+  // No runtime detected — log clear error and enter sequential mode
+  console.error(
+    "No supported runtime detected. The platform will enter sequential mode.\n" +
+    "Install at least one supported runtime: claude, pi, codex, gemini, opencode\n" +
+    "Run `platform doctor --category runtimes` to diagnose runtime availability."
+  );
+  // Prompt the operator to install a runtime
   throw new Error(
     "No supported runtime detected. Install one of: claude, pi, codex, gemini, opencode"
   );
@@ -825,6 +871,36 @@ function createAdapter(name: string): RuntimeAdapter {
   }
   return factory();
 }
+```
+
+### No-Runtime-Detected Fallback
+
+When auto-detection finds zero installed runtimes, the platform does not silently fail.
+Instead:
+
+1. **Logs a clear error** explaining which runtimes were checked and none found
+2. **Enters sequential mode** if possible (the operator's own CLI session becomes the
+   single executor)
+3. **Prompts the operator** to install at least one supported runtime
+4. **Provides diagnostic command**: `platform doctor --category runtimes` enumerates
+   each supported runtime, checks for its binary, and reports which are available:
+
+```bash
+$ platform doctor --category runtimes
+
+Runtime Diagnostics:
+  claude-code  ✓  /usr/local/bin/claude (v4.2.1)
+  pi-cli       ✗  not found (install: npm i -g @anthropic/pi)
+  codex-cli    ✗  not found (install: npm i -g @openai/codex)
+  gemini-cli   ✗  not found (install: npm i -g @google/gemini-cli)
+  opencode     ✗  not found (install: go install github.com/opencode/cli@latest)
+  sapling      ✗  not found
+  cursor       ✗  not detected (IDE process not running)
+  copilot      ✗  not found
+  windsurf     ✗  not detected (IDE process not running)
+
+Available: 1 runtime (claude-code)
+Fleet mode: supported (tmux detected)
 ```
 
 ---
@@ -1540,6 +1616,94 @@ structural.
 instruction file includes explicit statements about what the agent is
 and is not allowed to do. Enforcement is advisory (LLM compliance), not
 structural.
+
+---
+
+## 12. Transcript Normalization
+
+Each runtime produces events in different formats -- Claude Code emits JSONL transcripts,
+Pi uses JSON-RPC responses, Codex streams NDJSON events, and Gemini has its own logging.
+The platform normalizes all of these into a common event schema before writing to The Trail.
+
+### Common Event Schema
+
+```typescript
+interface NormalizedEvent {
+  session_id: string;           // unique session identifier
+  agent_id: string;             // agent identity (e.g., "builder-alpha")
+  runtime: string;              // "claude-code", "pi-cli", "codex-cli", etc.
+  event_type: string;           // "tool_call", "tool_result", "message", "error", "cost_snapshot"
+  timestamp: string;            // ISO 8601 with milliseconds
+  tool_name: string | null;     // "Read", "Edit", "Bash", etc. (null for non-tool events)
+  tool_args: object | null;     // tool arguments (null for non-tool events)
+  tool_result: string | null;   // truncated tool output (null for non-tool events)
+  model: string;                // "claude-sonnet-4-6", "pi-fast", etc.
+  token_delta: {                // tokens consumed by this event
+    input: number;
+    output: number;
+    cache_read: number;
+    cache_write: number;
+  };
+  cost_delta: number;           // USD cost of this event
+}
+```
+
+### Per-Runtime Normalization Rules
+
+| Runtime | Source Format | Normalization Notes |
+|---------|-------------|---------------------|
+| Claude Code | JSONL transcript in `~/.claude/projects/` | Direct mapping; richest source data |
+| Pi CLI | JSON-RPC 2.0 responses on stdout pipe | Extract from RPC response frames; token counts in metadata |
+| Codex CLI | NDJSON event stream on stdout | Map `tool_call`/`result` events; token counts may be estimated |
+| Gemini CLI | Gemini's native log format | Parse from Gemini's output; model names need mapping |
+| Others | Varies | Best-effort extraction; missing fields filled with null/estimates |
+
+### Token Snapshot Mechanism
+
+For live cost tracking in The Yield (the platform's cost dashboard), the normalizer
+periodically captures cumulative token counts:
+
+```
+Every 30 seconds (or on significant events):
+  → Query each active session's cumulative token usage
+  → Emit a `cost_snapshot` event with running totals
+  → The Yield reads these snapshots for real-time cost display
+  → Snapshots are lightweight (~100 bytes each) and do not bloat The Trail
+```
+
+This mechanism enables the `platform costs --live` command to show real-time per-agent
+token consumption without parsing full transcript files on every refresh.
+
+---
+
+## 13. MCP Security Notes
+
+The Model Context Protocol (MCP) enables runtime extensibility through tool servers,
+but introduces a significant attack surface that must be managed.
+
+### Known Vulnerabilities
+
+**CVE-2025-6514** (CVSS 9.6): OS command injection in `mcp-remote` versions ≤0.1.15.
+An attacker-controlled MCP server can execute arbitrary OS commands on the client machine
+through crafted tool responses. This affects any runtime that uses `mcp-remote` for
+remote MCP server connections.
+
+**Mitigation:** Pin `mcp-remote ≥0.1.16` in all runtime configurations. The platform's
+`platform doctor --category security` check validates this pin.
+
+### MCP Server Supply Chain Risk
+
+Per the Snyk ToxicSkills study, **43% of MCP servers** contain potential command injection
+vectors -- tool implementations that pass user-controlled input to shell commands without
+sanitization. This is not a theoretical risk; it is a measured prevalence.
+
+**Platform policy:**
+- Only approved MCP servers may be used in fleet configurations
+- The platform maintains an allowlist of vetted MCP server packages
+- New MCP servers require security review before fleet deployment
+- `platform doctor --category mcp` audits installed MCP servers against known
+  vulnerability databases
+- Guard rules for MCP tools follow the same allow/deny pattern as native tools
 
 ```markdown
 ## Restrictions
