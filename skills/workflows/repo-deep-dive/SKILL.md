@@ -83,7 +83,7 @@ Agent 4: Agent/worker/plugin system (if applicable)
 ```
 
 The goal is a mental model of the architecture that you can explain in ~200 lines of markdown,
-with an ASCII diagram showing how the major pieces connect.
+with a mermaid diagram (using the `mermaid-charts` skill) showing how the major pieces connect.
 
 ### Phase 3: Deep Dive Each Subsystem
 
@@ -120,8 +120,8 @@ worth pursuing.
 
 All output goes in `{output_dir}/{project}_deepdive/source-material/`.
 
-The user may specify `{output_dir}` — if not, default to `plans/the-future/` in the
-current working directory.
+The user may specify `{output_dir}` — if not, default to `~/AI/DeepResearch/`.
+This is the central monorepo for all deep dive research and analysis documents.
 
 ### Document Progression
 
@@ -148,7 +148,7 @@ a complex agent system gets `agent-system.md`. A project with a custom database 
 - **80-300 lines per document** — long enough to be thorough, short enough to read in one sitting
 - **Code paths, not code dumps** — reference specific files and functions, don't paste large blocks
 - **"By the numbers" tables** — readers love hard data, give them precise counts
-- **ASCII architecture diagrams** — show how pieces connect, use box-drawing characters
+- **Mermaid architecture diagrams** — use the `mermaid-charts` skill for flowcharts, sequence diagrams, and system maps instead of ASCII art. Prefer `flowchart TB` with subgraphs for layer-cake architectures, `sequenceDiagram` for request flows
 - **Cross-references** — link between documents when one subsystem touches another
 - **Honest assessments** — note gaps, limitations, and production readiness issues candidly
 
