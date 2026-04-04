@@ -19,6 +19,10 @@ composes_with:
   - frontend-agent
   - skill-writer
   - project-profiler
+  - orchestrator
+  - infrastructure-agent
+  - contract-author
+  - observability-agent
 ---
 
 # Mermaid Charts

@@ -15,7 +15,8 @@ composes_with: [
   "backend-agent", "frontend-agent", "infrastructure-agent", "qe-agent",
   "security-agent", "docs-agent", "observability-agent", "db-migration-agent", "performance-agent",
   "contract-author", "contract-auditor",
-  "context-manager", "deployment-checklist", "code-reviewer", "project-profiler"
+  "context-manager", "deployment-checklist", "code-reviewer", "project-profiler",
+  "mermaid-charts", "plan-builder", "git-commit", "git-pr"
 ]
 spawned_by: []
 ---

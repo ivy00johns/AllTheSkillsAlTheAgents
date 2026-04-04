@@ -4,7 +4,7 @@ version: 1.1.0
 description: |
   Transform research documents, Compass artifacts, PRDs, reference materials, and conversational goals into structured project plans ready for the orchestrator to execute. Use this skill when the user has source material and wants to build something from it, when the user says "make a plan", "plan this out", "I want to build X from this research", or when a plan is needed before invoking the orchestrator. Also trigger when @-mentioned files or attached documents accompany a build request, when the user wants to turn research into a website/app/tool, or when orchestrator would be invoked but no plan exists yet. This skill produces the plan — orchestrator consumes it.
 requires_claude_code: true
-composes_with: ["orchestrator", "project-profiler"]
+composes_with: ["orchestrator", "project-profiler", "mermaid-charts", "contract-author"]
 spawned_by: []
 ---
 

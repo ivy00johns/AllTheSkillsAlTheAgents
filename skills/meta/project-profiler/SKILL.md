@@ -11,7 +11,7 @@ owns:
   patterns: ["CLAUDE.md", ".claude/profile.yaml"]
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
-composes_with: ["skill-writer", "contract-author"]
+composes_with: ["skill-writer", "contract-author", "orchestrator"]
 spawned_by: ["orchestrator"]
 ---
 

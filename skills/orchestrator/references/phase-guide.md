@@ -25,6 +25,7 @@ Read the plan document. Extract:
 - **Shared data models**: Entities referenced by multiple components
 - **Dependency graph**: What must exist before something else can be built
 - **Validation criteria**: How we know it works (tests, curl commands, UI flows)
+- **Architecture visualization** — use the mermaid-charts skill to generate an architecture overview diagram showing major components, their layers, and dependency flow. This visual anchor guides the rest of the build and is included in final documentation.
 
 ## Phase 2: Size the Team
 
@@ -91,6 +92,7 @@ Quality checklist (all must pass):
 Before spawning implementation agents:
 
 - **Create a feature branch** — `git checkout -b build/<project-name>`. All work happens here, never on main. Do not merge to main unless the user explicitly requests it.
+- Follow git-commit conventions for branch naming and commit messages throughout the build
 - Create `.gitignore` (orchestrator-owned)
 - Invoke `contract-author` skill to create `contracts/` with shared types and integration contracts — contract-author owns this directory
 - Create any skeleton files needed for agent orientation (assign ownership per the canonical table in the design spec §6)
@@ -176,9 +178,10 @@ Gate rules:
 ## Phase 14: Post-Build
 
 1. Spawn docs-agent to write README.md — provide full-system context (architecture summary, how to run, directory map). Docs-agent owns README.md.
-2. Clean up any temporary files
-3. Verify the plan's acceptance criteria are met
-4. Produce final status report
+2. Generate final architecture diagram(s) using mermaid-charts — system overview, data flow, and deployment topology as appropriate. Include in README or `docs/`.
+3. Clean up any temporary files
+4. Verify the plan's acceptance criteria are met
+5. Produce final status report
 
 ## Definition of Done
 
