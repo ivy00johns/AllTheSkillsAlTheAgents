@@ -1,5 +1,6 @@
 ---
 name: settings-consolidator
+version: 1.0.0
 description: >
   Scan all .claude/settings.local.json files across the user's home directory,
   deduplicate permissions, collapse supersets, and merge everything into the

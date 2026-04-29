@@ -1,6 +1,6 @@
 ---
 name: qe-agent
-version: 1.1.0
+version: 1.2.0
 description: |
   Verify implementations match contracts, integrations connect, and edge cases are handled for multi-agent builds. Use this skill when spawning a QE agent, running contract conformance checks, integration verification, or adversarial testing. Trigger for any quality engineering or test verification task within an orchestrated build.
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: ["*.test.*", "*.spec.*", "qa-report.md", "qa-report.json"]
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
-composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent", "security-agent", "contract-auditor", "performance-agent"]
+composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent", "security-agent", "contract-auditor", "performance-agent", "playwright"]
 spawned_by: ["orchestrator"]
 ---
 
@@ -91,7 +91,13 @@ Choose the right tool for each test:
 
 - **curl / httpie** — fastest for API-level verification. Use for contract conformance, integration endpoints, and adversarial probing. Preferred default.
 - **Test files** (`tests/integration/`) — write actual test files when the project already has a test runner configured. Tests persist as regression coverage.
-- **Browser automation** — only if the project includes E2E tooling (Playwright, Cypress). Don't set up new E2E frameworks unless the plan calls for it.
+- **Playwright (via `/playwright` skill)** — use for any test that needs a real browser: user flow verification, frontend rendering checks, visual regression, or acceptance criteria that involve UI state. The Playwright skill handles installation, non-headless Chrome setup, and screenshot capture. Invoke it when:
+  - The project has a frontend and the plan includes E2E or acceptance testing
+  - You need to verify that the frontend correctly reflects backend state after mutations (Phase 2c)
+  - Acceptance criteria reference what the user *sees* (not just API responses)
+  - The user requests visual evidence of test results
+
+  The Playwright skill runs in **report mode** by default (automated, produces `playwright-report.json` and timestamped screenshots) or **spot-check mode** when the user wants to observe interactively. Pass it: the base URL, user flows from the plan, and acceptance criteria. It returns a structured report and screenshot paths that you incorporate into your QA report.
 
 Adapt to the tech stack: Python projects use `pytest` + `httpx`, Node projects use `vitest` + `supertest`, Go projects use `go test` + `net/http/httptest`. Fall back to curl when no test runner is available.
 
@@ -105,7 +111,7 @@ Walk through the primary user flow end-to-end. This is the single most important
 
 ### 2c. Data Flow Verification
 
-Verify data created through one layer is correctly visible through another (API→DB, DB→API, Frontend→DB round trip). If a frontend is present, verify the UI reflects backend state after mutations.
+Verify data created through one layer is correctly visible through another (API→DB, DB→API, Frontend→DB round trip). If a frontend is present, use the Playwright skill to verify the UI reflects backend state after mutations — screenshots provide evidence that the rendered page matches expected state.
 
 ### 2d. Persistence Check
 
