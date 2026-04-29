@@ -46,8 +46,6 @@ Each agent role skill works on its own without the orchestrator:
 
 ## Architecture
 
-See **[docs/architecture.md](docs/architecture.md)** for full mermaid diagrams covering system overview, build phase sequence, file ownership map, skill inventory, and runtime degradation.
-
 ```text
 skills/
 ├── orchestrator/              # Lead coordinator — the entry point
@@ -119,27 +117,16 @@ Skills use three loading levels to manage context efficiently:
 ```text
 .
 ├── README.md                          # This file
-├── skill-ecosystem-design-spec.md     # Design specification (the blueprint)
-├── docs/
-│   └── initial/                       # Original source documents
-│       ├── backend.md                 # Backend agent source material
-│       ├── frontend.md                # Frontend agent source material
-│       ├── infrastructure.md          # Infrastructure agent source material
-│       ├── qe.md                      # QE agent source material
-│       ├── specialist.md              # Specialist agent template
-│       ├── orchestrator-integration.md# QE orchestrator integration
-│       ├── build-with-agent-team.md   # Original orchestrator skill
-│       ├── tech-stacks.md             # Tech stack reference
-│       └── templates.md               # Contract templates source
+├── CLAUDE.md                          # Project guidance for Claude Code
+├── AGENTS.md                          # Shared instructions for AI agents
 └── skills/                            # The skill ecosystem (copy to ~/.claude/skills/)
     ├── orchestrator/
     ├── roles/
     ├── contracts/
     ├── meta/
+    ├── git/
     └── workflows/
 ```
-
-The `docs/initial/` directory contains the original source documents that informed the skill designs. The `skill-ecosystem-design-spec.md` is the blueprint that defined the full architecture, frontmatter conventions, and build order.
 
 ## Skill Inventory
 

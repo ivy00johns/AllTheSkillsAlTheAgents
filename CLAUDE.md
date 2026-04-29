@@ -41,11 +41,9 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 - **`skills/git/`** (5) — Git workflow conventions: git-commit, git-pr, git-pr-feedback, git-branch-cleanup, git-clean-worktrees.
 - **`skills/workflows/`** (13) — context-manager, deployment-checklist, sync-skills, mermaid-charts, nano-banana, railway-deploy, plan-builder, settings-consolidator, env-setup, llm-wiki, playwright, hive-cli, repo-deep-dive.
 
-See `docs/architecture.md` for a Mermaid diagram of how the categories relate.
-
 ## Key Design Decisions
 
-- **File ownership is exclusive** — no two agent roles can own the same file. The orchestrator resolves conflicts before spawning. See the ownership map in `skill-ecosystem-design-spec.md` §6.
+- **File ownership is exclusive** — no two agent roles can own the same file. The orchestrator resolves conflicts before spawning. The canonical ownership map lives in the orchestrator skill.
 - **QE gates the build** — the qe-agent outputs `qa-report.json` per `skills/roles/qe-agent/references/qa-report-schema.json`. Build blocks on CRITICAL blockers or contract_conformance/security scores < 3.
 - **Two-runtime degradation** — Agent Teams → subagents → sequential. Only the orchestrator needs this logic; role skills work standalone.
 - **Progressive disclosure** — frontmatter (~100 tokens) always loaded, SKILL.md body loaded on trigger, references loaded on demand.
@@ -60,8 +58,3 @@ When modifying a skill:
 - `owns.directories` must not overlap with other agent roles
 - Maintain the frontmatter convention (see `skills/meta/skill-writer/references/frontmatter-spec.md`)
 - If using symlinks (default), edits are automatically reflected in both locations
-
-## Source Material
-
-- `skill-ecosystem-design-spec.md` — The full design blueprint (frontmatter convention, profile schema, ownership map, QA schema, handoff protocol, build order)
-- `docs/initial/` — Original source documents that informed skill designs (backend, frontend, infrastructure, qe, specialist, orchestrator, tech-stacks, templates)
