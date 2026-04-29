@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 21 skills (48+ files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are symlinked to `~/.claude/skills/` for global availability.
+A multi-agent orchestration toolkit for Claude Code — 38 skills (~80 files) that enable contract-first parallel builds with declarative file ownership and QA-gated releases. Skills live in `skills/` and are symlinked to `~/.claude/skills/` for global availability.
 
 ## Install / Sync
 
@@ -34,16 +34,16 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 
 ## Skill Categories
 
-- **`skills/orchestrator/`** — Entry point. 14-phase build playbook, runtime detection, contract-first coordination. References: phase-guide, team-sizing, circuit-breaker, handoff-protocol.
-- **`skills/roles/`** — 9 implementation agents (backend, frontend, infrastructure, qe, security, docs, observability, db-migration, performance). Each has a SKILL.md + reference files with validation checklists.
-- **`skills/contracts/`** — contract-author (generates contracts from templates) and contract-auditor (verifies implementations match). Templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema.
-- **`skills/meta/`** — skill-writer (generates new skills), project-profiler (codebase → CLAUDE.md + profile.yaml), code-reviewer (structured review with rubric).
-- **`skills/git/`** — Git workflow conventions: git-commit (conventional commits), git-pr (PR creation/updates), git-pr-feedback (triage and address review comments), git-branch-cleanup (prune stale/merged branches).
-- **`skills/workflows/`** — context-manager (handoffs at ~80% context), deployment-checklist (pre-deploy gates), sync-skills, mermaid-charts, nano-banana, railway-deploy, plan-builder, settings-consolidator.
+- **`skills/orchestrator/`** (1) — Entry point. 14-phase build playbook, runtime detection, contract-first coordination. References: phase-guide, team-sizing, circuit-breaker, handoff-protocol.
+- **`skills/roles/`** (9) — Implementation agents (backend, frontend, infrastructure, qe, security, docs, observability, db-migration, performance). Each has a SKILL.md + reference files with validation checklists.
+- **`skills/contracts/`** (2) — contract-author (generates contracts from templates) and contract-auditor (verifies implementations match). Templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema.
+- **`skills/meta/`** (8) — skill-writer, project-profiler, code-reviewer, skill-audit, skill-deep-review, skill-improvement-plan, skill-updater, wiki-research.
+- **`skills/git/`** (5) — Git workflow conventions: git-commit, git-pr, git-pr-feedback, git-branch-cleanup, git-clean-worktrees.
+- **`skills/workflows/`** (13) — context-manager, deployment-checklist, sync-skills, mermaid-charts, nano-banana, railway-deploy, plan-builder, settings-consolidator, env-setup, llm-wiki, playwright, hive-cli, repo-deep-dive.
 
 ## Key Design Decisions
 
-- **File ownership is exclusive** — no two agent roles can own the same file. The orchestrator resolves conflicts before spawning. See the ownership map in `skill-ecosystem-design-spec.md` §6.
+- **File ownership is exclusive** — no two agent roles can own the same file. The orchestrator resolves conflicts before spawning. The canonical ownership map lives in the orchestrator skill.
 - **QE gates the build** — the qe-agent outputs `qa-report.json` per `skills/roles/qe-agent/references/qa-report-schema.json`. Build blocks on CRITICAL blockers or contract_conformance/security scores < 3.
 - **Two-runtime degradation** — Agent Teams → subagents → sequential. Only the orchestrator needs this logic; role skills work standalone.
 - **Progressive disclosure** — frontmatter (~100 tokens) always loaded, SKILL.md body loaded on trigger, references loaded on demand.
@@ -58,8 +58,3 @@ When modifying a skill:
 - `owns.directories` must not overlap with other agent roles
 - Maintain the frontmatter convention (see `skills/meta/skill-writer/references/frontmatter-spec.md`)
 - If using symlinks (default), edits are automatically reflected in both locations
-
-## Source Material
-
-- `skill-ecosystem-design-spec.md` — The full design blueprint (frontmatter convention, profile schema, ownership map, QA schema, handoff protocol, build order)
-- `docs/initial/` — Original source documents that informed skill designs (backend, frontend, infrastructure, qe, specialist, orchestrator, tech-stacks, templates)

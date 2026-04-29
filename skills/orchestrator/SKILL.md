@@ -12,10 +12,12 @@ owns:
   shared_read: ["contracts/", ".claude/handoffs/", "*"]
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: [
+  "wiki-research",
   "backend-agent", "frontend-agent", "infrastructure-agent", "qe-agent",
   "security-agent", "docs-agent", "observability-agent", "db-migration-agent", "performance-agent",
   "contract-author", "contract-auditor",
-  "context-manager", "deployment-checklist", "code-reviewer", "project-profiler"
+  "context-manager", "deployment-checklist", "code-reviewer", "project-profiler",
+  "mermaid-charts", "plan-builder", "git-commit", "git-pr"
 ]
 spawned_by: []
 ---
@@ -39,6 +41,7 @@ If the user says "merge it", "push to main", or "create a PR" — then and only 
 
 ## Quick Start
 
+0. **Check the wiki first** — if the project has an Obsidian wiki (`index.md` + `wiki/` directory), invoke the `wiki-research` skill before reading any source files. 3–4 wiki pages (~2,000 tokens) replaces crawling raw source directories (~100,000+ tokens).
 1. Create a feature branch (see Git Branching Policy above)
 2. Read the plan
 3. Size the team based on the work — see `references/team-sizing.md`

@@ -1,18 +1,56 @@
 ---
 name: settings-consolidator
+version: 1.0.0
 description: >
   Scan all .claude/settings.local.json files across the user's home directory,
   deduplicate permissions, collapse supersets, and merge everything into the
-  global ~/.claude/settings.local.json with a categorized report. Use this skill
+  global ~/.claude/settings.local.json with a categorized report. Also bootstraps
+  comprehensive permissions for autonomous/unattended sessions using a 350+ command
+  baseline with shell operators, Claude tools, and safety deny list. Use this skill
   whenever the user mentions consolidating settings, merging permissions, scanning
-  settings, deduping permissions, compiling settings, or says they're tired of
-  approving commands. Also trigger when users ask about managing Claude Code
-  permissions across projects or want to reduce permission prompts.
+  settings, deduping permissions, compiling settings, says they're tired of
+  approving commands, wants to set up permissions for overnight builds, mentions
+  "stop prompting me", "bootstrap permissions", "autonomous mode", "I want to go
+  to sleep and let this run", "unattended session", or asks about reducing permission
+  prompts. Also trigger when users want to upgrade colon-wildcards to space-wildcards
+  or manage Claude Code permissions across projects.
 ---
 
 # Settings Consolidator
 
 Scan every `.claude/settings.local.json` across your home directory, deduplicate the permissions, collapse supersets, and merge the result into your global `~/.claude/settings.local.json`. This saves you from clicking "allow" on the same commands over and over as you move between projects. The output is a categorized report showing exactly what was merged, what was collapsed, and what was flagged as project-specific.
+
+## Bootstrap Mode
+
+When the user wants autonomous sessions — "stop prompting me", "I want to go to sleep and let this run", "bootstrap permissions", "set up for unattended builds", or "I keep getting permission prompts" — use this workflow instead of (or before) the consolidation workflow.
+
+### Why Sessions Get Interrupted
+
+Permission prompts in long-running sessions come from three gaps, in order of how often they bite:
+
+1. **Missing shell operators.** Commands like `git log --oneline | head -5` or `npm test && npm run build` use pipes, chains, and redirects. Without `Bash(* | *)`, `Bash(* && *)`, `Bash(* > *)`, etc., every compound command prompts. This is the #1 cause of interruptions and the one most people miss entirely.
+
+2. **Missing Claude tool permissions.** Spawning subagents (`Agent(*)`), editing files (`Edit(**)`), entering plan mode (`EnterPlanMode(*)`), using worktrees (`EnterWorktree(*)`), or managing tasks (`Task(**)`) all need explicit permissions. Without them, multi-agent and orchestrated workflows stall.
+
+3. **Colon-wildcard gaps.** `Bash(git:*)` is narrower than `Bash(git *)`. Claude Code generates colon-wildcards when a user clicks "allow" on a specific invocation, but space-wildcards are strictly broader and catch command variations that colon-wildcards miss. Always prefer `Bash(cmd *)` over `Bash(cmd:*)`.
+
+### Bootstrap Workflow
+
+1. **Back up.** Copy `~/.claude/settings.local.json` to `~/.claude/settings.local.json.bak.YYYY-MM-DD-HHMMSS`.
+
+2. **Load the baseline.** Read `references/autonomous-permissions.json` — a comprehensive template with ~350 pre-approved commands (all using space-wildcards), all shell operators, all Claude Code tool permissions, and a safety deny list.
+
+3. **Merge.** Add baseline permissions to the existing global settings, deduplicating against what's already there. Don't remove existing permissions — the baseline is additive.
+
+4. **Upgrade colon-wildcards.** Scan the merged result for `Bash(cmd:*)` entries. For each one, if a `Bash(cmd *)` (space-wildcard) entry exists in the baseline or the merged result, drop the colon-wildcard — the space-wildcard already covers it.
+
+5. **Add MCP permissions.** Check `~/.claude/settings.json` for `enabledPlugins`. For each enabled plugin, add its tool permissions. Common patterns:
+   - Playwright: all `mcp__plugin_playwright_playwright__browser_*` tools
+   - Other MCP servers: `mcp__<server>__<tool>` format
+
+6. **Report.** Show a summary: how many permissions added, how many colon-wildcards upgraded, the deny list, and any MCP tools added.
+
+After bootstrapping, optionally run the consolidation workflow below to merge in any project-specific permissions on top.
 
 ## Permission Syntax Reference
 
@@ -67,6 +105,8 @@ Apply these rules in order:
 3. **Non-Bash glob collapsing.** `Read(**)` absorbs `Read(src/**)`, `Edit(**)` absorbs `Edit(components/**)`, etc.
 
 4. **Do NOT collapse colon-wildcards into each other** unless one is clearly a prefix of the other. `Bash(git config:*)` and `Bash(git status:*)` are independent.
+
+5. **Colon-to-space upgrade.** For any `Bash(cmd:*)` entry where no `Bash(cmd *)` exists yet, recommend upgrading to the space-wildcard form. Space-wildcards are strictly broader — `Bash(git *)` covers everything `Bash(git:*)` covers plus edge cases that colon-wildcards miss. This is especially important for autonomous sessions where a single missed command variant can interrupt an overnight build.
 
 ### Step 5: Detect Literal One-Offs
 

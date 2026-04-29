@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Grep", "Glob"]
-composes_with: ["qe-agent", "security-agent"]
+composes_with: ["wiki-research", "qe-agent", "security-agent", "backend-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
 ---
 
@@ -40,6 +40,7 @@ Consult `references/review-rubric.md` for the scoring criteria across all review
 
 Before reviewing:
 
+- **Check the wiki first** — if `index.md` + `wiki/` exist, invoke the `wiki-research` skill. Reading 2–3 wiki pages gives you the intended architecture for free, so you can judge whether the code matches the design intent.
 - Read the relevant contracts (what was the code supposed to implement?)
 - Read the project profile / CLAUDE.md (what conventions apply?)
 - Identify which agent wrote the code (for routing feedback)

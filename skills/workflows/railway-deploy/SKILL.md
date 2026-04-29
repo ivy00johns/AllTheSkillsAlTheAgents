@@ -9,6 +9,7 @@ description: >
   Railway configuration, health checks, deployment status, or environment variable management on Railway.
   This is the go-to skill for any Railway deployment workflow.
 requires_claude_code: true
+composes_with: ["infrastructure-agent", "deployment-checklist"]
 ---
 
 # Railway Deployment

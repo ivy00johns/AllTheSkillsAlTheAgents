@@ -9,6 +9,7 @@ description: >
   if they just say "let's do images", "generate the rest", or "make me a picture of". This is the go-to skill for any
   image generation workflow.
 requires_claude_code: true
+composes_with: ["frontend-agent", "docs-agent"]
 ---
 
 # Nano Banana Image Generation

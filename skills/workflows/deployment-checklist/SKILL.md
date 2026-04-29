@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Bash", "Glob", "Grep"]
-composes_with: ["infrastructure-agent", "qe-agent"]
+composes_with: ["infrastructure-agent", "qe-agent", "security-agent", "observability-agent"]
 spawned_by: ["orchestrator"]
 ---
 
