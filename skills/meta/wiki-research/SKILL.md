@@ -1,9 +1,9 @@
 ---
 name: wiki-research
-version: 2.0.0
+version: 2.1.0
 description: |
   Use this skill BEFORE any codebase exploration, repo-deep-dive, or raw source reading when
-  the project has an Obsidian wiki (index.md + wiki/ directory). Always invoke when an
+  the project has an Obsidian-style wiki (index.md + wiki/ directory). Always invoke when an
   orchestrator, code-reviewer, backend-agent, or any role skill needs project context,
   architecture understanding, component knowledge, or design decisions. Reading 3–4 wiki
   pages (~2,000 tokens) replaces crawling raw source directories (~100,000–500,000 tokens).
@@ -13,20 +13,20 @@ description: |
   wiki exists, spend 5 seconds checking — the payoff is enormous. Skip only when the task is
   purely mechanical (rename a variable, fix a typo) and requires zero project understanding.
 requires_agent_teams: false
-requires_claude_code: true
+requires_claude_code: false
 min_plan: starter
 owns:
   directories: []
   patterns: []
   shared_read: ["wiki/", "index.md"]
 allowed_tools: ["Read", "Glob", "Grep"]
-composes_with: []
+composes_with: ["repo-deep-dive", "llm-wiki", "project-profiler"]
 spawned_by: ["orchestrator", "code-reviewer", "repo-deep-dive", "project-profiler", "backend-agent", "frontend-agent", "security-agent", "plan-builder"]
 ---
 
 # Wiki-First Research Protocol
 
-An Obsidian wiki is a compiled, cross-linked knowledge base synthesized from raw source material. Reading it is an order of magnitude cheaper than re-reading raw sources — and faster than re-deriving understanding the hard way.
+An Obsidian-style wiki is a compiled, cross-linked knowledge base synthesized from raw source material. Reading it is an order of magnitude cheaper than re-reading raw sources — and faster than re-deriving understanding the hard way.
 
 ## Why Wiki-First
 
@@ -45,14 +45,16 @@ Reading the wiki index + 3 pages costs roughly the same as scanning a single mid
 Check if a wiki exists before doing anything else:
 
 ```bash
-# Fast check: does wiki structure exist?
+# Fast check: does wiki structure exist at the project root?
 ls index.md wiki/ 2>/dev/null | head -5
 
 # Or check CLAUDE.md for a wiki path declaration
 grep -i "wiki" CLAUDE.md 2>/dev/null | grep -i "path\|root\|location" | head -3
 ```
 
-If no wiki exists → skip this protocol entirely and proceed with normal exploration.  
+If the wiki lives outside the current working directory (a separate research repo, a sibling directory), the project's `CLAUDE.md` should declare the wiki root — see "Pointing at an external wiki" below.
+
+If no wiki exists → skip this protocol entirely and proceed with normal exploration.
 If a wiki is found → continue.
 
 ## Step 2 — Read index.md
@@ -68,9 +70,9 @@ Look for entries matching:
 
 Based on index.md summaries, read the pages most relevant to your task:
 
-**Entity pages** (`wiki/entities/<name>.md`) — for specific systems, platforms, or components  
-**Concept pages** (`wiki/concepts/<name>.md`) — for patterns, principles, and architectural ideas  
-**Overview** (`wiki/overview.md`) — only if you need broad ecosystem context  
+**Entity pages** (`wiki/entities/<name>.md`) — for specific systems, platforms, or components
+**Concept pages** (`wiki/concepts/<name>.md`) — for patterns, principles, and architectural ideas
+**Overview** (`wiki/overview.md`) — only if you need broad ecosystem context
 **Source pages** (`wiki/sources/<name>.md`) — only if you need research provenance or raw doc pointers
 
 Each page ends with a `## Related` section. Follow those links only if they're directly relevant — don't spider the entire wiki. Stop when your question is answered.
@@ -87,22 +89,22 @@ After reading targeted pages, one of three situations applies:
 - Return to your task once the gap is filled
 
 **Topic isn't in the wiki at all**:
-- Check `CLAUDE.md` or `confluence-overview.md` for source maps
-- Proceed with targeted codebase exploration (Grep/Glob first, not broad reads)
+- Check `CLAUDE.md` for a source map or directory pointer
+- Proceed with targeted exploration (grep/glob first, not broad reads)
 
 ## Standard Lookup Cost
 
-```
+```text
 1. Read index.md            →  ~500 tokens   (mandatory)
-2. Read 2–3 targeted pages  →  ~1,500 tokens  (pick relevant ones)
-3. Source page if needed    →  ~1,000 tokens  (optional)
+2. Read 2–3 targeted pages  →  ~1,500 tokens (pick relevant ones)
+3. Source page if needed    →  ~1,000 tokens (optional)
 ──────────────────────────────────────────────
 Total:  ~3,000 tokens  ←→  1 small source file
 ```
 
 ## Wiki Page Structure
 
-Every page follows this format — knowing this helps you skim efficiently:
+Every page should follow this format — knowing this helps you skim efficiently:
 
 ```markdown
 ---
@@ -125,8 +127,8 @@ The opening paragraph is often sufficient. Read sections selectively.
 
 ## Standard Wiki Directory Layout
 
-```
-<project-root>/
+```text
+<wiki-root>/
 ├── index.md          ← TOC, start here always
 └── wiki/
     ├── overview.md   ← Ecosystem synthesis and roadmap
@@ -136,39 +138,34 @@ The opening paragraph is often sufficient. Read sections selectively.
     └── sources/      ← Per-source research summaries
 ```
 
----
+This skill assumes that layout. If a project uses a different convention (a flat `docs/` folder, GitBook, MkDocs, Docusaurus), the protocol still applies but the file paths change — read the project's `CLAUDE.md` or top-level docs index to learn the structure first.
 
-## TheHiveWiki Quick Reference
+## Pointing at an external wiki
 
-For The Hive ecosystem at `/Users/johns/Repos/the-hive-ecosystem/DeepResearch/`:
+Many projects keep their research wiki in a separate repository so source code stays clean. When that's the case, the project's `CLAUDE.md` should declare the external root, for example:
 
-**Wiki root:** `/Users/johns/Repos/the-hive-ecosystem/DeepResearch/index.md`
+```markdown
+## Wiki
 
-**Two research clusters (intentionally disconnected):**
-- **The Hive cluster** — autonomous software delivery platform (beads, gastown, overstory, gstack, deerflow, mission-control, claude-code, claw-code, mempalace, codex, alltheskills)
-- **MarketsBeRigged cluster** — AI-native quantitative trading (marketsberiggged, quantdinger, inteldeck)
+This project's research wiki lives at `~/Research/MyProjectWiki/`.
+- Index: `~/Research/MyProjectWiki/index.md`
+- Wiki pages: `~/Research/MyProjectWiki/wiki/`
+- Raw source archives: `~/Research/MyProjectWiki/sources/`
+```
 
-**Key gotchas that will burn you if you don't know them:**
-- **Codex ≠ OpenAI Codex.** `wiki/entities/codex` is the *Future Stack Synthesis* — convergence of gstack+gastown+beads. The `The-Hive/codex/overview/` directory holds this synthesis.
-- **Two Claude Code deep dives.** `claude-code/` = v2.1.88 behavioral/architectural. `claude-code-source/` = v2.1.87 tool system and permissions. Intentionally separate.
-- **AllTheSkills is part of The Hive** — it's the prompt library running in Claude Code right now.
-- **MarketsBeRigged is a separate project** — zero wiki links to The Hive cluster.
+When a wiki is external, swap the Step 1 detection commands for `ls <wiki-root>/index.md <wiki-root>/wiki/` against the path the project declares.
 
-**Raw source map** (use when wiki gaps exist):
+## Multi-cluster wikis
 
-| Wiki entity | Raw source location | Approx size |
-|-------------|-------------------|-------------|
-| beads | `The-Hive/beads/source-material/` | 13 docs, 225k LoC |
-| gastown | `The-Hive/gastown/source-material/` | 13 docs, 377k LoC |
-| overstory | `The-Hive/overstory/source-material/` | 13 docs, 96k LoC |
-| gstack | `The-Hive/gstack/source-material/` | 14 docs |
-| deerflow | `The-Hive/deerflow/source-material/` | 13 docs |
-| mission-control | `The-Hive/mission-control/source-material/` | 14 docs |
-| claude-code | `The-Hive/claude-code/source-material/` | 12 docs |
-| claude-code-source | `The-Hive/claude-code-source/source-material/` | 14 docs |
-| claw-code | `The-Hive/claw-code/source-material/` | 13 docs |
-| codex (synthesis) | `The-Hive/codex/overview/` | 9 docs |
-| mempalace | `The-Hive/mempalace/source-material/` | 12 docs |
-| alltheskills | `AllTheSkills/alltheskills-design/` | 12 docs |
-| the-hive spec | `The-Hive/the-hive-spec/` | 21+ docs |
-| quantdinger | `MarketsBeRigged/QuantDinger_deepdive/source-material/` | 10 docs |
+A single wiki can house multiple unrelated knowledge clusters — for example, a research repo that documents one team's platform alongside another team's product. Each cluster typically has its own `index.md` section and its pages don't link across clusters. When working on a task in one cluster, restrict your reading to that cluster's pages — cross-cluster wandering wastes tokens.
+
+If the project uses this pattern, its `CLAUDE.md` should call out which cluster contains what, with any "looks like X but is actually Y" gotchas listed up front.
+
+## Anti-Patterns
+
+| Anti-Pattern | Why It Fails | Do This Instead |
+|---|---|---|
+| Reading raw source directories first | Burns 100k+ tokens before knowing what you need | Always check the wiki first; raw source is escalation only |
+| Skipping `index.md` | You read the wrong pages and miss key context | Always start with `index.md` — it costs ~500 tokens |
+| Following every `## Related` link | Token spiral; loses thread of original task | Follow only links directly relevant to current task |
+| Ignoring the wiki when CLAUDE.md mentions one | Defeats the entire optimization | If wiki is declared, use it — escalate to raw source only on gaps |

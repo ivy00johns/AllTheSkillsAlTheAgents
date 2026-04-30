@@ -1,21 +1,26 @@
 ---
 name: repo-deep-dive
-version: 1.0.0
+version: 1.1.0
 description: >-
   Perform a comprehensive technical deep dive on an open-source repository, combining
-  a Claude Deep Research document with hands-on codebase analysis to produce a structured
+  a deep-research markdown document with hands-on codebase analysis to produce a structured
   12-14 document reference series. Use this skill whenever the user wants to deeply analyze
   a repo, do a deep dive on a project, reverse-engineer a codebase, create a technical
   reference for an open-source tool, understand how a project works inside and out, or
-  compare another project's architecture with this ecosystem. Also trigger when the user
-  mentions "deep dive", "deep research", "analyze this repo", "break down this codebase",
-  "technical reference", "how does this project work", or has a Deep Research markdown
+  compare another project's architecture against a reference project. Also trigger when the
+  user mentions "deep dive", "deep research", "analyze this repo", "break down this codebase",
+  "technical reference", "how does this project work", or has a deep-research markdown
   alongside a cloned repo ready for analysis.
+requires_agent_teams: false
 requires_claude_code: true
-composes_with:
-  - project-profiler
-  - plan-builder
-  - mermaid-charts
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent"]
+composes_with: ["project-profiler", "plan-builder", "mermaid-charts", "wiki-research", "llm-wiki"]
+spawned_by: []
 ---
 
 # Repo Deep Dive
@@ -26,15 +31,20 @@ structured technical reference — the kind of document set that lets someone un
 
 ## What You Need
 
-1. **A Deep Research document** — markdown from a Claude Deep Research session about the project.
+1. **A deep-research document** — markdown from any deep-research session about the project
+   (Claude Deep Research, ChatGPT Deep Research, Gemini Deep Research, or a hand-written brief).
    This provides landscape context, community perspective, and high-level understanding that
    code analysis alone can't give you.
 
 2. **A locally cloned repo** — the actual source code to trace, measure, and analyze.
 
-If either is missing, ask the user. The Deep Research doc is critical — it grounds the
+3. **An output directory** — where the deep dive's document series should land. Ask the user
+   for this if not provided. There is no built-in default — naming the location explicitly
+   keeps deep dives from accumulating in a default folder the user forgets about.
+
+If the deep-research document is missing, ask the user. It's critical — it grounds the
 analysis in why the project exists and where it sits in the landscape, not just what the
-code does. If the user doesn't have one, suggest they run a Deep Research session first
+code does. If the user doesn't have one, suggest they run a deep-research session first
 (it takes ~5 minutes and dramatically improves the output quality).
 
 ## The Process
@@ -102,12 +112,14 @@ docs don't tell you.
 
 The final 2-3 documents provide the strategic view:
 
-**Comparison document** — How does this project compare to AllTheSkillsAllTheAgents and
-any other projects in the analysis scope? Use a table format:
+**Comparison document** — How does this project compare to a reference project (typically
+the user's own project or another tool in the same domain) and any other projects in the
+analysis scope? Ask the user which reference project to compare against if it isn't obvious.
+Use a table format:
 
-| Dimension | This Project | AllTheSkills | Notes |
-|-----------|-------------|--------------|-------|
-| Scale     | Xk LoC      | ~5k          | ...   |
+| Dimension | This Project | Reference Project | Notes |
+|-----------|-------------|-------------------|-------|
+| Scale     | Xk LoC      | Yk LoC            | ...   |
 
 Focus on what each project has that the other lacks — this is where the insight lives.
 
@@ -120,8 +132,9 @@ worth pursuing.
 
 All output goes in `{output_dir}/{project}_deepdive/source-material/`.
 
-The user may specify `{output_dir}` — if not, default to `~/AI/DeepResearch/`.
-This is the central monorepo for all deep dive research and analysis documents.
+`{output_dir}` is required and supplied by the user. If they don't specify one, ask before
+generating any files — silently dropping a 12-document series into a default location wastes
+their time finding it later.
 
 ### Document Progression
 
@@ -135,7 +148,7 @@ The consistent structure across all deep dives:
 | 01 | project-overview.md | What it is, by the numbers, landscape position |
 | 02 | architecture.md | High-level system design, layers, key decisions |
 | 03-09 | [subsystem docs] | Deep technical dives — one per major subsystem |
-| 10+ | comparison.md | How it compares to AllTheSkills and related projects |
+| 10+ | comparison.md | How it compares to a reference project and related tools |
 | 11+ | convergence-analysis.md | What each project has that the other lacks |
 | 12+ | frontier-assessment.md | What's novel, what's table stakes, what to build |
 
@@ -177,7 +190,7 @@ what to read first, what to keep open as reference, and what to save for last.}
 ## Generated
 
 {Date} — from codebase analysis of {project} ({version}, {LoC} LoC, {commits} commits,
-{other key stats}) and AllTheSkillsAllTheAgents ({N} skills, {M} files).
+{other key stats}). Compared against {reference-project} where applicable.
 ```
 
 ## Parallelization Strategy
@@ -226,7 +239,7 @@ Common patterns:
 
 ## What Makes a Great Deep Dive
 
-The best deep dives from this ecosystem share these qualities:
+The best deep dives share these qualities:
 
 1. **They teach** — someone reading the output understands the project deeply, not just superficially
 2. **They're honest** — gaps, limitations, and "this is impressive" moments are both documented

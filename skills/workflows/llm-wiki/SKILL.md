@@ -1,6 +1,6 @@
 ---
 name: llm-wiki
-version: 1.0.0
+version: 1.1.0
 description: |
   Bootstrap and maintain LLM-powered personal knowledge bases (wikis) for any project or
   domain. Use when the user wants to create a "second brain", knowledge base, personal wiki,
@@ -12,7 +12,16 @@ description: |
   lint operations — "add this article to the wiki", "what does the wiki say about X",
   "clean up the wiki", "process this source". This is distinct from RAG: the wiki is a
   persistent, maintained artifact that compounds over time.
-requires_claude_code: true
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: ["index.md", "log.md", "overview.md"]
+  shared_read: ["raw/", "wiki/"]
+allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+composes_with: ["wiki-research", "repo-deep-dive", "project-profiler", "mermaid-charts"]
+spawned_by: []
 ---
 
 # LLM Wiki
