@@ -1,6 +1,6 @@
 ---
 name: settings-consolidator
-version: 1.0.0
+version: 1.1.0
 description: >
   Scan all .claude/settings.local.json files across the user's home directory,
   deduplicate permissions, collapse supersets, and merge everything into the
@@ -14,6 +14,16 @@ description: >
   to sleep and let this run", "unattended session", or asks about reducing permission
   prompts. Also trigger when users want to upgrade colon-wildcards to space-wildcards
   or manage Claude Code permissions across projects.
+requires_agent_teams: false
+requires_claude_code: true
+min_plan: starter
+owns:
+  directories: []
+  patterns: ["settings.local.json"]
+  shared_read: ["~/.claude/", "**/.claude/"]
+allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob"]
+composes_with: ["sync-skills"]
+spawned_by: []
 ---
 
 # Settings Consolidator
@@ -146,7 +156,7 @@ Sort entries alphabetically within each category.
 
 Identify permissions that should NOT be merged into global settings. Apply these 7 rules:
 
-1. **Absolute paths to specific projects.** Entries like `Bash(source /Users/johns/myproject/.venv/bin/activate)` are meaningless outside that project.
+1. **Absolute paths to specific projects.** Entries like `Bash(source /Users/you/myproject/.venv/bin/activate)` are meaningless outside that project.
 
 2. **Named project scripts.** Relative paths referencing a specific file (e.g., `Bash(./ep help)`, `Bash(./run_tests.sh)`). Generic wildcards like `Bash(./scripts/*)` or `Bash(./bin/*)` are fine to merge because they work in any project with that directory structure.
 
@@ -203,7 +213,7 @@ LITERAL COMMANDS (kept or flagged):
 
 FLAGGED (not merged — project-specific):
   Bash(./ep help:*) — from ProjectName
-  Bash(source /Users/johns/myproject/.venv/bin/activate:*) — from myproject
+  Bash(source /Users/you/myproject/.venv/bin/activate:*) — from myproject
   ...
 
 DENY/ALLOW CONFLICTS (deny wins):
