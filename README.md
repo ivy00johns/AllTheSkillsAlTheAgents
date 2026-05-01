@@ -1,6 +1,8 @@
 # Claude Code Skill Ecosystem
 
-A complete multi-agent orchestration toolkit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Drop these skills into `~/.claude/skills/` and Claude Code gains the ability to coordinate parallel agent builds with contract-first architecture, declarative file ownership, and QA-gated releases.
+A complete multi-agent orchestration toolkit — **36 skills** spanning orchestration, role agents, contracts, git workflows, and developer workflows. Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) as the primary host, but the SKILL.md format is platform-agnostic so the same skills work on Claude.ai, Copilot CLI, Codex, and Gemini CLI.
+
+Symlink these skills into `~/.claude/skills/` and Claude Code gains the ability to coordinate parallel agent builds with contract-first architecture, declarative file ownership, and QA-gated releases.
 
 ## What This Is
 
@@ -17,11 +19,19 @@ It's built on [Claude Code Skills](https://docs.anthropic.com/en/docs/claude-cod
 
 ## Quick Start
 
-### Install (copy to global skills directory)
+### Install (symlink into Claude Code's global skills directory)
+
+Clone the repo, then run the bundled sync script — it creates flattened symlinks at `~/.claude/skills/<skill-name>` so edits in the repo are instantly live in every session.
 
 ```bash
-cp -R skills/* ~/.claude/skills/
+git clone https://github.com/<your-fork>/AllTheSkillsAllTheAgents.git
+cd AllTheSkillsAllTheAgents
+skills/workflows/sync-skills/scripts/sync-skills.sh --link --to-all
 ```
+
+Or, from inside Claude Code, just run `/sync-skills` once the repo is cloned.
+
+If you'd rather copy files than symlink (e.g., on a machine without repo access), use `--copy` instead of `--link`.
 
 ### Use It
 
@@ -38,7 +48,7 @@ The **orchestrator** skill triggers automatically. It reads your plan, sizes the
 Each agent role skill works on its own without the orchestrator:
 
 ```text
-"Review this code for security vulnerabilities"     → security-agent
+"Review this code for security vulnerabilities"      → security-agent
 "Set up Docker and CI/CD for this project"           → infrastructure-agent
 "Write performance tests with k6"                    → performance-agent
 "Profile this codebase and generate a CLAUDE.md"     → project-profiler
@@ -48,7 +58,7 @@ Each agent role skill works on its own without the orchestrator:
 
 ```text
 skills/
-├── orchestrator/              # Lead coordinator — the entry point
+├── orchestrator/              # Lead coordinator — the entry point (1)
 │   ├── SKILL.md               # 14-phase build playbook, runtime detection
 │   └── references/
 │       ├── phase-guide.md     # Full phase-by-phase instructions
@@ -56,7 +66,7 @@ skills/
 │       ├── circuit-breaker.md # Failure detection and recovery
 │       └── handoff-protocol.md# Session continuation spec
 │
-├── roles/                     # Implementation agents (9 roles)
+├── roles/                     # Implementation agents (9)
 │   ├── backend-agent/         # API servers, business logic, data layers
 │   ├── frontend-agent/        # UI, client-side state, presentation
 │   ├── infrastructure-agent/  # Docker, CI/CD, deployment configs
@@ -65,21 +75,42 @@ skills/
 │   ├── docs-agent/            # READMEs, API docs, architecture docs
 │   ├── observability-agent/   # Logging, metrics, health checks, alerting
 │   ├── db-migration-agent/    # Schema migrations, seed data
-│   └── performance-agent/     # Load testing with k6 and NeoLoad
+│   └── performance-agent/     # Load testing (k6 default; Locust/JMeter/Artillery patterns)
 │
-├── contracts/                 # Contract-first architecture
+├── contracts/                 # Contract-first architecture (2)
 │   ├── contract-author/       # Generates API/data/event contracts before builds
-│   │   └── references/        # OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema templates
+│   │   └── references/        # OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema, data-layer YAML
 │   └── contract-auditor/      # Verifies implementations match contracts
 │
-├── meta/                      # Skills that create and manage other skills
+├── meta/                      # Skills that create and manage other skills (8)
 │   ├── skill-writer/          # Generates new SKILL.md files with proper frontmatter
 │   ├── project-profiler/      # Analyzes codebases → generates CLAUDE.md + profile.yaml
-│   └── code-reviewer/         # Structured code review with scoring rubric
+│   ├── code-reviewer/         # Structured code review with scoring rubric
+│   ├── skill-audit/           # Bulk scan for ecosystem-level consistency issues
+│   ├── skill-deep-review/     # Single-skill deep dive with /skill-creator validation
+│   ├── skill-improvement-plan/# Turns review reports into prioritized fix plans
+│   ├── skill-updater/         # Executes improvement plans across SKILL.md files
+│   └── wiki-research/         # Wiki-first protocol — read 3 pages before crawling source
 │
-└── workflows/                 # Cross-cutting process skills
+├── git/                       # Git workflow conventions (5)
+│   ├── git-commit/            # Conventional commits + branch naming
+│   ├── git-pr/                # PR title/body format and gh CLI workflow
+│   ├── git-pr-feedback/       # Triage and address PR review comments
+│   ├── git-branch-cleanup/    # Prune merged + stale branches safely
+│   └── git-clean-worktrees/   # Remove worktrees whose work is already on main
+│
+└── workflows/                 # Cross-cutting process skills (11)
     ├── context-manager/       # Compaction strategy, handoffs, token budgets
-    └── deployment-checklist/  # Pre-deploy verification gates
+    ├── deployment-checklist/  # Pre-deploy verification gates
+    ├── sync-skills/           # Symlink/copy skills to ~/.claude/skills/ and Cursor
+    ├── plan-builder/          # Research/PRDs → orchestrator-ready build plans
+    ├── repo-deep-dive/        # Full technical reference series for an OSS repo
+    ├── settings-consolidator/ # Merge Claude Code permissions across projects
+    ├── llm-wiki/              # Bootstrap + maintain LLM-powered knowledge bases
+    ├── mermaid-charts/        # Expert-quality diagrams (15-30+ node systems)
+    ├── playwright/            # Browser-based E2E + screenshots with visible Chrome
+    ├── nano-banana/           # Google Gemini Imagen 4 image generation
+    └── railway-deploy/        # Deploy to Railway (Dockerfile, multi-service, GraphQL API)
 ```
 
 ## Key Concepts
@@ -119,38 +150,57 @@ Skills use three loading levels to manage context efficiently:
 ├── README.md                          # This file
 ├── CLAUDE.md                          # Project guidance for Claude Code
 ├── AGENTS.md                          # Shared instructions for AI agents
-└── skills/                            # The skill ecosystem (copy to ~/.claude/skills/)
-    ├── orchestrator/
-    ├── roles/
-    ├── contracts/
-    ├── meta/
-    ├── git/
-    └── workflows/
+└── skills/                            # The skill ecosystem — symlinked to ~/.claude/skills/
+    ├── orchestrator/                  # 1 skill
+    ├── roles/                         # 9 skills
+    ├── contracts/                     # 2 skills
+    ├── meta/                          # 8 skills
+    ├── git/                           # 5 skills
+    └── workflows/                     # 11 skills
 ```
 
 ## Skill Inventory
 
-| Skill | Type | Files | Description |
-|-------|------|-------|-------------|
-| orchestrator | coordinator | 5 | Lead coordinator for multi-agent builds |
-| backend-agent | role | 2 | API servers, business logic, data layers |
-| frontend-agent | role | 2 | UI, client-side state, presentation |
-| infrastructure-agent | role | 2 | Docker, CI/CD, deployment |
-| qe-agent | role | 4 | Testing, contract conformance, QA reports |
-| security-agent | role | 2 | OWASP audits, vulnerability scanning |
-| docs-agent | role | 2 | Documentation generation |
-| observability-agent | role | 2 | Logging, metrics, health checks |
-| db-migration-agent | role | 2 | Schema migrations, seed data |
-| performance-agent | role | 3 | Load testing (k6, NeoLoad) |
-| contract-author | contract | 6 | Generates integration contracts |
-| contract-auditor | contract | 2 | Audits implementation vs contract |
-| skill-writer | meta | 3 | Generates new SKILL.md files |
-| project-profiler | meta | 2 | Codebase analysis → project profile |
-| code-reviewer | meta | 2 | Structured code review |
-| context-manager | workflow | 2 | Context management and handoffs |
-| deployment-checklist | workflow | 2 | Pre-deployment verification |
+| # | Skill | Category | Description |
+|---|-------|----------|-------------|
+| 1 | orchestrator | coordinator | Lead coordinator for multi-agent builds (14-phase playbook) |
+| 2 | backend-agent | role | API servers, business logic, data layers |
+| 3 | frontend-agent | role | UI, client-side state, presentation |
+| 4 | infrastructure-agent | role | Docker, CI/CD, deployment configs |
+| 5 | qe-agent | role | Testing, contract conformance, QA gate report |
+| 6 | security-agent | role | OWASP audits, dependency + auth review |
+| 7 | docs-agent | role | READMEs, API docs, changelogs |
+| 8 | observability-agent | role | Logging, metrics, health checks, alerting |
+| 9 | db-migration-agent | role | Schema migrations, seed data |
+| 10 | performance-agent | role | Load testing (k6 default; OSS alternatives) |
+| 11 | contract-author | contract | Generates API / data layer / event contracts |
+| 12 | contract-auditor | contract | Static audit: implementation vs contract |
+| 13 | skill-writer | meta | Generates new SKILL.md files |
+| 14 | project-profiler | meta | Codebase analysis → CLAUDE.md + profile.yaml |
+| 15 | code-reviewer | meta | Structured code review with scoring rubric |
+| 16 | skill-audit | meta | Bulk ecosystem-level skill quality scan |
+| 17 | skill-deep-review | meta | Single-skill deep dive with /skill-creator |
+| 18 | skill-improvement-plan | meta | Review report → prioritized fix plan |
+| 19 | skill-updater | meta | Executes improvement plans across skills |
+| 20 | wiki-research | meta | Wiki-first protocol (3 pages vs 100k tokens) |
+| 21 | git-commit | git | Conventional commits + branch naming |
+| 22 | git-pr | git | PR title/body format, gh CLI workflow |
+| 23 | git-pr-feedback | git | Triage and address PR review comments |
+| 24 | git-branch-cleanup | git | Prune merged and stale branches safely |
+| 25 | git-clean-worktrees | git | Remove worktrees already merged to main |
+| 26 | context-manager | workflow | Compaction strategy + handoff protocol |
+| 27 | deployment-checklist | workflow | Pre-deployment verification gates |
+| 28 | sync-skills | workflow | Symlink skills to Claude Code + Cursor |
+| 29 | plan-builder | workflow | Research/PRDs → orchestrator-ready plans |
+| 30 | repo-deep-dive | workflow | OSS repo → 12–14 doc technical reference |
+| 31 | settings-consolidator | workflow | Merge Claude Code permissions across projects |
+| 32 | llm-wiki | workflow | Bootstrap + maintain LLM-powered wikis |
+| 33 | mermaid-charts | workflow | Expert mermaid diagrams (15–30+ nodes) |
+| 34 | playwright | workflow | Browser E2E + screenshots, visible Chrome |
+| 35 | nano-banana | workflow | Google Imagen 4 image generation |
+| 36 | railway-deploy | workflow | Deploy to Railway (Docker, multi-service) |
 
-**Total: 17 skills, 44 files**
+**Total: 36 skills.** All bodies under 500 lines (largest: mermaid-charts at 435). All frontmatter compliant; zero ownership conflicts; zero broken cross-references.
 
 ## Requirements
 
