@@ -33,6 +33,48 @@ Or, from inside Claude Code, just run `/sync-skills` once the repo is cloned.
 
 If you'd rather copy files than symlink (e.g., on a machine without repo access), use `--copy` instead of `--link`.
 
+## Install to Other Tools
+
+AllTheSkillsAllTheAgents skills are authored in the canonical SKILL.md format — a portable, platform-agnostic markdown + YAML frontmatter convention. The multi-tool installer translates these skills into 10 other tools' native formats, so the same skill library works everywhere: Cursor, Aider, Windsurf, OpenCode, Qwen Code, Gemini CLI, OpenClaw, Kimi Code, and GitHub Copilot.
+
+### Supported Tools
+
+| Tool | Scope | Format | Source |
+|---|---|---|---|
+| Claude Code | user | SKILL.md (passthrough) | — |
+| GitHub Copilot | user | .md (passthrough) | direct copy |
+| Cursor | project | .mdc with metadata | generated |
+| Aider | project | single CONVENTIONS.md | accumulated |
+| Windsurf | project | single .windsurfrules | accumulated |
+| OpenCode | project | .md with mode field | generated |
+| Qwen Code | project | .md with optional tools | generated |
+| OpenClaw | user | 3-file split (SOUL/AGENTS/IDENTITY) | generated |
+| Gemini CLI | user | extension manifest + SKILL.md | generated |
+| Antigravity | user | community-skill SKILL.md | generated |
+| Kimi Code | user | YAML config + system.md | generated |
+
+### Two-Step Installation
+
+```bash
+# Step 1: Convert all skills to tool-specific formats
+./scripts/convert.sh
+
+# Step 2: Install into detected tools (interactive if TTY, auto if not)
+./scripts/install.sh
+```
+
+See `scripts/README.md` for detailed flag documentation, per-tool examples, and the full convert/install/lint reference.
+
+### Important: Lossy Conversion
+
+Claude-Code-only frontmatter fields — `allowed_tools`, `owns`, `composes_with`, `spawned_by`, `requires_agent_teams` — are stripped when converting to other tools. You'll see a stderr warning per skill (`[copilot] stripped allowed_tools/owns from <slug>`). This is intentional and correct: these fields describe orchestration rules that only Claude Code's agent teams understand.
+
+Skills marked `requires_claude_code: true` are skipped entirely for non-Claude-Code targets. See `contracts/installer/per-tool-output-spec.md` for the complete specification.
+
+### CI Integration
+
+Every commit runs `scripts/lint-skills.sh` via `.github/workflows/lint-skills.yml` to validate all 38 skills' frontmatter and cross-skill invariants. PRs to `main` block on any lint errors. The workflow produces a JUnit report (visible as GitHub Actions test results) for easy triage.
+
 ### Use It
 
 Tell Claude Code to build something with multiple agents:
