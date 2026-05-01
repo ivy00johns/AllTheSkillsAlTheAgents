@@ -154,6 +154,7 @@ Before handing contracts to the orchestrator:
 - [ ] Per-agent implementation notes included
 - [ ] Field names consistent across ALL contract files (types, OpenAPI, data layer)
 - [ ] Complexity matches project scope (simple projects don't need JWT, AsyncAPI, etc.)
+- [ ] TypeScript projects: `contracts/tsconfig.json` exists alongside `src/` and extends a workspace base where applicable. Verify by running `tsc --noEmit` from the contracts package — it should typecheck cleanly, not print the tsc help screen.
 
 ## Contract Versioning
 
@@ -180,6 +181,7 @@ Over-engineered contracts waste agent time implementing unnecessary complexity.
 Your deliverables (machine-readable formats — not markdown narratives):
 
 - `contracts/types.[ts|py|json]` — shared type definitions
+- `contracts/tsconfig.json` — REQUIRED when language is TypeScript. Must extend the workspace base tsconfig if one exists (e.g. `../../tsconfig.base.json`). Without this, `tsc --noEmit` runs with no project config and silently prints its help text instead of typechecking, which gets discovered late. (Skip this file for Python/Go/other-language projects.)
 - `contracts/openapi.yaml` — API contract (OpenAPI 3.1 spec)
 - `contracts/data-layer.yaml` — data layer interface (use `references/data-layer-template.yaml`)
 - `contracts/asyncapi.yaml` — event-driven interface (if applicable)
