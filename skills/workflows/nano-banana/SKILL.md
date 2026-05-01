@@ -1,6 +1,6 @@
 ---
 name: nano-banana
-version: 1.0.0
+version: 1.2.0
 description: >
   Generate images using Google's Nano Banana (Gemini Image Generation) API and save them to the project. Use this skill
   whenever the user asks to generate images, create product photos, make hero banners, generate lifestyle shots, produce
@@ -8,8 +8,16 @@ description: >
   a banner", or wants to batch-generate images. Also trigger for any AI image generation task using Gemini models, even
   if they just say "let's do images", "generate the rest", or "make me a picture of". This is the go-to skill for any
   image generation workflow.
+requires_agent_teams: false
 requires_claude_code: true
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["frontend-agent", "docs-agent"]
+spawned_by: []
 ---
 
 # Nano Banana Image Generation
@@ -120,3 +128,8 @@ The key elements that improve output quality:
 - **Lighting direction** (side lighting, golden hour, warm torchlight) rather than just "good lighting"
 - **Setting details** that ground the image (aged oak table, stone courtyard, misty forest)
 - **Photography framing** (medium format, editorial, cinematic) to set the visual quality bar
+
+## Reference Files
+
+- `references/imagen-4-prompting.md` — deep-dive prompt engineering guide for Imagen 4 (the model behind Nano Banana). Read this when default output isn't hitting the mark, or when working with text-in-image, complex compositions, or specific photography styles. Covers the SCULPT framework, contextual priming techniques, the `enhancePrompt` parameter, and natural-language patterns that beat keyword soup.
+- `references/example-project-config.md` — pattern for documenting per-project image conventions (paths, prompt style guide, anti-pattern modifiers, tracking spreadsheet). Suggest this to the user when starting a project that will generate many images, so the project's prompts stay consistent across sessions.

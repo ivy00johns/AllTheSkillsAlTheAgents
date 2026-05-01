@@ -1,6 +1,6 @@
 ---
 name: git-pr
-version: 1.1.0
+version: 1.2.0
 description: >
   Guide for creating and updating GitHub pull requests in this repository:
   PR title format, body structure, clean descriptions, and the gh CLI workflow.
@@ -10,7 +10,16 @@ description: >
   "gh pr create", "open pull request", "submit PR", "PR template".
   Also use proactively whenever you are about to run `gh pr create` —
   even if the user did not explicitly mention this skill.
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Bash"]
 composes_with: ["git-commit", "git-pr-feedback"]
+spawned_by: []
 ---
 
 # GitHub Pull Request Conventions

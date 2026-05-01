@@ -1,9 +1,16 @@
 ---
 name: plan-builder
-version: 1.1.0
+version: 1.2.1
 description: |
   Transform research documents, Compass artifacts, PRDs, reference materials, and conversational goals into structured project plans ready for the orchestrator to execute. Use this skill when the user has source material and wants to build something from it, when the user says "make a plan", "plan this out", "I want to build X from this research", or when a plan is needed before invoking the orchestrator. Also trigger when @-mentioned files or attached documents accompany a build request, when the user wants to turn research into a website/app/tool, or when orchestrator would be invoked but no plan exists yet. This skill produces the plan — orchestrator consumes it.
+requires_agent_teams: false
 requires_claude_code: true
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["orchestrator", "project-profiler", "mermaid-charts", "contract-author"]
 spawned_by: []
 ---
@@ -40,7 +47,7 @@ Assess what the user has brought:
 | Vague idea, no artifacts ("I want to do something with AI") | **Redirect** → invoke brainstorming |
 | Existing codebase + new source material | **Path A+** — Augmentation variant |
 
-## Path A: Artifact Ingestionu
+## Path A: Artifact Ingestion
 
 When the user provides research documents, Compass artifacts, or reference material alongside a build request.
 
@@ -149,7 +156,7 @@ The orchestrator reads this section. It extracts: what to build, components, tec
 # [Project Name] — Build Plan
 
 > **For orchestrated builds:** Use the orchestrator skill to execute this plan with parallel agents.
-> **For solo builds:** Use superpowers:writing-plans to expand into TDD implementation detail.
+> **For solo builds:** Expand each component into TDD-style implementation steps (red → green → refactor) and work through them sequentially.
 
 ## Goal
 [One paragraph describing the finished product, its core purpose,

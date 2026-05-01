@@ -1,6 +1,6 @@
 ---
 name: mermaid-charts
-version: 2.0.0
+version: 2.2.0
 description: >
   Create expert-quality mermaid diagrams — flowcharts, sequence diagrams, architecture maps,
   state machines, ER diagrams, Gantt charts, mindmaps, and more. Handles complex systems with
@@ -13,6 +13,14 @@ description: >
   if they want a visual representation of something technical, this is the skill. Trigger for
   "draw this", "show me how X works", "map the architecture", "diagram the flow", or any
   request involving system visualization.
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with:
   - docs-agent
   - backend-agent
@@ -23,6 +31,7 @@ composes_with:
   - infrastructure-agent
   - contract-author
   - observability-agent
+spawned_by: []
 ---
 
 # Mermaid Charts
@@ -457,3 +466,7 @@ Before finishing any diagram, verify:
 - [ ] Styling highlights the important parts (not everything)
 - [ ] The diagram renders without errors in a mermaid-compatible viewer
 - [ ] Labels are free of special character issues
+
+## Reference Files
+
+- `references/advanced-patterns.md` — read this when the main guidance above isn't enough. Covers multi-diagram document structure, complex flowcharts, architecture diagrams with 15-30+ nodes, sequence diagram patterns, `block-beta` system maps, theming/branding, and the rendering pipeline (350+ lines of detailed patterns).

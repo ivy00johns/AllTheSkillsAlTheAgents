@@ -1,6 +1,6 @@
 ---
 name: git-clean-worktrees
-version: 1.0.0
+version: 1.1.0
 description: >
   Clean up stale git worktrees whose work is already on the main branch.
   Worktrees accumulate after branches are merged — they sit around with
@@ -14,7 +14,16 @@ description: >
   or any mention of phantom modified files in worktree directories.
   Trigger proactively when `git worktree list` shows entries beyond the
   main worktree, especially before or after branch cleanup operations.
-composes_with: ["git-branch-cleanup", "superpowers:using-git-worktrees", "superpowers:finishing-a-development-branch"]
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Bash"]
+composes_with: ["git-branch-cleanup"]
+spawned_by: []
 ---
 
 # Clean Worktrees

@@ -95,7 +95,7 @@ Before spawning implementation agents:
 - Follow git-commit conventions for branch naming and commit messages throughout the build
 - Create `.gitignore` (orchestrator-owned)
 - Invoke `contract-author` skill to create `contracts/` with shared types and integration contracts — contract-author owns this directory
-- Create any skeleton files needed for agent orientation (assign ownership per the canonical table in the design spec §6)
+- Create any skeleton files needed for agent orientation (assign ownership per the canonical table in `skills/orchestrator/SKILL.md` § File Ownership Map)
 
 ## Phase 7: Detect Runtime and Spawn
 
@@ -155,6 +155,8 @@ You (the orchestrator) run quick smoke tests to verify integration before spawni
 2. **Happy path**: One primary flow works end-to-end
 3. **Data flow**: Verify one write is visible via read (Frontend → Backend → Database → Backend → Frontend)
 
+For browser-based flows (auth, form submit, navigation), invoke the `playwright` skill to drive a real browser through the happy path — this catches CORS, redirect, and rendering issues that curl-only smoke tests miss. The QE agent will rerun and extend these in Phase 13.
+
 If smoke tests fail, fix integration issues before wasting QE agent context on a broken build. If they pass, spawn QE for thorough verification.
 
 ## Phase 12: Fix Failures
@@ -181,7 +183,8 @@ Gate rules:
 2. Generate final architecture diagram(s) using mermaid-charts — system overview, data flow, and deployment topology as appropriate. Include in README or `docs/`.
 3. Clean up any temporary files
 4. Verify the plan's acceptance criteria are met
-5. Produce final status report
+5. If the build will go through PR review, hand off to the `git-pr` and `git-pr-feedback` skills for the review cycle — they own commit/PR conventions and the response-to-review loop.
+6. Produce final status report
 
 ## Definition of Done
 

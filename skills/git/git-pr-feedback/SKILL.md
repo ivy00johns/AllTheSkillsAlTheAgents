@@ -1,6 +1,6 @@
 ---
 name: git-pr-feedback
-version: 1.1.0
+version: 1.2.0
 description: >
   Fetch, triage, and address PR review comments from GitHub Copilot and human
   reviewers. Use when the user asks to check PR feedback, review comments,
@@ -10,7 +10,16 @@ description: >
   "copilot review", "reviewer feedback", or any mention of responding to pull
   request comments. Also trigger when the user returns to a PR after some time
   and wants to handle accumulated feedback.
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Write", "Edit", "Bash", "Grep"]
 composes_with: ["git-pr", "git-commit"]
+spawned_by: []
 ---
 
 # PR Feedback Handler

@@ -1,8 +1,8 @@
 ---
 name: contract-author
-version: 1.1.0
+version: 1.2.0
 description: |
-  Generate machine-readable integration contracts (API, data layer, shared types) before any implementation begins in multi-agent builds. Use this skill when authoring API contracts, defining shared type schemas, writing data layer interfaces, establishing integration boundaries between agents, or documenting domain business rules for multi-agent coordination. Trigger for any contract creation task, especially before spawning implementation agents. Also trigger when the orchestrator needs contracts authored for a plan document, when defining file ownership boundaries between agents, or when establishing cross-cutting concern assignments.
+  Generate machine-readable integration contracts (API, data layer, shared types, events) before any implementation begins in multi-agent builds. This is orchestrator Phase 4 — contracts are written here before any implementation agent is spawned. Use this skill when authoring API contracts, OpenAPI specs, AsyncAPI specs, Pydantic models, TypeScript interfaces, JSON Schema definitions, data layer interfaces, shared type schemas, integration boundaries between agents, or domain business rules for multi-agent coordination. Trigger for any contract creation task, especially before spawning implementation agents. Also trigger when the user says "write the API contract", "define the shared types", "spec out the endpoints", "create the OpenAPI", "author the contract", or when the orchestrator needs contracts authored for a plan document. Bundles 6 templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema, and a data-layer YAML — pick the one matching the project's stack.
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter

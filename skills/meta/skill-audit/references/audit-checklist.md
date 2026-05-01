@@ -48,8 +48,8 @@ Run these once across the full inventory:
 - [ ] `spawned_by` is reciprocal where expected (A spawns B → B.spawned_by includes A)
 
 ### Coverage
-- [ ] All roles from design spec have skill implementations
-- [ ] All workflows from design spec have skill implementations
+- [ ] All roles described in `docs/architecture.md` and `CLAUDE.md` have skill implementations
+- [ ] All workflows the orchestrator phase-guide depends on have skill implementations
 - [ ] Contract types (OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema) all have templates
 
 ### Consistency

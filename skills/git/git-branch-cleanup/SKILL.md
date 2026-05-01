@@ -1,6 +1,6 @@
 ---
 name: git-branch-cleanup
-version: 1.1.0
+version: 1.2.0
 description: >
   Clean up stale and merged git branches — both local and remote. Prunes
   tracking refs, identifies merged branches safe to delete, flags orphaned
@@ -13,7 +13,16 @@ description: >
   or any request about removing branches that have already been merged.
   Also trigger when the user says things like "I have too many branches",
   "clean up my git", or "lots of things merged".
-composes_with: ["git-commit", "git-pr"]
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Bash"]
+composes_with: ["git-commit", "git-pr", "git-clean-worktrees"]
+spawned_by: []
 ---
 
 # Git Branch Cleanup

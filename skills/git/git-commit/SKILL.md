@@ -1,6 +1,6 @@
 ---
 name: git-commit
-version: 1.1.0
+version: 1.2.0
 description: >
   Guide for creating git commits in this repository: conventional commit format,
   allowed types, and branch naming conventions.
@@ -9,7 +9,16 @@ description: >
   "stage changes", "write a commit message", "make a commit", "branch name",
   "new branch", "create branch". Also use proactively whenever you are about
   to run `git commit` — even if the user did not explicitly mention this skill.
+requires_agent_teams: false
+requires_claude_code: false
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["*"]
+allowed_tools: ["Read", "Bash"]
 composes_with: ["git-pr", "git-branch-cleanup"]
+spawned_by: []
 ---
 
 # Git Commit Conventions

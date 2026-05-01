@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.3.0
+version: 1.4.0
 description: |
   Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. IMPORTANT: This skill MUST take priority over brainstorming, writing-plans, and other design skills when the user requests an agent team build. It handles its own design phase (plan analysis, contract authoring, team sizing) internally. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", or wants to split work across multiple Claude sessions. Also trigger when the user provides a plan document and wants it built with maximum parallelism. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build and should not be preempted by brainstorming or planning skills.
 requires_agent_teams: false
@@ -17,7 +17,8 @@ composes_with: [
   "security-agent", "docs-agent", "observability-agent", "db-migration-agent", "performance-agent",
   "contract-author", "contract-auditor",
   "context-manager", "deployment-checklist", "code-reviewer", "project-profiler",
-  "mermaid-charts", "plan-builder", "git-commit", "git-pr"
+  "mermaid-charts", "plan-builder", "playwright",
+  "git-commit", "git-pr", "git-pr-feedback"
 ]
 spawned_by: []
 ---
@@ -69,7 +70,7 @@ Each agent role skill works standalone regardless of runtime. Only this orchestr
 
 ## File Ownership Map
 
-Directory ownership takes precedence over pattern ownership. Subdirectory carve-outs are explicit (e.g., performance-agent owns `tests/performance/` carved out from qe-agent's `tests/`). See the full canonical table in the design spec §6.
+Directory ownership takes precedence over pattern ownership. Subdirectory carve-outs are explicit (e.g., performance-agent owns `tests/performance/` carved out from qe-agent's `tests/`). The table below is the canonical ownership map — when in doubt, this overrides any individual role skill.
 
 | Agent Role | Owns (Exclusive) | Shared Read | Never Touches |
 |------------|-----------------|-------------|---------------|

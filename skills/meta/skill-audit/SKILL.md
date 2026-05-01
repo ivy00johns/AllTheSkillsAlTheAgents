@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-version: 1.1.0
+version: 1.2.0
 description: |
   Scan all skills (or a filtered subset) for consistency, quality issues, gaps, and ownership conflicts in bulk. Use this skill when auditing the full skill ecosystem, running a broad quality scan, checking for ownership overlaps across agents, finding inconsistencies between skills, doing a "health check" on all skills, or when someone says "audit skills", "scan all skills", "skill ecosystem health", "bulk review", or "what needs fixing". Not for single-skill deep dives — use skill-deep-review for that.
 requires_agent_teams: false
@@ -102,10 +102,10 @@ Check for ecosystem-level issues:
 
 #### 2f. Coverage Gap Analysis
 
-Compare the skill inventory against the ecosystem design spec:
-- Are all roles defined in `skill-ecosystem-design-spec.md` implemented?
-- Are all workflow skills implemented?
-- Any design spec capabilities not covered by a skill?
+Compare the skill inventory against the project's canonical documentation (`docs/architecture.md`, `CLAUDE.md`, and the orchestrator's File Ownership Map):
+- Are all roles described in the architecture doc implemented as skills?
+- Are all workflows the project depends on covered?
+- Any capabilities the orchestrator's playbook references but no skill exists for?
 
 ### Phase 3: Generate Audit Report
 
@@ -153,7 +153,7 @@ Skills scanned: [count]
 |-----------|-----------------|-------------|
 
 ## Coverage Gaps
-[Capabilities from design spec not covered by existing skills]
+[Capabilities referenced in `docs/architecture.md`, `CLAUDE.md`, or orchestrator phase-guide that no existing skill covers]
 
 ## Recommendations
 [Top 5 highest-impact improvements, ordered by priority]

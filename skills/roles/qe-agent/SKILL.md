@@ -1,8 +1,8 @@
 ---
 name: qe-agent
-version: 1.2.0
+version: 1.3.0
 description: |
-  Verify implementations match contracts, integrations connect, and edge cases are handled for multi-agent builds. Use this skill when spawning a QE agent, running contract conformance checks, integration verification, or adversarial testing. Trigger for any quality engineering or test verification task within an orchestrated build.
+  Verify implementations match contracts, integrations connect, and edge cases are handled for multi-agent builds. This is the role agent that owns `qa-report.json` — the build gate that the orchestrator parses to decide whether a build can complete. Use this skill when spawning a QE agent, running contract conformance checks, integration verification, adversarial testing, or generating the QA gate report. Trigger for any quality engineering, test verification, or QA-gate task within an orchestrated build, including phrases like "verify the build", "qa gate", "contract diff", "adversarial probing", "qa report", "test agent", "qe agent", or "block the build". Do not preempt with generic test-writing skills — this is the role agent that gates orchestrated builds.
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
