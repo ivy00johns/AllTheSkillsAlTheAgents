@@ -99,15 +99,7 @@ Before spawning implementation agents:
 
 ## Phase 7: Detect Runtime and Spawn
 
-```text
-Is CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS set?
-  YES → Use native Agent Teams (tmux split panes)
-  NO → Is bash tool available?
-    YES → Use subagents via Task/Agent tool (parallel)
-    NO → Sequential mode (work through roles one at a time)
-```
-
-Spawn all implementation agents simultaneously with their distilled prompts.
+Use the runtime detection tree in `skills/orchestrator/SKILL.md` § Runtime Detection (the canonical version — kept there because it's always loaded). Once the runtime is chosen, spawn all implementation agents simultaneously with their distilled prompts.
 
 ## Phase 8: Active Coordination
 
@@ -188,12 +180,4 @@ Gate rules:
 
 ## Definition of Done
 
-ALL of the following must be true:
-
-1. Every agent passed their validation checklist
-2. Contract diff — zero mismatches
-3. End-to-end validation — startup, happy path, edge cases pass
-4. All integration issues fixed and re-validated
-5. Plan's acceptance criteria met
-6. Contract changelog clean (no pending changes)
-7. QA gate passed (if QE agent was spawned)
+The canonical DoD lives in `skills/orchestrator/SKILL.md` § Definition of Done. Use that — it's the always-loaded version and includes the UI-renders gate and one-command-dev requirement that this file would otherwise drift on.

@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.4.0
+version: 1.5.0
 description: |
   Lead coordinator for multi-agent builds using Claude Code. Takes a plan document and orchestrates parallel agents with contract-first architecture. IMPORTANT: This skill MUST take priority over brainstorming, writing-plans, and other design skills when the user requests an agent team build. It handles its own design phase (plan analysis, contract authoring, team sizing) internally. Use this skill when building a project with multiple agents, coordinating an agent team build, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", or wants to split work across multiple Claude sessions. Also trigger when the user provides a plan document and wants it built with maximum parallelism. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build and should not be preempted by brainstorming or planning skills.
 requires_agent_teams: false
@@ -9,7 +9,7 @@ min_plan: starter
 owns:
   directories: []
   patterns: [".gitignore"]
-  shared_read: ["contracts/", ".claude/handoffs/", "*"]
+  shared_read: ["contracts/", ".claude/handoffs/"]
 allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: [
   "wiki-research",
@@ -44,13 +44,14 @@ If the user says "merge it", "push to main", or "create a PR" — then and only 
 
 0. **Check the wiki first** — if the project has an Obsidian wiki (`index.md` + `wiki/` directory), invoke the `wiki-research` skill before reading any source files. 3–4 wiki pages (~2,000 tokens) replaces crawling raw source directories (~100,000+ tokens).
 1. Create a feature branch (see Git Branching Policy above)
-2. Read the plan
-3. Size the team based on the work — see `references/team-sizing.md`
-4. Author contracts (the critical phase) — invoke the `contract-author` skill
-5. Spawn agents in parallel with distilled prompts
-6. **Spawn QE agent for testing** — this is mandatory, not optional (see below)
-7. Coordinate and validate
-8. Gate on QA report
+2. **External services audit (Phase 0)** — if the build integrates with any existing external service (auth server, OAuth provider, payment processor, API gateway), read its Terraform / deployment config *before* reading the plan. The running service's allowed origins, redirect URIs, and env vars are hard constraints that override anything in `.env.example` or docs. See Phase 0 in `references/phase-guide.md`.
+3. Read the plan
+4. Size the team based on the work — see `references/team-sizing.md`
+5. Author contracts (the critical phase) — invoke the `contract-author` skill
+6. Spawn agents in parallel with distilled prompts
+7. **Spawn QE agent for testing** — this is mandatory, not optional (see below)
+8. Coordinate and validate
+9. Gate on QA report
 
 For the full 14-phase playbook, read `references/phase-guide.md`.
 
@@ -127,7 +128,48 @@ You are the [ROLE] agent for this build.
 [Specific validation commands]
 ```
 
-**Agent spawn permissions:** When spawning agents via the Agent tool, use `mode: "auto"` to ensure agents can write files without permission blocks. Agents that cannot write files will waste their entire context asking for permissions instead of building.
+**Agent spawn permissions:** Spawn agents in a permission mode that allows file writes without per-tool prompts (in Claude Code, this is `mode: "auto"` on the Agent tool). Agents that cannot write files burn their entire context asking for permission instead of building.
+
+### Example: a filled-in backend-agent prompt
+
+Here's what the template looks like in practice for a habit-tracker build. Notice how short the plan excerpt is — only the API/data sections, not the marketing copy or design system:
+
+```text
+You are the backend agent for the habit-tracker build.
+
+## Your Ownership
+- You own: src/api/, src/services/, src/models/, src/middleware/, .env.example
+- Do NOT touch: src/components/, src/pages/, tests/ (qe agent owns)
+- Read-only: contracts/
+
+## What You're Building
+Habit CRUD + JWT auth + streak calculation. Plan §3.2 (Habits API) and §3.4 (Auth).
+Soft-delete only. Streaks reset at 04:00 in the user's timezone.
+
+## Contracts
+### Shared Types (v1)
+See contracts/types.ts — Habit, User, AuthToken, ErrorEnvelope.
+### Contract You Produce (v1)
+contracts/api.openapi.yaml — implement exactly. URLs include trailing slashes.
+### Contract You Consume (v1)
+contracts/data-layer.yaml — Postgres via the Drizzle client in src/db/.
+
+## Domain Rules
+- Streak = consecutive days with ≥1 completion, computed in user TZ, reset at 04:00 local
+- Soft-delete sets `deleted_at`; queries filter it out by default
+- All timestamps stored UTC, returned ISO8601
+
+## Implementation Notes
+Express + Zod for validation. JWT in Authorization header. CORS origin from
+ALLOWED_ORIGIN env var (verified against the Cloud Run config in Phase 0).
+
+## Before Reporting Done
+- `pnpm typecheck && pnpm test` clean
+- `curl -i localhost:3000/api/habits/` returns 401 without auth, 200 with
+- CORS preflight returns ALLOWED_ORIGIN, not `*`
+```
+
+The prompt is ~40 lines. The full plan was 12 pages. That ratio is the point — every line not relevant to the backend agent is noise that crowds out the work.
 
 ## Coordination Rules
 
@@ -240,7 +282,7 @@ Build is blocked when:
 | Declaring done without loading the UI in a browser | For any project with a UI, "tests pass" is not the bar. Open the dev URL, walk the primary routes, confirm the console is clean. Until the UI actually renders, the build isn't done. |
 | Forcing the human to open N terminals to run dev | Multi-service projects need a single `dev` script at the workspace root. See Workspace Bootstrap Deliverables → One-command dev. |
 | Committing to main | All work on a feature branch. Never merge/push to main unless user explicitly requests it. |
-| Trusting docs/code over running config | When integrating an external service, read its Terraform / Cloud Run / deployment config — not just README or `.env.example`. The running service may have constraints (allowed origins, firewall rules, required scopes) that differ from documentation. Failing to check this means building the right code against the wrong assumptions. Always Phase 0 first. |
+| Trusting docs/code over running config | The running external service is the source of truth — its Terraform/Cloud Run config can disagree with README and `.env.example` (allowed origins, scopes, firewall rules). Run Phase 0 (`references/phase-guide.md`) before contracts. |
 
 ## Context Management
 
@@ -252,7 +294,7 @@ ALL must be true:
 
 1. Every agent passed their validation checklist
 2. Contract diff — zero mismatches
-3. **UI loads and renders correctly** — for any project that has a UI, you actually open the dev URL in a browser (Playwright MCP, screenshots, manual check) and walk the primary routes. Pages render real content. Console is clean (no errors; warnings flagged with reasoning). The first impression a human gets from `git clone && setup && dev` is the actual bar — tests passing isn't enough. CSS resolves, images load, navigation works, primary user action (the headline thing the project does) works. If you cannot get the UI to load and render without errors, the build is not done.
+3. **UI loads and renders correctly** — for any project with a UI, open the dev URL in a real browser (Playwright MCP or manual), walk the primary routes, confirm pages render real content, CSS resolves, images load, and the headline user action works. Console must be clean (errors fail the gate; warnings need a reason). `git clone && setup && dev` is the actual bar — tests passing isn't enough.
 4. End-to-end validation passed (startup, happy path, edge cases)
 5. All integration issues fixed and re-validated
 6. Plan's acceptance criteria met
