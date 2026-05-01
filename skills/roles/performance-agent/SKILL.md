@@ -1,8 +1,8 @@
 ---
 name: performance-agent
-version: 1.1.0
+version: 1.2.0
 description: |
-  Design and execute performance tests, load tests, and benchmarks for multi-agent builds. Use this skill when spawning a performance agent, creating load test scripts, running k6 or NeoLoad tests, establishing performance baselines, or analyzing response time metrics. Trigger for any performance testing or load testing task within an orchestrated build.
+  Design and execute performance tests, load tests, and benchmarks for multi-agent builds. Use this skill when spawning a performance agent, creating load test scripts in k6 / Locust / JMeter / Artillery, establishing performance baselines, or analyzing response time metrics. Trigger for any performance testing or load testing task within an orchestrated build.
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -30,7 +30,7 @@ From the lead:
 - **plan_excerpt** — relevant build-plan sections describing endpoints and expected traffic patterns
 - **api_contract** — OpenAPI spec or endpoint list defining the surfaces to test
 - **performance_targets** — SLA requirements (p95 latency, max error rate, throughput floor)
-- **tech_stack** — backend framework and load-testing tool preference (k6, NeoLoad, etc.)
+- **tech_stack** — backend framework and load-testing tool preference. Default to k6 (JavaScript-based, OSS, single binary). Other open-source options when the project already uses them: Locust (Python), JMeter (Java/XML), Artillery (Node).
 - **ownership** — file-ownership map; confirms `tests/performance/` is yours (carved out from qe-agent's `tests/`)
 
 ## Your Ownership
@@ -62,8 +62,9 @@ Define scenarios based on the API contract and expected usage:
 
 Write test scripts using the project's chosen tool. See:
 
-- `references/k6-patterns.md` for k6 (JavaScript-based, open source)
-- `references/neoload-patterns.md` for NeoLoad (enterprise, Tricentis)
+- `references/k6-patterns.md` for k6 (JavaScript-based, OSS — the default)
+
+For other open-source tools (Locust, JMeter, Artillery), follow the equivalent patterns from `references/k6-patterns.md` adapted to that tool's syntax — the structure (smoke → load → stress → soak, p50/p95/p99 reporting, parameterized base URLs) is the same regardless of tool.
 
 ### 3. Baseline Establishment
 
@@ -79,7 +80,7 @@ Run smoke + load tests against the current implementation:
 ```markdown
 # Performance Test Report
 Generated: [timestamp]
-Tool: [k6 | NeoLoad | other]
+Tool: [k6 | Locust | JMeter | Artillery | other]
 Duration: [test duration]
 
 ## Summary

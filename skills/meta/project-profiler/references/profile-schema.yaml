@@ -4,8 +4,8 @@
 schema_version: "1.0.0"
 
 project:
-  name: string                        # e.g. "tricentis-tais"
-  display_name: string                # e.g. "Tricentis AI Hub (TAIS)"
+  name: string                        # e.g. "acme-portal"
+  display_name: string                # e.g. "Acme Customer Portal"
   type: web-app | api | library | monorepo | cli | data-pipeline
   description: string                 # 1-2 sentences
 
@@ -68,7 +68,7 @@ directory_structure:
     description: string              # What lives here
 
 performance_testing:
-  tool: NeoLoad | k6 | Locust | JMeter | none
+  tool: k6 | Locust | JMeter | Artillery | none
   scenarios: []                      # Named test scenarios
   baseline_targets: {}               # e.g. {p95_ms: 500, error_rate_pct: 0.1}
 
