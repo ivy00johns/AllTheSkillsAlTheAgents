@@ -1,0 +1,95 @@
+name: Skill Lint
+
+# Trigger on every push to any branch and on PRs targeting main.
+# This ensures lint failures are caught both during feature development
+# and at the merge gate.
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+# Cancel in-progress runs for the same ref on rapid pushes.
+# Saves CI minutes and reduces queue congestion without losing coverage.
+concurrency:
+  group: lint-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Primary blocking job. A non-zero exit from lint-skills.sh fails the PR.
+  lint-ubuntu:
+    name: Lint Skills (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # python3 is preinstalled on ubuntu-latest; this step confirms
+      # availability and surfaces the version in the job log.
+      - name: Verify python3
+        run: python3 --version
+
+      # bats-core is used by lint-skills.sh for test execution.
+      # The apt package is named 'bats' on Ubuntu.
+      # Refresh the package index first — older runner images can 404
+      # against stale package URLs.
+      - name: Install bats-core
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y bats
+
+      # First pass: capture JUnit output regardless of exit code.
+      # The '|| true' prevents early failure so the artifact is always
+      # produced before the authoritative gate run below.
+      - name: Run lint (capture JUnit report)
+        run: scripts/lint-skills.sh --format junit > lint-results.xml || true
+
+      # Second pass: real gate. Exits non-zero on any lint violation,
+      # which marks the job failed. No '|| true' here — intentional.
+      - name: Run lint (enforce pass/fail)
+        run: scripts/lint-skills.sh skills/
+
+      # Upload the JUnit XML even when the job fails so reviewers can
+      # inspect which rules fired without re-running locally.
+      - name: Upload lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results-ubuntu
+          path: lint-results.xml
+
+  # Smoke-check on macOS to catch bash 3.2 compatibility quirks.
+  # Not a merge gate — continue-on-error prevents macOS-only failures
+  # from blocking PRs authored on Linux/Windows.
+  lint-macos:
+    name: Lint Skills (macOS)
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # python3 is preinstalled on macos-latest runners.
+      - name: Verify python3
+        run: python3 --version
+
+      # brew is preinstalled on macos-latest. The package is 'bats-core'
+      # (not 'bats') on Homebrew — distinct from the Ubuntu apt package name.
+      - name: Install bats-core
+        run: brew install bats-core
+
+      # Same two-pass pattern as Ubuntu: capture report first, gate second.
+      - name: Run lint (capture JUnit report)
+        run: scripts/lint-skills.sh --format junit > lint-results.xml || true
+
+      - name: Run lint (enforce pass/fail)
+        run: scripts/lint-skills.sh skills/
+
+      - name: Upload lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results-macos
+          path: lint-results.xml

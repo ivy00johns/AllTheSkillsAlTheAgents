@@ -1,9 +1,12 @@
 # Contract: Lint Rules
 
 **Build:** Multi-Tool Installer (Slice A)
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Owner:** orchestrator (authored Phase 4)
 **Consumed by:** scripts-agent (lint-skills.sh), infrastructure-agent (CI workflow), qe-agent (lint test fixtures)
+
+**Changelog:**
+- 1.1.0 — Demoted `description` length checks from ERROR to WARN at every threshold. Reason: `CLAUDE.md` explicitly endorses "pushy" descriptions that over-enumerate trigger contexts to combat under-triggering. Hard ERROR-on-length conflicted with the ecosystem's intentional design. Length is now a quality signal, not a CI gate.
 
 ## Purpose
 
@@ -23,7 +26,7 @@ The canonical frontmatter spec is at `skills/meta/skill-writer/references/frontm
 |---|---|
 | `name` | present, non-empty, kebab-case (`^[a-z][a-z0-9-]*$`), ≤64 chars, equals the parent directory name |
 | `version` | present, valid semver (`^\d+\.\d+\.\d+$`) |
-| `description` | present, non-empty, ≤200 chars (WARN if 200–300, ERROR if >300) |
+| `description` | present, non-empty (length WARN-only — see below) |
 
 The `name` MUST match the directory name. Mismatch is ERROR — both `/sync-skills` symlinks and the converter rely on this invariant.
 
@@ -60,6 +63,16 @@ These checks require reading multiple skills:
 | Body present (≥1 non-frontmatter line) | ERROR |
 | Body word count ≥50 | WARN (likely a stub) |
 | Body line count ≤500 | WARN (progressive disclosure violated; move detail to `references/`) |
+
+## Description Length (WARN)
+
+Length thresholds are advisory. The `CLAUDE.md` design philosophy intentionally favors "pushy" descriptions that enumerate trigger contexts. Use these as soft guides:
+
+- ≤200 chars — clean (no warning)
+- 200–500 chars — WARN, soft target exceeded but acceptable for pushy triggering
+- >500 chars — WARN, consider whether some trigger context belongs in the body or references
+
+No description length is ever an ERROR — only missing/empty `description` fails the gate.
 
 ## Description Quality (WARN)
 
