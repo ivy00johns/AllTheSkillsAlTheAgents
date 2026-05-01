@@ -62,6 +62,8 @@ Order:
 
 Use the contract-author skill and templates in `contracts/contract-author/references/`.
 
+For monorepos where ≥2 implementation agents will each write a package manifest (`package.json`, `pyproject.toml`, `Cargo.toml`), also invoke the `dependency-coordinator` skill in this same phase. It authors the cross-package dependency contract so parallel agents don't produce transitive version drift that breaks `install` after the wave completes.
+
 Quality checklist (all must pass):
 
 - URLs are exact (method + path)
