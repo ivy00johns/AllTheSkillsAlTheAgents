@@ -196,6 +196,20 @@ Use the project's actual commands — `pnpm install`, `cargo build`, `poetry ins
 
 A project ships without a root README → the human's first impression is "where do I even start?" That is a build failure, regardless of how clean the contracts are.
 
+### One-command dev (mandatory for multi-service projects)
+
+If the project has more than one long-running dev process — typically an API plus a web frontend, possibly plus a worker, gateway, or background job — the workspace root MUST expose a single `dev` script that launches all of them in one terminal with prefixed/colored output. The human should never need to open four terminals to run a dev stack.
+
+| Stack | Aggregator |
+|---|---|
+| Node monorepo (pnpm/npm/yarn) | root devDep `concurrently` or `npm-run-all`; `"dev": "concurrently --names api,web --prefix-colors cyan,magenta 'pnpm dev:api' 'pnpm dev:web'"` |
+| Node + Turborepo | `turbo dev` — runs the `dev` task across packages |
+| Python (multiple services) | `honcho` / `foreman` against a `Procfile`; or a `make dev` target |
+| Go | `make dev` invoking each service via `&` plus a `wait` trap; or `air` per service under `tmuxinator` |
+| Polyglot | `mprocs`, `overmind`, or a `Procfile`-based supervisor |
+
+Also: do not include scripts that point at services that don't exist yet. `dev:worker` referencing an `apps/worker/` that ships as a placeholder Dockerfile is dead-on-arrival — strip it from the root or leave a clear `# TODO` comment so the human doesn't try to run it and get confused.
+
 ## QA Gate Rules
 
 The QE agent outputs structured JSON per `roles/qe-agent/references/qa-report-schema.json`. Before reading scores, **validate the report conforms to the schema** — check that `scores` contains objects with `score` and `notes` fields (not bare integers), that all required top-level fields exist (`schema_version`, `status`, `scores`, `test_results`, `blockers`, `issues`, `gate_decision`), and that `gate_decision` has `proceed` and `reason`. A non-conformant report should be sent back to the QE agent for correction.
@@ -223,6 +237,8 @@ Build is blocked when:
 | Skipping QE agent | QE agent is mandatory. Always spawn one, even if the plan doesn't mention tests. |
 | Skipping the wave gate | Always run the project's install + typecheck + test commands between waves (see Wave Gate section for the per-stack equivalents). Per-agent grep validation cannot catch cross-package drift. |
 | Shipping without a root README | A workspace without a root README has no setup story for the human. Always include it in the bootstrap deliverables. |
+| Declaring done without loading the UI in a browser | For any project with a UI, "tests pass" is not the bar. Open the dev URL, walk the primary routes, confirm the console is clean. Until the UI actually renders, the build isn't done. |
+| Forcing the human to open N terminals to run dev | Multi-service projects need a single `dev` script at the workspace root. See Workspace Bootstrap Deliverables → One-command dev. |
 | Committing to main | All work on a feature branch. Never merge/push to main unless user explicitly requests it. |
 | Trusting docs/code over running config | When integrating an external service, read its Terraform / Cloud Run / deployment config — not just README or `.env.example`. The running service may have constraints (allowed origins, firewall rules, required scopes) that differ from documentation. Failing to check this means building the right code against the wrong assumptions. Always Phase 0 first. |
 
@@ -236,8 +252,10 @@ ALL must be true:
 
 1. Every agent passed their validation checklist
 2. Contract diff — zero mismatches
-3. End-to-end validation passed (startup, happy path, edge cases)
-4. All integration issues fixed and re-validated
-5. Plan's acceptance criteria met
-6. Contract changelog clean
-7. QA gate passed — QE agent tests written, executed, and passing
+3. **UI loads and renders correctly** — for any project that has a UI, you actually open the dev URL in a browser (Playwright MCP, screenshots, manual check) and walk the primary routes. Pages render real content. Console is clean (no errors; warnings flagged with reasoning). The first impression a human gets from `git clone && setup && dev` is the actual bar — tests passing isn't enough. CSS resolves, images load, navigation works, primary user action (the headline thing the project does) works. If you cannot get the UI to load and render without errors, the build is not done.
+4. End-to-end validation passed (startup, happy path, edge cases)
+5. All integration issues fixed and re-validated
+6. Plan's acceptance criteria met
+7. Contract changelog clean
+8. QA gate passed — QE agent tests written, executed, and passing
+9. **One-command dev is wired** — for any project with multiple services, the workspace root has a single `dev` (or equivalent) script that runs the whole dev stack in one terminal with prefixed output. The human should not need 4 terminals to run a dev environment. See Workspace Bootstrap Deliverables.

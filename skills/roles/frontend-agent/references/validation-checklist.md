@@ -38,6 +38,35 @@ grep -rhE '^(import |from )([a-zA-Z_][a-zA-Z0-9_]*)' src/ \
 
 For each entry, confirm it appears in the project manifest. **Workspace siblings — declare them explicitly.** Tooling will not auto-symlink a sibling unless your manifest lists it; the resulting "module not found" error looks mysterious until you remember to check.
 
+## Cross-package CSS imports — JS-side, not `@import`
+
+In a workspace where your frontend imports CSS from a sibling package (a design-system package, a shared tokens file, etc.), the `@import` directive inside a `.css` file does NOT reliably resolve through:
+
+- the sibling package's `exports` map
+- TypeScript path aliases (`@scope/sibling/*`)
+- pnpm/npm/yarn workspace symlinks
+
+PostCSS-import follows the package's `main` field and naively concatenates subpaths; Vite respects the exports map but its CSS plugin doesn't fall back gracefully when your `.css`-extensioned subpath isn't an explicit key. Combinations break in non-obvious ways: `@import '@scope/ui/tokens'` resolves to `<scope/ui/main>/tokens` instead of looking up the export, then errors with `ENOTDIR` or `ENOENT` against a fake path.
+
+**The reliable pattern: import the CSS from your TypeScript/JS entry point, not from a CSS file.** Vite handles JS-side CSS imports natively and the cross-package resolution Just Works.
+
+```ts
+// ✅ apps/web/src/main.tsx — JS-side CSS import via relative workspace path
+import '../../../packages/ui/src/tokens.css';
+import './styles/global.css';
+```
+
+```css
+/* ❌ apps/web/src/styles/global.css — don't try to @import a workspace sibling */
+@import '@scope/ui/tokens';            /* breaks: postcss-import + main field */
+@import '@scope/ui/src/tokens.css';    /* breaks: exports map filters by key */
+@import '../../../packages/ui/src/tokens.css';  /* breaks: postcss-import cwd */
+```
+
+The relative path inside a JS import is stable because Vite resolves it against the importing file's directory. CSS imports in CSS files are not the same — they go through a different resolver with different cwd semantics.
+
+If you genuinely need the CSS imported from another CSS file (e.g., a Tailwind layer), use Vite's plugin layer (`vite-plugin-postcss-import` with a custom resolver) — but for 95% of cases, importing from `main.tsx` is the right answer.
+
 ## Build Verification (continued)
 
 ## Dev Server

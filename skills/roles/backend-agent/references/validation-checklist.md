@@ -20,6 +20,24 @@ Run the project's own scripts for your package — whatever the stack provides:
 
 If your package can't be tested in isolation because it depends on workspace siblings that aren't built yet, surface that as a blocker to the orchestrator BEFORE reporting done. Do not report done with a known-failing typecheck or test.
 
+**`test` script defaults to run-once, not watch mode.** When you wire up the package's test script, the canonical entry point — `npm test` / `pnpm test` / `yarn test` — must run the suite once and exit. Watch mode goes under `test:watch`. The reason: workspace-level recursive runs (`pnpm -r run test`, `npm run test --workspaces`) and CI invoke `test`; if `test` boots vitest/jest in watch mode, it runs the suite then sits forever waiting for file changes, hanging the wave gate and CI for ~10 minutes per package until the timeout fires. Standard pattern:
+
+```json
+// ✅ Right
+"scripts": {
+  "test": "vitest run",
+  "test:watch": "vitest"
+}
+
+// ❌ Wrong — wave gate / CI hangs
+"scripts": {
+  "test": "vitest",
+  "test:run": "vitest run"
+}
+```
+
+Same idea for jest (`jest` not `jest --watch`), pytest (`pytest` is run-once by default — fine), Go (`go test ./...` is run-once — fine), Cargo (`cargo test` is run-once — fine). The trap is mostly Vitest/Jest-specific because their bare invocation defaults differ across versions.
+
 ## Fastify-specific: plugins must escape their encapsulation context
 
 If you're writing Fastify plugins (anything that calls `app.decorate(...)`, `app.addHook(...)`, `app.setErrorHandler(...)`, or `app.setNotFoundHandler(...)`), the plugin MUST be wrapped with `fastify-plugin`'s `fp()` or its decorations stay inside the plugin's local scope and are invisible to siblings.
