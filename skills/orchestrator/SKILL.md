@@ -152,45 +152,49 @@ Every orchestrated build **must** spawn a QE agent. Testing is not optional. Eve
 
 ## Wave Gate (do not skip)
 
-Parallel agents writing independent files — different `package.json`, different test setups, different decorator patterns — produce latent integration bugs that grep-based per-agent validation cannot catch. Examples seen in the wild: missing workspace dep declarations (typecheck fails the moment install symlinks resolve), Fastify decorators not wrapped with `fastify-plugin` (every test 500s), deprecated `node --loader tsx` invocations (Node 24+ hard error), host-side port collisions in docker-compose, omitted `tsconfig.json` files (tsc prints help instead of typechecking).
+Parallel agents writing independent files — different package manifests, different test setups, different framework conventions — produce latent integration bugs that grep-based per-agent validation cannot catch. Examples seen in the wild: missing workspace dep declarations (the import resolves locally but breaks the moment a clean install runs), framework decorators that don't escape encapsulation (every test 500s), deprecated runtime invocations that pass linting but error at execution, host-side port collisions in compose files, omitted compile config files (the typechecker prints help instead of typechecking).
 
-After every wave of parallel agents reports done, BEFORE declaring the wave complete or dispatching the next wave, run the integrated gate:
+After every wave of parallel agents reports done, BEFORE declaring the wave complete or dispatching the next wave, run the project's three integrated checks. Use whatever the project's stack provides — the gate is **install + typecheck + test from a clean state**, not a specific tool:
 
-```bash
-# 1. Install — surfaces dependency-manifest drift across packages.
-pnpm install         # or npm/yarn/poetry/cargo equivalent
+| Stack signal | Install | Typecheck/lint | Test |
+|---|---|---|---|
+| `pnpm-workspace.yaml` | `pnpm install` | `pnpm -r run typecheck` | `pnpm -r run test` |
+| `package.json` (npm/yarn) | `npm ci` / `yarn install` | `npm run typecheck` (per package) | `npm test` |
+| `pyproject.toml` + Poetry | `poetry install` | `poetry run mypy .` or `poetry run ruff check .` | `poetry run pytest` |
+| `pyproject.toml` + uv | `uv sync` | `uv run mypy .` | `uv run pytest` |
+| `Cargo.toml` workspace | `cargo fetch` | `cargo check --workspace` | `cargo test --workspace` |
+| `go.mod` | `go mod download` | `go vet ./...` | `go test ./...` |
+| `Gemfile` | `bundle install` | `bundle exec rubocop` | `bundle exec rspec` |
+| `pom.xml` / `build.gradle` | `mvn -B verify` (covers all three) | — | — |
 
-# 2. Typecheck — surfaces missing workspace deps, brand-type drift, missing tsconfig.json.
-pnpm -r run typecheck
-
-# 3. Tests — surfaces decorator encapsulation bugs, broken integrations, false-positive grep validations.
-pnpm -r run test
-```
+For polyglot monorepos, run the gate for every language present (Node + Python both, etc.).
 
 If any step fails, the wave is **not complete**. Route each specific failure back to the responsible agent (via SendMessage if the runtime supports it, otherwise spawn a fix subagent with the agent role) with the exact error output. Repeat until all three steps pass.
 
-This is non-negotiable. Agent self-validation can be bypassed by grep tricks, missing files, or unran tests. The integrated gate cannot — if `pnpm install` fails, the workspace is broken, full stop. Catching it here is 30 minutes of fix work; catching it when the human runs the project is a credibility hit and a damaged handoff.
+This is non-negotiable. Agent self-validation can be bypassed by grep tricks, missing files, or unran tests. The integrated gate cannot — if install fails, the workspace is broken, full stop. Catching it here is 30 minutes of fix work; catching it when the human runs the project is a credibility hit and a damaged handoff.
 
 **The orchestrator does not declare "build complete" without a clean integrated gate.** This applies whether or not a QE agent is in the loop — the wave gate is the orchestrator's own check, not delegated.
 
 ## Workspace Bootstrap Deliverables
 
-When the plan establishes a multi-package workspace (pnpm/yarn/npm workspaces, Cargo workspace, Poetry monorepo), the orchestrator's bootstrap step MUST produce a **root README.md** as part of the skeleton, alongside the package manifest and tsconfig base. The README is the single artifact a human reaches for when they sit down to set up the project — every other doc (CLAUDE.md, plan documents, ADRs) is for downstream agents or operations, not the human running `git clone && setup`.
+When the plan establishes any project with more than a single source file — a multi-package workspace, a service plus a frontend, a single-app repo with build/test machinery — the orchestrator's bootstrap step MUST produce a **root README.md** as part of the skeleton. The README is the single artifact a human reaches for when they sit down to set up the project — every other doc (CLAUDE.md, plan documents, ADRs) is for downstream agents or operations, not the human running `git clone && setup`.
 
-Required sections in the root README (omit only if genuinely irrelevant):
+Required sections in the root README (omit only if genuinely irrelevant to this project):
 
 1. **What the project is** — one paragraph, no marketing
 2. **Stack** — bullet list of language, framework, database, queue, deploy target
-3. **Prerequisites** — the things the human needs installed BEFORE `pnpm install` (Node version, package manager version, Docker, etc.)
-4. **Setup** — exact commands in order: install, bring up infra dependencies (docker compose), copy env template, run migrations, run seed, run tests
-5. **Start** — the dev commands the human runs in separate terminals
+3. **Prerequisites** — the things the human needs installed BEFORE the first build command (language runtime version, package manager, Docker, OS-specific deps, etc.)
+4. **Setup** — exact commands in order: install dependencies, bring up infrastructure dependencies if any (docker compose, dev DB), copy env template, run migrations, run seed, run tests
+5. **Start** — the dev commands the human runs to launch each service
 6. **Tests** — how to run unit, integration, e2e
 7. **Deploy** — the actual deploy command for the target deployment platform
-8. **Project structure** — short tree showing apps/* and packages/* with one-line descriptions
-9. **Known issues** — any latent bugs, unresolved type errors, deferred work the human will hit when running the project (be honest)
+8. **Project structure** — short tree showing top-level layout with one-line descriptions
+9. **Known issues** — any latent bugs, unresolved type errors, deferred work the human will hit when running the project (be honest — see Anti-Patterns: shipping with hidden setup pain damages trust)
 10. **Documentation map** — table linking to the deeper docs (CLAUDE.md, plans, ADRs, qa reports)
 
-A workspace ships without a root README → the human's first impression is "where do I even start?" That is a build failure, regardless of how clean the contracts are.
+Use the project's actual commands — `pnpm install`, `cargo build`, `poetry install`, `bundle install`, `make setup` — never placeholders. The README is dead if its commands don't run.
+
+A project ships without a root README → the human's first impression is "where do I even start?" That is a build failure, regardless of how clean the contracts are.
 
 ## QA Gate Rules
 
@@ -217,7 +221,7 @@ Build is blocked when:
 | Verbal contract changes | Always write full updated contract, version it, get acknowledgments |
 | Skipping contract diff | Always compare curl vs fetch before integration testing |
 | Skipping QE agent | QE agent is mandatory. Always spawn one, even if the plan doesn't mention tests. |
-| Skipping the wave gate | Always run `pnpm install && pnpm -r run typecheck && pnpm -r run test` (or equivalent) between waves. Per-agent grep validation cannot catch cross-package drift. |
+| Skipping the wave gate | Always run the project's install + typecheck + test commands between waves (see Wave Gate section for the per-stack equivalents). Per-agent grep validation cannot catch cross-package drift. |
 | Shipping without a root README | A workspace without a root README has no setup story for the human. Always include it in the bootstrap deliverables. |
 | Committing to main | All work on a feature branch. Never merge/push to main unless user explicitly requests it. |
 | Trusting docs/code over running config | When integrating an external service, read its Terraform / Cloud Run / deployment config — not just README or `.env.example`. The running service may have constraints (allowed origins, firewall rules, required scopes) that differ from documentation. Failing to check this means building the right code against the wrong assumptions. Always Phase 0 first. |

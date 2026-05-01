@@ -6,28 +6,37 @@ Run ALL before reporting done. Fix failures. Adapt commands for your package man
 
 ## Build Verification
 
-```bash
-# Run the package's own scripts via the workspace package manager so workspace-deps resolve correctly.
-pnpm --filter <your-package> run typecheck   # zero type errors (TS projects)
-pnpm --filter <your-package> run build       # zero build errors
-pnpm --filter <your-package> run lint        # zero lint errors (warnings OK)
-pnpm --filter <your-package> run test        # if a test script exists
-```
+Run the project's own scripts for your package — whatever the stack provides:
 
-Common failure: `Cannot find module '@<workspace-scope>/<sibling>'`. This means the sibling package is referenced in your code (an `import` statement) but NOT declared in your `package.json` `dependencies`. Add it as `"@<workspace-scope>/<sibling>": "workspace:*"`. The dep declaration is what tells the package manager to symlink the sibling into your `node_modules`.
+| Stack | Typecheck | Build | Lint | Test |
+|---|---|---|---|---|
+| Node (pnpm workspace) | `pnpm --filter <pkg> run typecheck` | `pnpm --filter <pkg> run build` | `pnpm --filter <pkg> run lint` | `pnpm --filter <pkg> run test` |
+| Node (npm / yarn) | `npm run typecheck` (in package dir) | `npm run build` | `npm run lint` | `npm test` |
+| Elixir (Phoenix LiveView) | `mix compile --warnings-as-errors` | `mix assets.deploy` | `mix credo` | `mix test` |
+| Ruby (Rails views) | — | `bundle exec rake assets:precompile` | `bundle exec rubocop` | `bundle exec rspec` |
+| Python (Streamlit / Reflex / templates) | `mypy .` | `python -m build` (if applicable) | `ruff check .` | `pytest` |
+
+Common failure (Node workspaces): `Cannot find module '@<scope>/<sibling>'`. The sibling is referenced in an `import` statement but NOT declared in your `package.json` `dependencies`. Add it as `"@<scope>/<sibling>": "workspace:*"` — that's what tells pnpm/npm/yarn to symlink the sibling into `node_modules`. Same principle in Python: `pip install -e ./packages/sibling` won't happen unless the manifest pins it.
 
 ## Imports must resolve to declared deps
 
+This applies wherever the language has an explicit dependency manifest (Node `package.json`, Python `pyproject.toml`, Ruby `Gemfile`, Go `go.mod`, Rust `Cargo.toml`). Every non-relative import in your source must correspond to a declared dependency.
+
 ```bash
-# List every import path used in src/, then verify each is in package.json (deps + devDeps + peerDeps).
-# If any import is unresolvable, the typecheck above will already flag it — but be aware of the failure mode.
+# Node example — list every non-relative import in src/.
 grep -rhE '^import .* from "([^.][^"]+)"' src/ \
   | sed -E 's/.*from "([^"]+)".*/\1/' \
   | grep -v '^\.' \
   | sort -u
+
+# Python example — every `import foo` and `from foo import …`.
+grep -rhE '^(import |from )([a-zA-Z_][a-zA-Z0-9_]*)' src/ \
+  | sed -E 's/^(import|from) ([a-zA-Z_][a-zA-Z0-9_]*).*/\2/' \
+  | grep -v '^_' \
+  | sort -u
 ```
 
-For each entry, confirm it appears as a key under `dependencies`, `devDependencies`, or `peerDependencies` in your `package.json`. **Workspace siblings (e.g., `@bazaar/contracts`) MUST be declared explicitly** — pnpm/npm will not symlink them into `node_modules` otherwise, and you'll get `TS2307: Cannot find module` errors that look mysterious until you check the manifest.
+For each entry, confirm it appears in the project manifest. **Workspace siblings — declare them explicitly.** Tooling will not auto-symlink a sibling unless your manifest lists it; the resulting "module not found" error looks mysterious until you remember to check.
 
 ## Build Verification (continued)
 

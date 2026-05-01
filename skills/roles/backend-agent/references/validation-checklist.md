@@ -6,13 +6,17 @@ Run ALL before reporting done. Fix failures. Substitute actual endpoints from th
 
 ## Typecheck and tests pass (start here, not at the end)
 
-```bash
-# Whatever the package's manifest declares — run it.
-pnpm --filter <your-package> run typecheck   # zero errors
-pnpm --filter <your-package> run test        # all pass
-# or npm/yarn equivalent for the project's package manager
-# or pytest / go test ./... / dotnet test for non-Node stacks
-```
+Run the project's own scripts for your package — whatever the stack provides:
+
+| Stack | Typecheck | Test |
+|---|---|---|
+| Node (pnpm workspace) | `pnpm --filter <pkg> run typecheck` | `pnpm --filter <pkg> run test` |
+| Node (npm / yarn) | `npm run typecheck` (in package dir) | `npm test` |
+| Python (FastAPI/Django) | `mypy .` or `ruff check .` | `pytest` |
+| Go | `go vet ./...` | `go test ./...` |
+| Rust | `cargo check` | `cargo test` |
+| Ruby (Rails) | `bundle exec rubocop` | `bundle exec rspec` |
+| .NET | `dotnet build` | `dotnet test` |
 
 If your package can't be tested in isolation because it depends on workspace siblings that aren't built yet, surface that as a blocker to the orchestrator BEFORE reporting done. Do not report done with a known-failing typecheck or test.
 

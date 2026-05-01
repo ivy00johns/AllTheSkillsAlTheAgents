@@ -4,62 +4,75 @@ Run ALL before reporting done. Fix failures. Substitute actual paths and connect
 
 > **The single most important gate is below: actually run the migration up + rollback against a real database, not just lint the SQL.** Hand-written migrations frequently fail at runtime even when they compile and pass syntax checks. Run them.
 
-## Typecheck and tests pass
+## Typecheck and tests pass (where applicable)
 
-```bash
-pnpm --filter <db-package> run typecheck   # zero type errors
-pnpm --filter <db-package> run test        # if a test script exists, all pass
-```
+If your migration code is in a typed language and the project has a typecheck/test script, run it. Examples by stack:
 
-If schema tests iterate over `Object.values(schema)`, confirm they filter for actual table objects rather than blowing up on relation/type re-exports — see `migration-checklist.md` § Schema iteration.
+| Stack | Typecheck / lint | Test |
+|---|---|---|
+| Node + Drizzle / Knex / Prisma | `npm run typecheck` (or pnpm/yarn) | `npm test` |
+| Python + SQLAlchemy / Alembic | `mypy migrations/ models/` | `pytest` |
+| Django | — | `python manage.py test` |
+| Go + sqlc / migrate | `go vet ./...` | `go test ./...` |
+| Raw SQL only | `pg_query` syntax check OR run against a scratch DB | — |
+
+If schema tests iterate over a schema object's exports, confirm they filter for actual table instances rather than blowing up on relation/type/helper re-exports — see `migration-checklist.md` § Schema iteration for the Drizzle pattern; the same principle applies to SQLAlchemy `Base.metadata.tables` (already filtered by SQLAlchemy) and Django's `apps.get_models()`.
 
 ## Migration runs against a live database
 
+The exact commands depend on the migration tool. The shape is always the same: bring up the DB, apply, rollback, re-apply.
+
 ```bash
-# Bring up Postgres (or whatever the data layer profile specifies)
-docker compose up -d postgres
-# Wait for healthy
+# 1. Bring up the database (whatever the data-layer profile specifies)
+docker compose up -d postgres   # or mysql, mongo, etc.
+# Wait for healthy — adapt to the actual database
 until docker compose exec postgres pg_isready -U <user>; do sleep 1; done
 
-# Apply
-pnpm --filter <db-package> run migrate:up
+# 2. Apply — invocation depends on stack
+#    Drizzle (Node):      npm run migrate:up   (or pnpm/yarn)
+#    Knex (Node):         npx knex migrate:latest
+#    Prisma (Node):       npx prisma migrate deploy
+#    Alembic (Python):    alembic upgrade head
+#    Django:              python manage.py migrate
+#    Raw SQL:             psql -U <user> -d <db> -f migrations/0001_initial.sql
 # Expected: every CREATE TABLE / CREATE INDEX runs without error
 
-# Rollback
-pnpm --filter <db-package> run migrate:rollback
+# 3. Rollback — same tool, reverse direction
+#    Drizzle:             npm run migrate:rollback   (custom; drizzle-kit ships no rollback)
+#    Knex:                npx knex migrate:rollback
+#    Prisma:              npx prisma migrate reset --skip-seed   (dev only)
+#    Alembic:             alembic downgrade -1
+#    Django:              python manage.py migrate <app> <previous>
 # Expected: every DROP runs without error, schema is empty
 
-# Re-apply (idempotency check)
-pnpm --filter <db-package> run migrate:up
-# Expected: clean re-apply with no leftover state from the rollback
+# 4. Re-apply (idempotency check) — re-run step 2.
+# Expected: clean re-apply with no leftover state from the rollback.
 ```
 
-If migrate:up succeeds but migrate:rollback fails, you have a destructive migration with no escape hatch. Fix the rollback before reporting done.
+If migrate-up succeeds but rollback fails, you have a destructive migration with no escape hatch. Fix the rollback before reporting done.
 
-## tsx invocation (Node-stack only)
+## Stack-specific gotchas
 
-```bash
-# Verify package.json migrate scripts use tsx as a CLI, not as a Node --loader.
-# --loader was deprecated in Node 20.6 and errors in Node 24+.
-grep -E '"migrate.*node --loader|"seed.*node --loader' packages/<db-package>/package.json
-# Expected: zero matches. If it matches, fix it before testing.
-```
+**Drizzle ORM (TypeScript)** — see `migration-checklist.md` § Drizzle ORM. The `node --loader tsx` pattern is deprecated in Node 20.6 and errors in Node 24+; use `tsx <file>` as a CLI directly.
 
-The correct pattern is `"migrate:up": "tsx ./src/migrate.ts up"` — see `migration-checklist.md` § Drizzle ORM.
+**Alembic (Python)** — autogenerate (`alembic revision --autogenerate`) misses constraint-only changes; review the generated file before applying.
+
+**Prisma (Node)** — `prisma migrate dev` resets the DB by default in development; never run on a database with real data.
+
+**Knex (Node)** — migrations run in alphabetical filename order; if you change a filename after committing, replays diverge. Stick with the timestamp prefix Knex generates.
 
 ## Seed determinism
 
 ```bash
 # Seeds must be reproducible — same input ⇒ same output.
-pnpm --filter <db-package> run seed
-# Hash the resulting table state.
+# 1. Run seed (whatever the project's command is — npm run seed, alembic seed, rake db:seed, etc.).
+# 2. Hash the resulting table state.
 psql ${DATABASE_URL} -At -c "SELECT md5(string_agg(id::text, ',' ORDER BY id)) FROM users"
-# Reset.
-pnpm --filter <db-package> run migrate:rollback && pnpm --filter <db-package> run migrate:up
-# Re-seed and verify the hash matches.
+# 3. Reset (rollback then re-up), re-seed, hash again.
+# 4. Hashes must match.
 ```
 
-If the hash changes across runs, the seed depends on `Math.random()`, `Date.now()`, or another non-deterministic source. Replace it with a seeded RNG (mulberry32, sha1-derived UUIDs) before reporting done.
+If the hash changes across runs, the seed depends on `Math.random()` / `random.random()` / `rand()` / `Date.now()` / `time.time()` / another non-deterministic source. Replace it with a seeded RNG (mulberry32 in JS, `random.seed(N)` in Python, etc.) before reporting done.
 
 ## Indexes match data-layer contract
 
