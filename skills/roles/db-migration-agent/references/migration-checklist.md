@@ -77,6 +77,51 @@ npx knex migrate:rollback
 npx knex seed:run
 ```
 
+### Drizzle ORM (TypeScript)
+
+```bash
+# Generate migration from schema changes
+pnpm --filter <db-package> exec drizzle-kit generate
+
+# Apply
+pnpm --filter <db-package> run migrate:up
+
+# Rollback (custom — drizzle-kit does not ship a rollback runner)
+pnpm --filter <db-package> run migrate:rollback
+```
+
+> **Critical: invoke tsx as a CLI, never as a Node loader.** `node --loader tsx <file>` was deprecated in Node 20.6 and emits a hard error in Node 24+: `Error: tsx must be loaded with --import instead of --loader`. The migration scripts MUST use `tsx <file>` directly:
+>
+> ```json
+> // ✅ Right — works on every Node version that has tsx as a dep
+> "scripts": {
+>   "migrate:up":       "tsx ./src/migrate.ts up",
+>   "migrate:rollback": "tsx ./src/migrate.ts rollback",
+>   "seed":             "tsx ./src/seed.ts"
+> }
+>
+> // ❌ Wrong — Node 20.6+ deprecation, Node 24+ hard error
+> "scripts": {
+>   "migrate:up": "node --loader tsx ./src/migrate.ts up"
+> }
+> ```
+>
+> If you generate the migrate runner yourself rather than using a built-in CLI, this matters — drizzle-kit doesn't ship its own runner.
+
+### Schema iteration: filter for actual table objects
+
+Tests or runtime code that walks `Object.values(schema)` will trip on non-table exports (relations, type aliases, helper functions) — those don't have `._.columns`. Filter for actual Drizzle pgTable instances:
+
+```ts
+for (const [name, value] of Object.entries(schema)) {
+  const inner = (value as { _?: { columns?: Record<string, unknown> } })?._;
+  if (!inner || typeof inner.columns !== 'object' || inner.columns === null) {
+    continue; // skip relations, types, helpers
+  }
+  // value is a pgTable; inspect inner.columns
+}
+```
+
 ### Raw SQL
 
 ```bash

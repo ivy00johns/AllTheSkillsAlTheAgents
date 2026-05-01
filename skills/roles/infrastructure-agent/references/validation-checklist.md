@@ -2,6 +2,31 @@
 
 Adapt all commands to the project's actual service names, ports, and endpoints. The examples below use placeholder variables — replace them with values from the service map and contracts.
 
+## Host-port collision preflight (before authoring docker-compose.yml)
+
+The standard ports for common dev services (5432 Postgres, 6379 Redis, 5672 RabbitMQ, 27017 Mongo, 9200 Elasticsearch, 11211 memcached, 9000 MinIO) are routinely held by other local stacks — Homebrew services, another project's docker-compose, a globally-installed daemon. If you publish those ports unconditionally, the human's first `docker compose up -d` will fail with `Bind for 127.0.0.1:6379 failed: port is already allocated` and the build will look broken on day one.
+
+Probe before you publish:
+
+```bash
+# For each port you intend to publish on the host:
+for p in 5432 6379 5672; do
+  if lsof -nP -iTCP:$p -sTCP:LISTEN 2>/dev/null | grep -q LISTEN; then
+    echo "PORT $p IS HELD — pick a non-default host port (e.g., $((p+1)):$p)"
+  fi
+done
+```
+
+If a port is held, remap on the **host side only** in `docker-compose.yml`:
+
+```yaml
+# ✅ Right — container-side stays standard, host-side moves out of the way
+redis:
+  ports: ["6380:6379"]   # host 6380 → container 6379
+```
+
+Update `.env.example` to match (`REDIS_URL=redis://localhost:6380`) and add a one-line comment in the compose file explaining why the non-default host port. **Do not silently take a port the user is already using.**
+
 ## Docker Build
 
 ```bash

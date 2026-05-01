@@ -2,13 +2,34 @@
 
 Run ALL before reporting done. Fix failures. Adapt commands for your package manager (npm/pnpm/yarn).
 
+> **The single most important gate is below: actually run the typecheck and any tests the package defines.** Grep-based validation (e.g., "all 9 routes are wired" by counting matches) cannot catch missing dependency declarations, broken type narrowing, or runtime errors. If `tsc --noEmit` reports errors, you are not done.
+
 ## Build Verification
 
 ```bash
-npx tsc --noEmit        # Zero type errors (TypeScript projects)
-npm run build           # Zero build errors
-npm run lint            # Zero lint errors (warnings OK)
+# Run the package's own scripts via the workspace package manager so workspace-deps resolve correctly.
+pnpm --filter <your-package> run typecheck   # zero type errors (TS projects)
+pnpm --filter <your-package> run build       # zero build errors
+pnpm --filter <your-package> run lint        # zero lint errors (warnings OK)
+pnpm --filter <your-package> run test        # if a test script exists
 ```
+
+Common failure: `Cannot find module '@<workspace-scope>/<sibling>'`. This means the sibling package is referenced in your code (an `import` statement) but NOT declared in your `package.json` `dependencies`. Add it as `"@<workspace-scope>/<sibling>": "workspace:*"`. The dep declaration is what tells the package manager to symlink the sibling into your `node_modules`.
+
+## Imports must resolve to declared deps
+
+```bash
+# List every import path used in src/, then verify each is in package.json (deps + devDeps + peerDeps).
+# If any import is unresolvable, the typecheck above will already flag it — but be aware of the failure mode.
+grep -rhE '^import .* from "([^.][^"]+)"' src/ \
+  | sed -E 's/.*from "([^"]+)".*/\1/' \
+  | grep -v '^\.' \
+  | sort -u
+```
+
+For each entry, confirm it appears as a key under `dependencies`, `devDependencies`, or `peerDependencies` in your `package.json`. **Workspace siblings (e.g., `@bazaar/contracts`) MUST be declared explicitly** — pnpm/npm will not symlink them into `node_modules` otherwise, and you'll get `TS2307: Cannot find module` errors that look mysterious until you check the manifest.
+
+## Build Verification (continued)
 
 ## Dev Server
 

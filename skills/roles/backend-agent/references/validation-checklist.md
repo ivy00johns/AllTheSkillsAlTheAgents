@@ -2,6 +2,42 @@
 
 Run ALL before reporting done. Fix failures. Substitute actual endpoints from the API contract.
 
+> **The single most important gate is at the bottom of this file: run the package's own typecheck and test scripts.** Grep-based validation alone is not sufficient — it cannot catch decorator-encapsulation bugs, missing dependency declarations, or wrong runtime behavior. If your package has a `test` or `typecheck` script, you run it. If it fails, you fix it. Only then do you report done.
+
+## Typecheck and tests pass (start here, not at the end)
+
+```bash
+# Whatever the package's manifest declares — run it.
+pnpm --filter <your-package> run typecheck   # zero errors
+pnpm --filter <your-package> run test        # all pass
+# or npm/yarn equivalent for the project's package manager
+# or pytest / go test ./... / dotnet test for non-Node stacks
+```
+
+If your package can't be tested in isolation because it depends on workspace siblings that aren't built yet, surface that as a blocker to the orchestrator BEFORE reporting done. Do not report done with a known-failing typecheck or test.
+
+## Fastify-specific: plugins must escape their encapsulation context
+
+If you're writing Fastify plugins (anything that calls `app.decorate(...)`, `app.addHook(...)`, `app.setErrorHandler(...)`, or `app.setNotFoundHandler(...)`), the plugin MUST be wrapped with `fastify-plugin`'s `fp()` or its decorations stay inside the plugin's local scope and are invisible to siblings.
+
+```ts
+// ❌ Wrong — decorations are encapsulated, sibling routes won't see app.requireUser
+export async function authPlugin(app: FastifyInstance) {
+  app.decorate('requireUser', requireUser);
+}
+
+// ✅ Right — fp() breaks encapsulation, decoration applies to the parent instance
+import fp from 'fastify-plugin';
+async function authPluginImpl(app: FastifyInstance) {
+  app.decorate('requireUser', requireUser);
+}
+export const authPlugin = fp(authPluginImpl, { name: 'auth' });
+```
+
+Symptoms when this is wrong: routes throw `app.requireUser is not a function` at runtime → 500 errors across every test, hours wasted because the typecheck still passes (the type declaration via `declare module 'fastify'` is global and unaffected).
+
+This applies equally to plugins that set the global error handler or the not-found handler — without `fp()`, those handlers don't see exceptions from sibling-registered route plugins.
+
 ## Server Starts
 
 ```bash
