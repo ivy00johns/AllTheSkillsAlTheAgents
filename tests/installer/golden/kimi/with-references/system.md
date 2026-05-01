@@ -1,0 +1,48 @@
+# with-references
+
+Apply with-references when testing reference file handling across all 11 tools, including copy-alongside, inline-bundle, and skip strategies.
+
+
+## Overview
+
+This fixture skill exists to test the references handling contract. It ships with two reference files in its references/ directory: guide.md and glossary.md.
+
+## Reference Handling Matrix
+
+Different tools treat the references directory differently. The test suite verifies the following behaviors:
+
+- **Copy alongside:** claude-code, antigravity, gemini-cli, opencode, openclaw, copilot copy references/ next to SKILL.md
+- **Inline bundle:** cursor, qwen, kimi append each reference file under a Reference header in the body
+- **Skip:** aider and windsurf skip references and emit a stderr note per skill
+
+## Why This Matters
+
+Reference files can be large. The inline-bundle strategy is used by project-scoped tools where a directory layout is impractical. The skip strategy prevents the consolidated aider and windsurf single-file outputs from becoming unmanageable.
+
+## Reference: glossary
+
+# With-References Glossary
+
+This is reference file two: glossary.md. It provides a glossary of terms for the with-references fixture skill.
+
+## Terms
+
+**copy-alongside:** The converter copies the entire references/ directory next to the per-skill output file. Used by claude-code, antigravity, gemini-cli, opencode, openclaw, and copilot.
+
+**inline-bundle:** The converter reads each reference file and appends its content to the body under a `## Reference: <filename>` header. Used by cursor, qwen, and kimi.
+
+**skip:** The converter ignores references entirely and emits a stderr note. Used by aider and windsurf to prevent file bloat.
+
+## Reference: guide
+
+# With-References Guide
+
+This is reference file one: guide.md. It documents how to use the with-references fixture skill.
+
+## Usage
+
+Point convert.sh at the fixtures/skills/ directory with --out pointing to a temp dir. Then check that each tool's output directory either contains a references/ subdirectory or has the content of this file inlined.
+
+## Verification
+
+For cursor, qwen, and kimi: look for the line `## Reference: guide` followed by this file's content. For aider and windsurf: look for a stderr line containing `skipped references for with-references`.
