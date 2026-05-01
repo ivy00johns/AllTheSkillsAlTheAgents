@@ -1,6 +1,6 @@
 # Claude Code Skill Ecosystem
 
-A complete multi-agent orchestration toolkit — **36 skills** spanning orchestration, role agents, contracts, git workflows, and developer workflows. Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) as the primary host, but the SKILL.md format is platform-agnostic so the same skills work on Claude.ai, Copilot CLI, Codex, and Gemini CLI.
+A complete multi-agent orchestration toolkit — **38 skills** spanning orchestration, role agents, contracts, git workflows, and developer workflows. Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) as the primary host, but the SKILL.md format is platform-agnostic so the same skills work on Claude.ai, Copilot CLI, Codex, and Gemini CLI.
 
 Symlink these skills into `~/.claude/skills/` and Claude Code gains the ability to coordinate parallel agent builds with contract-first architecture, declarative file ownership, and QA-gated releases.
 
@@ -77,10 +77,11 @@ skills/
 │   ├── db-migration-agent/    # Schema migrations, seed data
 │   └── performance-agent/     # Load testing (k6 default; Locust/JMeter/Artillery patterns)
 │
-├── contracts/                 # Contract-first architecture (2)
+├── contracts/                 # Contract-first architecture (3)
 │   ├── contract-author/       # Generates API/data/event contracts before builds
 │   │   └── references/        # OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema, data-layer YAML
-│   └── contract-auditor/      # Verifies implementations match contracts
+│   ├── contract-auditor/      # Verifies implementations match contracts
+│   └── dependency-coordinator/# Cross-package dependency manifest (pnpm overrides, package.json templates)
 │
 ├── meta/                      # Skills that create and manage other skills (8)
 │   ├── skill-writer/          # Generates new SKILL.md files with proper frontmatter
@@ -99,7 +100,7 @@ skills/
 │   ├── git-branch-cleanup/    # Prune merged + stale branches safely
 │   └── git-clean-worktrees/   # Remove worktrees whose work is already on main
 │
-└── workflows/                 # Cross-cutting process skills (11)
+└── workflows/                 # Cross-cutting process skills (12)
     ├── context-manager/       # Compaction strategy, handoffs, token budgets
     ├── deployment-checklist/  # Pre-deploy verification gates
     ├── sync-skills/           # Symlink/copy skills to ~/.claude/skills/ and Cursor
@@ -110,7 +111,8 @@ skills/
     ├── mermaid-charts/        # Expert-quality diagrams (15-30+ node systems)
     ├── playwright/            # Browser-based E2E + screenshots with visible Chrome
     ├── nano-banana/           # Google Gemini Imagen 4 image generation
-    └── railway-deploy/        # Deploy to Railway (Dockerfile, multi-service, GraphQL API)
+    ├── railway-deploy/        # Deploy to Railway (Dockerfile, multi-service, GraphQL API)
+    └── ui-brief/              # Opinionated UI design briefs (greenfield + rebuild)
 ```
 
 ## Key Concepts
@@ -199,8 +201,10 @@ Skills use three loading levels to manage context efficiently:
 | 34 | playwright | workflow | Browser E2E + screenshots, visible Chrome |
 | 35 | nano-banana | workflow | Google Imagen 4 image generation |
 | 36 | railway-deploy | workflow | Deploy to Railway (Docker, multi-service) |
+| 37 | ui-brief | workflow | Opinionated UI design briefs (greenfield + rebuild) |
+| 38 | dependency-coordinator | contract | Cross-package dependency manifest before parallel agent dispatch |
 
-**Total: 36 skills.** All bodies under 500 lines (largest: mermaid-charts at 435). All frontmatter compliant; zero ownership conflicts; zero broken cross-references.
+**Total: 38 skills.** All bodies under 500 lines. All frontmatter compliant; zero ownership conflicts; zero broken cross-references.
 
 ## Requirements
 
