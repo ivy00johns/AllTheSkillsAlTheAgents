@@ -168,8 +168,11 @@ convert_copilot() {
     printf '%s\n' "$body"
   } > "$dest_file"
 
-  # Emit per-skill stderr warning per contract
-  printf '[copilot] stripped allowed_tools/owns from %s\n' "$slug" >&2
+  # Emit per-skill stderr warning only when something was actually stripped
+  # (avoids false-positive noise on minimal skills with neither field).
+  if fm_has_field "allowed_tools" "$file" || fm_has_field "owns" "$file"; then
+    printf '[copilot] stripped allowed_tools/owns from %s\n' "$slug" >&2
+  fi
 
   # Copy references alongside
   refs_src="$(dirname "$file")/references"
