@@ -222,7 +222,12 @@ lint_one() {
   fm_error="$(printf '%s' "$json_out" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['error'] or '')" 2>/dev/null || echo '')"
 
   if [[ "$ok" != "True" ]]; then
-    emit_issue ERROR "$file" "1" "$fm_error"
+    # Missing pyyaml is an environment advisory, not a content defect — WARN, not ERROR.
+    if [[ "$fm_error" == *"install python3 pyyaml"* ]]; then
+      emit_issue WARN "$file" "1" "$fm_error"
+    else
+      emit_issue ERROR "$file" "1" "$fm_error"
+    fi
     return
   fi
 

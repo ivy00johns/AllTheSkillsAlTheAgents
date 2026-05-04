@@ -75,6 +75,13 @@ jobs:
       - name: Verify python3
         run: python3 --version
 
+      # PyYAML is not preinstalled on macos-latest (it is on ubuntu-latest).
+      # Without it, the linter falls back to a degraded check that flags
+      # every skill — install it so the smoke job mirrors Ubuntu coverage.
+      # --break-system-packages is required on PEP 668-managed Pythons.
+      - name: Install pyyaml
+        run: python3 -m pip install --user --break-system-packages pyyaml
+
       # brew is preinstalled on macos-latest. The package is 'bats-core'
       # (not 'bats') on Homebrew — distinct from the Ubuntu apt package name.
       - name: Install bats-core

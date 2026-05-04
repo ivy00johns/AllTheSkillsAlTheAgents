@@ -4,6 +4,7 @@
 *.swo
 *~
 
+# /skill-creator workspaces for testing and development
 .workspaces/
 *-workspace/
 
