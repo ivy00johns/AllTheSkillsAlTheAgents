@@ -1,0 +1,8 @@
+# no-headers
+
+Apply no-headers when testing the openclaw fallback path for skills whose body contains no double-hash section headers, verifying the entire body goes to AGENTS.md and SOUL.md becomes a placeholder.
+
+
+This fixture skill intentionally has no markdown level-two headers in its body. The openclaw converter should detect the absence of headers and put the entire body into AGENTS.md while writing only a single-line placeholder into SOUL.md of the form: # no-headers
+
+The body must still be at least fifty words for the lint body-word-count check to pass. This paragraph adds enough words to satisfy that requirement. The important thing is that no line in this body starts with two hash characters followed by a space, which is the pattern the openclaw header classifier looks for when deciding where to route content.
