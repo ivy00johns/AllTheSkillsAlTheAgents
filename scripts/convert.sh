@@ -2,7 +2,7 @@
 #
 # convert.sh — Convert canonical SKILL.md files into 11 tool-specific formats.
 #
-# Reads all skills from skills/**/SKILL.md (never claude_docs/) and writes
+# Reads all skills from skills/**/SKILL.md and writes
 # converted output to integrations/<tool>/. Run this before install.sh.
 #
 # Usage:
@@ -53,7 +53,6 @@ usage() {
 # ---------------------------------------------------------------------------
 # Walk skills in deterministic ASCII order.
 # Prints absolute paths of all SKILL.md files, sorted by category/slug.
-# Skips claude_docs/ (personal skills excluded from OSS bundle).
 # ---------------------------------------------------------------------------
 collect_skills() {
   find "$SKILLS_ROOT" -name "SKILL.md" -type f | sort

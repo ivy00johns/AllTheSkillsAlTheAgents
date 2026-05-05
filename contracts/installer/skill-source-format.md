@@ -22,7 +22,7 @@ skills/
 └── <category>/<skill>/references/*.md   (optional, unlimited)
 ```
 
-The converter MUST walk `skills/**/SKILL.md` exactly. It MUST NOT walk `claude_docs/.claude/skills/` — those are personal skills excluded from the OSS bundle (see `CLAUDE.md`).
+The converter MUST walk `skills/**/SKILL.md` exactly.
 
 For each match, derive:
 
