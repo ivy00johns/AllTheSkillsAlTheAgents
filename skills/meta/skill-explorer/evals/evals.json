@@ -1,0 +1,40 @@
+{
+  "skill_name": "skill-explorer",
+  "evals": [
+    {
+      "id": 0,
+      "name": "recall-forgotten-skill",
+      "prompt": "i had a skill that writes those opinionated design briefs for ui rebuilds, the one that helps you not end up with another generic shadcn dashboard. forgot the name. what was it called?",
+      "expected_output": "Names ui-brief specifically, in code formatting, with one line on what it does and how to trigger it. Doesn't list a bunch of unrelated skills.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "catalog-by-category",
+      "prompt": "give me a quick rundown of all my skills grouped by what they do — i want to actually see the catalog instead of guessing names every time",
+      "expected_output": "A grouped list (orchestration / roles / contracts / meta / git / workflows or similar), one short line per skill, scannable. Includes plugin skills only if it separates them clearly from repo skills, or just sticks to the repo skills.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "route-orchestrator-misuse",
+      "prompt": "ok i'm gonna fire up orchestrator to redesign the dashboard ui in this app, the current one looks like every other shadcn admin",
+      "expected_output": "Pushes back: this isn't a multi-agent build. Recommends ui-brief first (to write the brief), then frontend-design or frontend-agent to build from it. Names skills in code. Does NOT invoke any skill — just names them.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "explain-specific-skill",
+      "prompt": "what does the contract-author skill actually do and when should i be using it vs writing types myself",
+      "expected_output": "Explains contract-author: produces machine-readable integration contracts (API/data/types/events) in orchestrator phase 4 before agents implement. When to use: multi-agent builds with shared boundaries. Mentions composes_with neighbors (contract-auditor, dependency-coordinator, orchestrator) and the bundled templates. Does not over-explain or pad.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "compose-graph-question",
+      "prompt": "what skills naturally work together with orchestrator? trying to understand the build pipeline before i kick one off",
+      "expected_output": "Reads orchestrator's composes_with / spawned_by relationships and the role agents it spawns. Returns a concise picture (text tree or short mermaid) showing: plan-builder → orchestrator → contract-author → role agents (backend/frontend/etc) → qe-agent gate. Skills named in code.",
+      "files": []
+    }
+  ]
+}
