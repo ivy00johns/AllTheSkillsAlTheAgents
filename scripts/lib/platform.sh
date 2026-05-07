@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/platform.sh — Cross-platform shims for AllTheSkillsAllTheAgents scripts.
+# lib/platform.sh — Cross-platform shims for Skill Madness scripts.
 #
 # Provides: nproc_count (portable nproc), portable mktemp, portable cp -r.
 #

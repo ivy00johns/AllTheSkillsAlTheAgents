@@ -310,7 +310,7 @@ teardown_file() {
 }
 
 @test "aider: CONVENTIONS.md contains the file header comment" {
-  grep -q "AllTheSkillsAllTheAgents" "$OUTDIR/aider/CONVENTIONS.md"
+  grep -q "Skill Madness" "$OUTDIR/aider/CONVENTIONS.md"
   grep -q "do not edit manually" "$OUTDIR/aider/CONVENTIONS.md"
 }
 
@@ -339,7 +339,7 @@ teardown_file() {
 }
 
 @test "windsurf: .windsurfrules contains the file header comment" {
-  grep -q "AllTheSkillsAllTheAgents" "$OUTDIR/windsurf/.windsurfrules"
+  grep -q "Skill Madness" "$OUTDIR/windsurf/.windsurfrules"
   grep -q "do not edit manually" "$OUTDIR/windsurf/.windsurfrules"
 }
 

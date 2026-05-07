@@ -30,7 +30,7 @@ Railway builds and runs your app from a Dockerfile (or auto-detects with Nixpack
 
 ## Prerequisites
 
-**Railway credentials** (for GraphQL API deployments) go in the AllTheSkillsAllTheAgents root `.env` file — see `.env.example` for the full list. Get your API token at https://railway.app/account/tokens.
+**Railway credentials** (for GraphQL API deployments) go in the Skill Madness root `.env` file — see `.env.example` for the full list. Get your API token at https://railway.app/account/tokens.
 
 **Railway CLI** should be installed and authenticated. Verify:
 

@@ -176,7 +176,7 @@ The brief is a standalone Markdown file. It must be paste-ready into a fresh Cla
 
 ## Examples Of Briefs That Worked
 
-Two reference briefs are linked from this skill's parent repo (when running inside the AllTheSkillsAllTheAgents context):
+Two reference briefs are linked from this skill's parent repo (when running inside the Skill Madness context):
 
 - **Greenfield** — `THE-GAUNTLET.md` at the AllTheSkills repo root. Single-prompt greenfield stress test for "Bazaar" (eBay × PayPal × Twitter). Called for bento-grid item cards, glassmorphism trust badges, dark-mode default, full responsive. The UI section is one phase of a larger build brief — the design language was opinion-dense even without an existing UI to diagnose.
 - **Rebuild** — `UI-CHALLENGE.md` at the MarketsBeRigged repo root. Diagnoses the existing trading dashboard's "generic shadcn admin grid" failure mode and prescribes a Bloomberg × Linear × TradingView replacement that leads with the LLM-reasoning moat.

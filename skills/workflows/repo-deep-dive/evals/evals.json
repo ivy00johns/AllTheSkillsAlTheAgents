@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "I just cloned the overstory repo to ~/repos/overstory and I have a deep research doc at plans/the-future/claude_research/overstory-research.md — do a deep dive on it. I want to understand how their agent system works compared to our skills ecosystem.",
-      "expected_output": "A structured deep dive output in {project}_deepdive/source-material/ with 00-INDEX.md through 12-frontier-assessment.md. Should include a 'by the numbers' table, architecture diagram, subsystem deep dives covering the agent system and messaging, and comparison/convergence docs comparing with AllTheSkillsAllTheAgents.",
+      "expected_output": "A structured deep dive output in {project}_deepdive/source-material/ with 00-INDEX.md through 12-frontier-assessment.md. Should include a 'by the numbers' table, architecture diagram, subsystem deep dives covering the agent system and messaging, and comparison/convergence docs comparing with Skill Madness.",
       "files": []
     },
     {

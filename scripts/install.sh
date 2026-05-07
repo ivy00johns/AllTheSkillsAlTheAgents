@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install.sh — Install AllTheSkillsAllTheAgents into local agentic tools.
+# install.sh — Install Skill Madness into local agentic tools.
 #
 # Reads converted artifacts from integrations/ and copies them to the
 # appropriate config directories for each tool. Run scripts/convert.sh first.
@@ -189,7 +189,7 @@ interactive_select() {
   while true; do
     printf '\n'
     box_top
-    box_row "${C_BOLD}  AllTheSkillsAllTheAgents -- Skill Installer${C_RESET}"
+    box_row "${C_BOLD}  Skill Madness -- Skill Installer${C_RESET}"
     box_bot
     printf '\n'
     printf '  %sSystem scan:  [*] = detected on this machine%s\n' "${C_DIM}" "${C_RESET}"
@@ -680,9 +680,9 @@ main() {
   check_integrations
 
   if $DRY_RUN; then
-    ats_header "AllTheSkillsAllTheAgents -- Skill Installer (DRY RUN)"
+    ats_header "Skill Madness -- Skill Installer (DRY RUN)"
   else
-    ats_header "AllTheSkillsAllTheAgents -- Skill Installer"
+    ats_header "Skill Madness -- Skill Installer"
   fi
 
   SELECTED_TOOLS=()

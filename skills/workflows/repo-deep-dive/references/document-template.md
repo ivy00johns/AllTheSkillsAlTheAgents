@@ -43,7 +43,7 @@ the technical docs first.}
 ## Generated
 
 {YYYY-MM-DD} — from codebase analysis of {project} ({version}, {N}k LoC,
-{N} commits, {other distinguishing stats}) and AllTheSkillsAllTheAgents
+{N} commits, {other distinguishing stats}) and Skill Madness
 ({N} skills, {N} files).
 ```
 

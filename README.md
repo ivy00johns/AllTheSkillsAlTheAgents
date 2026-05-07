@@ -1,13 +1,13 @@
 <div align="center">
 
-# 🧰 AllTheSkillsAllTheAgents
+# 🧰 Skill Madness
 
 ### *Multi-agent build orchestration. A portable 39-skill library. Eleven AI coding hosts.*
 
 **One agent in one context window can only build so much. The `orchestrator` decomposes a build into a 14-phase plan, authors machine-readable contracts *before* any code is written, dispatches role agents in parallel with exclusive file ownership, and blocks the merge on a structured QA report. The skill library it draws from is portable: author once in `SKILL.md`, install into eleven AI coding tools — Claude Code, Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, Kimi.**
 
 <p align="center">
-  <a href="https://github.com/ivy00johns/AllTheSkillsAlTheAgents/actions/workflows/lint-skills.yml"><img src="https://github.com/ivy00johns/AllTheSkillsAlTheAgents/actions/workflows/lint-skills.yml/badge.svg" alt="Skill Lint" /></a>
+  <a href="https://github.com/ivy00johns/Skill-Madness/actions/workflows/lint-skills.yml"><img src="https://github.com/ivy00johns/Skill-Madness/actions/workflows/lint-skills.yml/badge.svg" alt="Skill Lint" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
   <img src="https://img.shields.io/badge/skills-39-success.svg" alt="39 skills" />
   <img src="https://img.shields.io/badge/role%20agents-9-blueviolet.svg" alt="9 role agents" />
@@ -34,7 +34,7 @@
 
 Every AI coding tool ships the same trap: one agent, one context window, one set of files — fine for small projects, brittle for anything larger than a single context can hold. And every tool reinvents the same wheel — Cursor wants `.mdc`, Aider wants `CONVENTIONS.md`, Windsurf wants `.windsurfrules`, Claude Code wants `SKILL.md` — so any prompt library you build gets stranded on whichever host you wrote it for.
 
-**AllTheSkillsAllTheAgents fixes both ends.** The `orchestrator` skill decomposes a complex build into a 14-phase plan, makes integration surfaces machine-readable *before* anyone writes code, dispatches role agents in parallel with strict file ownership, and refuses to ship until a separate QE agent signs off via a structured report. And the skill library it draws from authors once in the canonical `SKILL.md` format — the same skills install into eleven different AI coding tools without copy-paste drift.
+**Skill Madness fixes both ends.** The `orchestrator` skill decomposes a complex build into a 14-phase plan, makes integration surfaces machine-readable *before* anyone writes code, dispatches role agents in parallel with strict file ownership, and refuses to ship until a separate QE agent signs off via a structured report. And the skill library it draws from authors once in the canonical `SKILL.md` format — the same skills install into eleven different AI coding tools without copy-paste drift.
 
 - 👑 **The orchestrator is the entry point** — a single 14-phase playbook covering team sizing, runtime detection, contract authoring, parallel dispatch, integration validation, QA gate, and handoff. It's the skill that turns a one-line ask into a coordinated multi-agent build.
 - 📜 **Contract-first** — `contract-author` writes OpenAPI / AsyncAPI / Pydantic / TypeScript / JSON Schema *before* a line of implementation. `contract-auditor` verifies every shipped module against the spec. Agents can't drift; the contract is the truth.
@@ -69,8 +69,8 @@ Every AI coding tool ships the same trap: one agent, one context window, one set
 Clone, then run `/sync-skills` from inside Claude Code. It creates flattened symlinks at `~/.claude/skills/<skill-name>` so edits in the repo are live in every session — no rebuild step.
 
 ```bash
-git clone https://github.com/ivy00johns/AllTheSkillsAlTheAgents.git
-cd AllTheSkillsAlTheAgents
+git clone https://github.com/ivy00johns/Skill-Madness.git
+cd Skill-Madness
 
 # Inside Claude Code:
 /sync-skills
@@ -471,8 +471,8 @@ The multi-tool installer (`scripts/convert.sh`, `scripts/install.sh`, `scripts/l
 
 ### ⭐ Star History
 
-<a href="https://star-history.com/#ivy00johns/AllTheSkillsAlTheAgents&Date">
-  <img src="https://api.star-history.com/svg?repos=ivy00johns/AllTheSkillsAlTheAgents&type=Date" alt="Star History Chart" width="640" />
+<a href="https://star-history.com/#ivy00johns/Skill-Madness&Date">
+  <img src="https://api.star-history.com/svg?repos=ivy00johns/Skill-Madness&type=Date" alt="Star History Chart" width="640" />
 </a>
 
 <br/><br/>

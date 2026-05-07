@@ -52,7 +52,7 @@ The exception: if the user's intent is unambiguous AND they explicitly say "go a
 2. **SKILL.md frontmatter** — read when the user wants deeper detail (composes_with, spawned_by, owns), or when descriptions alone don't disambiguate. Use `head -30` or read with `limit: 30` — frontmatter is small.
 3. **SKILL.md body** — read only for "explain in depth" questions or when the user is debugging why a skill triggered/didn't trigger.
 
-For the AllTheSkillsAllTheAgents repo specifically, skills live in:
+For the Skill Madness repo specifically, skills live in:
 
 ```
 skills/orchestrator/SKILL.md

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/term.sh — Terminal / color helpers for AllTheSkillsAllTheAgents scripts.
+# lib/term.sh — Terminal / color helpers for Skill Madness scripts.
 #
 # Source this file; it sets COLOR vars and defines logging + box-drawing funcs.
 # Respects NO_COLOR and TERM=dumb.  Only emits ANSI when stdout is a TTY.

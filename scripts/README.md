@@ -1,6 +1,6 @@
 # scripts/
 
-Three command-line utilities for managing the AllTheSkillsAllTheAgents ecosystem:
+Three command-line utilities for managing the Skill Madness ecosystem:
 
 - **`convert.sh`** — translates canonical SKILL.md files into 11 tool-specific formats
 - **`install.sh`** — copies converted artifacts to the appropriate config directories for each tool
@@ -133,7 +133,7 @@ When stdin is a TTY and no explicit tool is specified, the installer shows an AS
 
 ```
 +----------------------------------------------------+
-|  AllTheSkillsAllTheAgents -- Skill Installer       |
+|  Skill Madness -- Skill Installer       |
 +----------------------------------------------------+
 
 System scan:  [*] = detected on this machine

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/frontmatter.sh — SKILL.md frontmatter parser for AllTheSkillsAllTheAgents.
+# lib/frontmatter.sh — SKILL.md frontmatter parser for Skill Madness.
 #
 # get_body() is adapted from msitarzewski/agency-agents (MIT). See
 # ACKNOWLEDGMENTS.md at the repo root.

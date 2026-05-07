@@ -58,7 +58,7 @@ When the TUI is shown:
 
 ```
 +----------------------------------------------------+
-|  AllTheSkillsAllTheAgents -- Skill Installer       |
+|  Skill Madness -- Skill Installer       |
 +----------------------------------------------------+
 
 System scan:  [*] = detected on this machine

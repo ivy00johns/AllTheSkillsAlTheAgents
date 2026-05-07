@@ -44,7 +44,7 @@ The bundled script uses `gemini-2.5-flash-image` — Google's current image gene
 
 ## Setup
 
-The script requires a `GEMINI_API_KEY` environment variable. It reads from the AllTheSkillsAllTheAgents root `.env` file automatically. If not set, direct the user to:
+The script requires a `GEMINI_API_KEY` environment variable. It reads from the Skill Madness root `.env` file automatically. If not set, direct the user to:
 
 1. Get a key at https://aistudio.google.com/apikey
 2. Add it to the repo root `.env` (see `.env.example` for the template)

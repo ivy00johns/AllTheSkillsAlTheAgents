@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Defines the **input** that `scripts/convert.sh` walks. The canonical source format is the existing AllTheSkillsAllTheAgents SKILL.md layout — this contract pins down the parsing and walking rules so the converter never guesses.
+Defines the **input** that `scripts/convert.sh` walks. The canonical source format is the existing Skill Madness SKILL.md layout — this contract pins down the parsing and walking rules so the converter never guesses.
 
 ## Source Layout
 

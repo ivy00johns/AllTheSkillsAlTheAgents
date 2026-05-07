@@ -18,7 +18,7 @@ import sys
 import urllib.request
 import urllib.error
 
-# Load .env from the skills repo root (AllTheSkillsAllTheAgents/.env)
+# Load .env from the skills repo root (Skill-Madness/.env)
 # Walk up from scripts/ -> nano-banana/ -> workflows/ -> skills/ -> repo root
 _SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parent.parent.parent.parent

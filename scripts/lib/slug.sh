@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/slug.sh — Slug / string utilities for AllTheSkillsAllTheAgents scripts.
+# lib/slug.sh — Slug / string utilities for Skill Madness scripts.
 #
 # slugify() is adapted from msitarzewski/agency-agents (MIT). See
 # ACKNOWLEDGMENTS.md at the repo root.
