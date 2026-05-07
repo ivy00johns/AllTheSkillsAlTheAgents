@@ -43,7 +43,7 @@ Every AI coding tool ships the same trap: one agent, one context window, one set
 - 🪜 **Progressive disclosure** — frontmatter (~100 tokens) always loaded, body loaded on trigger, references loaded on demand. A 39-skill library stays cheap to host.
 - 🔁 **Two-runtime degradation** — Agent Teams (parallel tmux) → subagents (Task tool) → sequential. The orchestrator picks the highest mode the host supports; role skills work standalone in any of them.
 - 🧰 **39 skills, six categories, all CI-linted** — orchestrator, roles, contracts, meta-skills (skill-writer, skill-explorer, audit, deep-review), git workflow conventions, and 12 cross-cutting workflow skills (plan-builder, repo-deep-dive, ui-brief, mermaid-charts, …). Frontmatter, body length, and cross-skill ownership all gated on every push.
-- 🌐 **Portable across eleven hosts** — `SKILL.md` is the canonical source; converters emit Claude Code, Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, and Kimi formats. The orchestrator's parallel-dispatch metadata is Claude-Code-specific, but everything else (role definitions, contracts, workflows, git conventions, meta-skills) ports cleanly. See [Also works on ten other hosts](#also-works-on-ten-other-hosts).
+- 🌐 **Portable across eleven hosts** — `SKILL.md` is the canonical source; converters emit Claude Code, Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, and Kimi formats. The orchestrator's parallel-dispatch metadata is Claude-Code-specific, but everything else (role definitions, contracts, workflows, git conventions, meta-skills) ports cleanly. See [Also works on ten other hosts](#-also-works-on-ten-other-hosts).
 
 > **Status — read before you pitch this to anyone:**
 > - **The orchestrator + 39-skill library is the mature part.** All bodies under 500 lines, zero ownership conflicts, zero broken cross-references, full Ubuntu + macOS lint matrix on every push.
@@ -62,7 +62,7 @@ Every AI coding tool ships the same trap: one agent, one context window, one set
 | **python3** | Frontmatter parsing in `lint-skills.sh` |
 | **git** | Cloning the repo and (optionally) symlinking into your global skills dir |
 | **Claude Code** (recommended) | Where the orchestrator + multi-agent QA gate actually run end-to-end |
-| **(optional) any of ten other hosts** | Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, Kimi — see [Also works on ten other hosts](#also-works-on-ten-other-hosts) |
+| **(optional) any of ten other hosts** | Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, Kimi — see [Also works on ten other hosts](#-also-works-on-ten-other-hosts) |
 
 ### Install for Claude Code
 
@@ -87,7 +87,7 @@ Two scripts. The first translates the canonical `SKILL.md` files into eleven hos
 ./scripts/install.sh   # integrations/<host> →  ~/.<host>/, .cursor/rules/, etc.
 ```
 
-`install.sh` is interactive when run in a TTY and auto-detects from environment variables in CI. See [Also works on ten other hosts](#also-works-on-ten-other-hosts) for the per-host format matrix and what gets stripped on conversion, and `scripts/README.md` for flag-level docs.
+`install.sh` is interactive when run in a TTY and auto-detects from environment variables in CI. See [Also works on ten other hosts](#-also-works-on-ten-other-hosts) for the per-host format matrix and what gets stripped on conversion, and `scripts/README.md` for flag-level docs.
 
 ### Use it
 
