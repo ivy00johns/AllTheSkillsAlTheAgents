@@ -2,7 +2,7 @@
 
 # 🧰 Skill Madness
 
-### *Multi-agent build orchestration. A portable 39-skill library. Eleven AI coding hosts.*
+### *Skill-Madness — all the skills, all the agents, all the chaos.*
 
 **One agent in one context window can only build so much. The `orchestrator` decomposes a build into a 14-phase plan, authors machine-readable contracts *before* any code is written, dispatches role agents in parallel with exclusive file ownership, and blocks the merge on a structured QA report. The skill library it draws from is portable: author once in `SKILL.md`, install into eleven AI coding tools — Claude Code, Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, Kimi.**
 
