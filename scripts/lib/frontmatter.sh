@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # lib/frontmatter.sh — SKILL.md frontmatter parser for AllTheSkillsAllTheAgents.
 #
+# get_body() is adapted from msitarzewski/agency-agents (MIT). See
+# ACKNOWLEDGMENTS.md at the repo root.
+#
 # Uses Python 3 + PyYAML for correctness on multiline descriptions.
 # Provides targeted field-extraction functions that are called individually
 # rather than bulk-parsed-and-evaled, avoiding shell eval of arbitrary data.

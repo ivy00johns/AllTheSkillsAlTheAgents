@@ -9,7 +9,7 @@
 
 Defines the **output** that `scripts/convert.sh` produces in `integrations/<tool>/` for each of the 11 supported tools. Each section gives: filename pattern, frontmatter format, body handling, and concrete example.
 
-The implementation agent MAY consult `/Users/johns/Repos/ai-tools-and-frameworks/agent-frameworks/agency-agents/scripts/convert.sh` as a reference implementation, but MUST adapt to AllTheSkillsAllTheAgents conventions documented here.
+The implementation agent MAY consult [msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents) (MIT) as a reference implementation, but MUST adapt to AllTheSkillsAllTheAgents conventions documented here. Code adapted from that project is credited in `ACKNOWLEDGMENTS.md` at the repo root.
 
 ## Tool Matrix
 

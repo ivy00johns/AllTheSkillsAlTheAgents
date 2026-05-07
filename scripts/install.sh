@@ -20,6 +20,10 @@
 #   --help               Print this and exit
 #
 # Exit codes: 0 success, 1 install error, 2 argument/preflight error
+#
+# Portions of this script (the per-tool detection helpers and the interactive
+# selection UI) are adapted from msitarzewski/agency-agents (MIT). See
+# ACKNOWLEDGMENTS.md at the repo root.
 
 set -euo pipefail
 

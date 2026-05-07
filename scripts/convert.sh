@@ -20,6 +20,10 @@
 #   --help           Show this help and exit
 #
 # Exit codes: 0 success, 1 per-skill error, 2 argument error
+#
+# The 11-tool target list and the soul/agents body-split used by
+# convert_openclaw are adapted from msitarzewski/agency-agents (MIT). See
+# ACKNOWLEDGMENTS.md at the repo root.
 
 set -euo pipefail
 
