@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.7.0
+version: 1.7.1
 description: |
   Lead coordinator and conductor for multi-agent builds using Claude Code. Takes a plan or mission document, executes its phases end-to-end, and orchestrates parallel role-agents with a contract-first architecture. The orchestrator is the conductor — not the only player: it INVOKES other skills (nano-banana for imagery, ui-ux-pro-max + frontend-design for UI quality, ux-review for post-build validation, repo-deep-dive for reference research, llm-wiki for project knowledge bases, mermaid-charts for diagrams, deployment-checklist for ship readiness) at the appropriate phase, and DISPATCHES role-agents (backend, frontend, db, infra, security, observability, performance, docs, qe) for parallel implementation. Use this skill when building a project with multiple agents, coordinating an agent team build, executing a multi-phase mission document, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", a "MISSION.md" file, or wants to split work across multiple Claude sessions. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build. It does NOT preempt brainstorming, plan-builder, writing-plans, frontend-design, ui-ux-pro-max, nano-banana, claude-design-brief, ui-brief, repo-deep-dive, llm-wiki, ux-review, feature-dev, or claude-mem — it COMPOSES with them, invoking each at the phase where it earns its keep.
 requires_agent_teams: false
@@ -66,7 +66,26 @@ If the user says "merge it", "push to main", or "create a PR" — then and only 
 1. Create a feature branch (see Git Branching Policy above)
 2. **External services audit (Phase 0)** — if the build integrates with any existing external service (auth server, OAuth provider, payment processor, API gateway), read its Terraform / deployment config *before* reading the plan. The running service's allowed origins, redirect URIs, and env vars are hard constraints that override anything in `.env.example` or docs. See Phase 0 in `references/phase-guide.md`.
 3. **Read the plan/mission AS A MULTI-PHASE SCRIPT, not just a feature list.** If the document organizes work into Phase 0, Phase 1, Phase 2 (etc.), those are YOUR phases to execute end-to-end — not just suggestions. Stopping at "Phase 3: parallel build" when the mission has phases 4–8 is the most common failure mode of this skill. See `references/mission-interpretation.md`.
-4. **Mission skill manifest** — scan the plan for every explicit skill mention (anything starting with `/` or referenced by name: `nano-banana`, `ui-ux-pro-max`, `frontend-design`, `ux-review`, `repo-deep-dive`, `llm-wiki`, `claude-mem`, `mermaid-charts`, `feature-dev`, `claude-design-brief`, `ui-brief`, etc.). Write the list to `coordination/MISSION_SKILLS.md` with one line per skill: `- [ ] skill-name — invoke at <phase>`. **Tick each box only when the skill is actually invoked.** Skills mentioned in the mission but not invoked are a Definition-of-Done failure unless a written reason is recorded. See `references/mission-interpretation.md` for the heuristic mapping (when to fire each skill).
+4. **Mission skill manifest** — scan the plan for every explicit skill mention (anything starting with `/` or referenced by name: `nano-banana`, `ui-ux-pro-max`, `frontend-design`, `ux-review`, `repo-deep-dive`, `llm-wiki`, `claude-mem`, `mermaid-charts`, `feature-dev`, `claude-design-brief`, `ui-brief`, etc.). Write the list to `coordination/MISSION_SKILLS.md` using this canonical template (every plan should produce the SAME structure so reviewers can audit at a glance):
+
+   ```markdown
+   # Mission skill manifest — <project>
+   Source: <path/to/MISSION.md> · Scanned: <ISO date>
+
+   Every box must end the build either ✅ (invoked, with the artifact path)
+   or annotated with a one-line reason for deferral. Empty boxes are bugs.
+
+   ## Phase <N> — <name>
+   - [ ] `skill-name` — invoke at Phase <N>; produces `<artifact path>`.
+   ```
+
+   If the mission uses its OWN phase numbering (Phase 0/1/2/3/4 from the
+   mission text), USE THAT NUMBERING. Don't renumber to match this skill's
+   internal 14-phase playbook — the audit trail has to be readable against
+   the original mission. See `references/mission-interpretation.md` for the
+   skill-trigger heuristic (when to fire each skill).
+
+   **Skills mentioned in the mission but not invoked are a Definition-of-Done failure unless a written reason is recorded.**
 5. Size the team based on the work — see `references/team-sizing.md`
 6. **Pre-build creative + research skills** — invoke these BEFORE contracts where the mission asks for them: `nano-banana` (generates real seed imagery — hero banners, product photos, category icons), `claude-design-brief` or `ui-brief` (design direction document), `repo-deep-dive` (reference repo analysis), `llm-wiki` (project knowledge base bootstrap), `mermaid-charts` (architecture diagrams). These produce ARTIFACTS the agents will consume — running them first means agents get real images and real architecture refs instead of placeholders.
 7. Author contracts (the critical phase) — invoke the `contract-author` skill
