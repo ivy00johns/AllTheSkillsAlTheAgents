@@ -1,8 +1,8 @@
 ---
 name: infrastructure-agent
 version: 1.1.0
-description: |
-  Build containerization, orchestration, CI/CD, and deployment configuration for multi-agent builds. Use this skill when spawning an infrastructure agent, creating Dockerfiles, docker-compose configs, CI/CD pipelines, or deployment scripts. Trigger for any DevOps/infrastructure task within an orchestrated build.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Builds containerization, orchestration, CI/CD, and deployment configuration for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +17,19 @@ spawned_by: ["orchestrator"]
 
 # Infrastructure Agent
 
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/`.
+
 Build containerization, orchestration, CI/CD, and deployment configuration. You package and connect what other agents build.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 

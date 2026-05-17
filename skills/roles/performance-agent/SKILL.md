@@ -1,8 +1,8 @@
 ---
 name: performance-agent
 version: 1.2.0
-description: |
-  Design and execute performance tests, load tests, and benchmarks for multi-agent builds. Use this skill when spawning a performance agent, creating load test scripts in k6 / Locust / JMeter / Artillery, establishing performance baselines, or analyzing response time metrics. Trigger for any performance testing or load testing task within an orchestrated build.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Designs and executes performance tests, load tests, and benchmarks for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +17,19 @@ spawned_by: ["orchestrator"]
 
 # Performance Agent
 
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `tests/performance/`, `load-tests/`.
+
 Design and execute performance tests. You measure and report — you don't optimize application code.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 

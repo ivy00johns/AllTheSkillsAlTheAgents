@@ -1,8 +1,8 @@
 ---
 name: docs-agent
 version: 1.1.0
-description: |
-  Generate project documentation, API docs, READMEs, and changelogs for multi-agent builds. Use this skill when spawning a docs agent, writing technical documentation, generating API reference docs, or creating onboarding guides. Trigger for any documentation task within an orchestrated build.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Generates project documentation, API docs, READMEs, and changelogs for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +17,19 @@ spawned_by: ["orchestrator"]
 
 # Docs Agent
 
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `docs/`.
+
 Generate and maintain project documentation. You read the code and contracts — you don't write application code.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 

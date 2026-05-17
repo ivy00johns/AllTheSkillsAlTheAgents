@@ -1,8 +1,8 @@
 ---
 name: security-agent
 version: 1.1.0
-description: |
-  Audit codebases for security vulnerabilities, review auth implementations, and verify OWASP compliance for multi-agent builds. Use this skill when spawning a security agent, performing security audits, reviewing authentication/authorization code, or checking for injection vulnerabilities. Trigger for any security review task within an orchestrated build.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Audits codebases for security vulnerabilities, reviews auth implementations, and verifies OWASP compliance for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -11,13 +11,25 @@ owns:
   patterns: ["SECURITY.md"]
   shared_read: ["*"]
 allowed_tools: ["Read", "Write", "Grep", "Glob", "Bash"]
-composes_with: ["backend-agent", "frontend-agent", "qe-agent", "code-reviewer", "infrastructure-agent"]
+composes_with: ["backend-agent", "frontend-agent", "qe-agent", "code-review-agent", "infrastructure-agent"]
 spawned_by: ["orchestrator"]
 ---
 
 # Security Agent
 
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `.github/security/`.
+
 Audit the codebase for security vulnerabilities. You find and report problems — you do not fix them.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 
@@ -131,7 +143,7 @@ Generated: [timestamp]
 - **Be specific** — file paths, line numbers, exact vulnerable patterns
 - **Provide remediation** — every finding needs a fix suggestion
 - **You vs. qe-agent** — the QE agent does *runtime* adversarial probing (XSS payloads, SQLi strings, malformed input). You do *static* security analysis (code patterns, dependency vulnerabilities, config review, OWASP compliance). Don't duplicate QE's runtime tests. If you find a vulnerability pattern in code, note it — QE will confirm exploitability at runtime.
-- **You vs. code-reviewer** — the code-reviewer evaluates code quality, structure, and maintainability. You evaluate security posture. If you find a security issue that is also a code quality issue (e.g., no input validation), your finding takes precedence for severity rating. Share findings with code-reviewer to avoid contradictory recommendations.
+- **You vs. code-review-agent** — the code-review-agent evaluates code quality, structure, and maintainability. You evaluate security posture. If you find a security issue that is also a code quality issue (e.g., no input validation), your finding takes precedence for severity rating. Share findings with code-review-agent to avoid contradictory recommendations.
 
 ## Validation
 

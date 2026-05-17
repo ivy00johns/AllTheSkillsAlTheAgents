@@ -1,8 +1,8 @@
 ---
-name: code-reviewer
-version: 1.1.0
-description: |
-  Review code for quality, correctness, security, and adherence to project conventions in multi-agent builds. Use this skill when performing code reviews, checking implementation quality, validating coding standards, or reviewing pull requests. Trigger for any code review task within an orchestrated build or standalone review context.
+name: code-review-agent
+version: 1.2.0
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Reviews code for quality, correctness, security, and adherence to project conventions in multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -15,9 +15,21 @@ composes_with: ["wiki-research", "qe-agent", "security-agent", "backend-agent", 
 spawned_by: ["orchestrator"]
 ---
 
-# Code Reviewer
+# Code Review Agent
+
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: none (read-only review across all source).
 
 Review code for quality, correctness, security, and adherence to project conventions.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 
@@ -86,7 +98,7 @@ For each file or logical unit:
 
 ```markdown
 # Code Review Report
-Reviewer: code-reviewer agent
+Reviewer: code-review-agent
 Files reviewed: [count]
 Generated: [timestamp]
 
