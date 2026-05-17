@@ -17,6 +17,8 @@ spawned_by: []
 
 # UI Brief
 
+> **Tradeoff:** Biases toward design opinionation. For greenfield work where the user wants exploration, use claude-design-brief instead.
+
 Produce opinionated, design-leading UI briefs that survive contact with implementation.
 
 The default failure mode for LLM-driven UI work is converging on the same shadcn-default-card-grid for every product. This skill exists to write a brief so opinion-dense and reference-specific that the implementing agent cannot drift back into that default. The output is a standalone Markdown file the user (or an orchestrator + frontend-agent) can paste into a fresh Claude Code session and execute against.

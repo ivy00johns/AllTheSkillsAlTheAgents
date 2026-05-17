@@ -1,28 +1,41 @@
 ---
 name: dependency-coordinator
 version: 1.0.0
-description: |
-  Author the cross-package dependency manifest before dispatching parallel implementation agents. Use PROACTIVELY in monorepos when multiple agents will independently write package.json/requirements.txt/Cargo.toml files, to prevent cross-agent transitive version drift (e.g. one agent pulls esbuild ~0.19, another ~0.25, install fails). Pairs with contract-author in the same orchestrator phase. Triggers on: "set up workspace dependency pinning", "before parallel agent dispatch", "monorepo dependency policy", "shared dependency overrides", "pnpm.overrides", "lock dependency versions across packages", or any orchestrated build where ≥2 agents will own ≥1 package.json each.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Authors the cross-package dependency manifest before parallel implementation agents are dispatched, preventing transitive version drift. Composed by orchestrator during multi-agent builds. Not user-invocable."
 type: contract
 ---
 
 # Dependency Coordinator
 
+> **Pipeline position.** Runs after `plan-builder`, before `orchestrator` dispatches parallel agents. Pins inter-agent deps so concurrent work doesn't collide.
+
 Authors the cross-package dependency manifest in a monorepo so parallel implementation agents can fill in their own `package.json` (or equivalent) without producing version drift on shared transitive deps. **Run before any agent that will write a package manifest is dispatched.**
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Why this skill exists
 
 Specification problems cause ~42% of multi-agent failures (per orchestrator skill). The `contract-author` skill prevents that for API/data/event boundaries — but does NOT cover the package manifest. Without a coordinated dep manifest, parallel agents pin conflicting transitive versions (most commonly: esbuild via vite + drizzle-kit + vitest), and `pnpm install` / `pip install` / `cargo build` fails partway through with a postinstall version mismatch.
 
-This skill sits next to `contract-author` in the orchestrator's Phase 4 (the contracts phase), authoring a different kind of contract: **the dependency contract**.
+This skill sits next to `contract-author` in the orchestrator's Phase 4 (contracts), authoring a different kind of contract: **the dependency contract**.
 
 ## Role
 
 You are the **dependency coordinator**. You read the project's tech-stack profile (from `.claude/profile.yaml` or the plan), enumerate every shared transitive dependency that's likely to drift, and emit:
 
-1. A root manifest with overrides/resolutions pinning shared transitives to one version.
-2. Per-package manifest templates that consumer agents fill in (rather than authoring from scratch).
-3. A human-readable `DEPENDENCIES.md` documenting the version policy.
+1. A root manifest with overrides/resolutions pinning shared transitives to one version
+2. Per-package manifest templates that consumer agents fill in (rather than authoring from scratch)
+3. A human-readable `DEPENDENCIES.md` documenting the version policy
+4. A short dispatch advisory the orchestrator pastes into each agent's prompt
 
 ## Inputs
 
@@ -32,144 +45,30 @@ You are the **dependency coordinator**. You read the project's tech-stack profil
 
 ## Process
 
-### Step 1: Enumerate shared transitives
+The detailed recipes for each step live in `references/pinning-strategies.md` — read it before authoring. The flow is:
 
-For the detected stack, list dependencies that frequently cause cross-package version drift. The reference table in `references/known-conflict-deps.md` covers the most common stacks; consult it before authoring.
+1. **Enumerate shared transitives** — for the detected stack, list deps known to drift (see `references/known-conflict-deps.md`).
+2. **Pick a target version per transitive** — choose the version satisfying the most demanding consumer; record rationale.
+3. **Author the root manifest** — emit the overrides/resolutions block matching the workspace's package manager (pnpm/npm/yarn/poetry/uv/cargo). Stack-specific templates are in `references/pinning-strategies.md`.
+4. **Author per-package manifest templates** — one `package.json.template` (or equivalent) per workspace package, with a header comment listing inherited pins.
+5. **Author `DEPENDENCIES.md`** — version policy in human-readable form, including rationale, per-package boundaries, escalation procedure, and migration playbook. See `references/dependencies-md-template.md`.
+6. **Emit a dispatch advisory** — short string pasted verbatim into every implementation agent's prompt warning them not to modify root overrides.
 
-Common JavaScript/TypeScript drift sources:
-- `esbuild` (pulled by vite, drizzle-kit, vitest, tsx — each pins a different version range)
-- `typescript` (every package's devDeps; drifts if not pinned at root)
-- `@types/node` (drifts; pin one major)
-- `zod` (peer-dep tension with @anthropic-ai/sdk — current SDK wants ^3.25 || ^4)
-- `react` / `react-dom` (peer-dep tension with @types/react)
-
-Common Python drift sources:
-- `pydantic` v1 vs v2 (FastAPI auto-pulls v2; legacy code sometimes wants v1)
-- `httpx` (versions matter for async test clients)
-- `sqlalchemy` v1 vs v2
-
-### Step 2: Pick a target version per shared transitive
-
-For each shared transitive, pick the version that satisfies the most demanding consumer. Examples:
-- `vite@^5.4` requires `esbuild@^0.21` → pin esbuild=0.21.5 if drizzle-kit (which wants ^0.19) is also in the workspace.
-- `@anthropic-ai/sdk@^0.92` peers `zod@^3.25 || ^4.0` → pin zod=3.25.0+ (or 4.x) workspace-wide.
-
-Document the pinning rationale in `DEPENDENCIES.md` so a future maintainer knows WHY each override exists.
-
-### Step 3: Author the root manifest
-
-Output the root manifest with the overrides/resolutions block:
-
-**pnpm:**
-```json
-{
-  "pnpm": {
-    "overrides": {
-      "esbuild": "0.21.5",
-      "zod": "3.25.0"
-    }
-  }
-}
-```
-
-**npm:**
-```json
-{
-  "overrides": {
-    "esbuild": "0.21.5"
-  }
-}
-```
-
-**yarn:**
-```json
-{
-  "resolutions": {
-    "esbuild": "0.21.5"
-  }
-}
-```
-
-**Python (Poetry):**
-```toml
-[tool.poetry.dependencies]
-pydantic = "^2.0"  # workspace-wide; sub-packages MUST inherit
-```
-
-### Step 4: Author per-package manifest templates
-
-For each `apps/*` and `packages/*` that an agent will own, emit a `package.json.template` (or equivalent) that includes:
-
-- The package's own deps + devDeps appropriate to its role.
-- A header comment listing which version pins are inherited from root.
-- The standard scripts (`build`, `typecheck`, `test`, `lint`) wired to the workspace's tools.
-
-Example template for a backend service package in a TypeScript pnpm workspace:
-
-```json
-{
-  "name": "@<scope>/<package-name>",
-  "version": "0.1.0",
-  "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": {
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "build": "tsc"
-  },
-  "dependencies": {
-    "<TODO: package-specific deps>": ""
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.5.0",
-    "vitest": "^1.6.0"
-  }
-}
-```
-
-The agent that owns this package replaces the `<TODO>` block with package-specific deps but does NOT alter the dev-deps row. This is enforced by convention (skill instructions to the consuming agent) and verifiable by `contract-auditor` post-hoc.
-
-### Step 5: Author `DEPENDENCIES.md`
-
-Document the version policy in human-readable form. Include:
-
-- The pinned versions table with rationale per pin.
-- The per-package boundaries (which package owns which deps).
-- The escalation procedure when an agent needs a dep that isn't yet listed.
-- The migration playbook for bumping a pin.
-
-See `references/dependencies-md-template.md` for the template.
-
-### Step 6: Emit a "dispatch advisory"
-
-Before the orchestrator dispatches implementation agents, emit a short advisory string that goes into each agent's prompt:
-
-```
-Workspace dependency policy:
-- Root package.json includes pnpm.overrides — DO NOT modify.
-- Use the per-package template at packages/<your-package>/package.json.template as the starting point.
-- For new deps not in the template, ADD them to your package's deps but DO NOT pin shared transitives (esbuild, typescript, @types/node, zod) — root overrides handle those.
-- If a dep you need conflicts with an override, escalate to the orchestrator before authoring.
-```
-
-The orchestrator pastes this into every implementation agent's prompt verbatim.
+After steps 1–6, run a dry install in the workspace root before dispatching agents (see `references/pinning-strategies.md` for the per-tool command). A failing dry install means the overrides block is wrong — fix it before dispatching.
 
 ## Right-sizing
 
 Match output complexity to the project:
 
-- **Single-package project** — skip this skill entirely. There's no cross-agent drift surface.
-- **2–3 package monorepo** — author overrides + DEPENDENCIES.md only; skip per-package templates (the agents can read the existing root for cues).
+- **Single-package project** — skip this skill entirely. No cross-agent drift surface exists.
+- **2–3 package monorepo** — author overrides + DEPENDENCIES.md only; skip per-package templates.
 - **4+ packages with parallel agent dispatch** — full output: root overrides + per-package templates + DEPENDENCIES.md + dispatch advisory.
 - **Polyglot monorepo (e.g. TS + Python)** — emit one manifest per language (root `package.json` overrides + workspace-level `pyproject.toml` constraints).
 
 ## Coordination
 
 - **You vs. contract-author** — `contract-author` owns API/data/event boundaries. You own the dependency boundary. Both run in the orchestrator's Phase 4. Run `contract-author` first (it determines which packages exist), then you (you pin their deps).
-- **You vs. infrastructure-agent** — `infrastructure-agent` owns Dockerfiles, CI, deploy configs. You own the package manifests they install from. Your output is upstream of theirs; they pick up the pinned versions automatically.
+- **You vs. infrastructure-agent** — `infrastructure-agent` owns Dockerfiles, CI, deploy configs. You own the package manifests they install from. Your output is upstream of theirs; they pick up pinned versions automatically.
 - **Run order:** plan → contract-author → dependency-coordinator → implementation agents → contract-auditor (verifies no agent broke the pin policy).
 
 ## Output
@@ -199,7 +98,8 @@ Match output complexity to the project:
 
 ## Reference files
 
-- `references/known-conflict-deps.md` — table of frequently-drift transitives per stack (TS/Python/Go/Rust)
+- `references/pinning-strategies.md` — full recipes per stack: enumeration, version-pick logic, root manifest templates for pnpm/npm/yarn/Poetry/uv/Cargo, per-package template patterns, dry-install verification commands
+- `references/known-conflict-deps.md` — table of frequently-drifting transitives per stack (TS/Python/Go/Rust)
 - `references/dependencies-md-template.md` — DEPENDENCIES.md template
 
 ## Composes with

@@ -1,0 +1,29 @@
+{
+  "skill_name": "interactive-doc",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've got deep research notes on how The Hive orchestrator dispatches agents to skills. It's all in markdown with Mermaid diagrams and code references. Turn it into an interactive HTML doc that actually explains how it works visually — not just a wall of text.",
+      "expected_output": "A paired .md (source of truth, Obsidian-native with YAML frontmatter, wiki links, callouts, Mermaid diagrams) and a self-contained .html companion (SVG-based diagrams, collapsibles, on-page nav, styled components). The HTML faithfully renders the .md content without adding new information.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a doc explaining SKILL.md as an operational contract for agents. I want it to teach the concept with a live interactive demo where people can edit a SKILL.md and see how the orchestrator would route to it. Include a comparison table showing SKILL.md vs OpenAPI specs vs Jira tickets.",
+      "expected_output": "Both .md and .html files. The .md has full prose structure with callouts describing what the demo does. The .html has the actual working demo (vanilla JS editor), comparison table, hover-glossary of terms, and follows the concept-explainer pattern.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We borrowed architecture patterns from three projects: Temporal for durable tasks, Ray for distributed dispatch, and Dask for DAG execution. Create a comparison doc showing what we took from each and how they fit into The Hive.",
+      "expected_output": "Paired .md and .html using the comparison doc pattern. Headline comparison table scanning which dimension each project excels at. Side-by-side detail sections for primary abstraction, coupling model, failure handling, observability. Clear synthesis of what-we-borrowed for each.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Workflow A: I have an existing markdown file documenting the Glass UI's panel system (references.md). The .md already has detailed sections, code blocks with file paths, and a Mermaid diagram. Just render it as HTML — don't edit the .md, just make the HTML companion.",
+      "expected_output": "An HTML file next to the source .md that faithfully renders every section, code block, diagram, and callout. The Mermaid diagram becomes a hand-drawn SVG. File references become badges. Wiki links become anchors. No new content added to the HTML beyond what the .md contains.",
+      "files": []
+    }
+  ]
+}

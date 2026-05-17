@@ -2,7 +2,7 @@
 name: context-manager
 version: 1.1.0
 description: |
-  Manage context window usage, compaction strategy, and session handoffs for long-running multi-agent builds. Use this skill when managing context limits, performing session handoffs, compacting conversation history, or coordinating continuation agents. Trigger for any context management, handoff, or session continuation task.
+  Manage context window usage, compaction strategy, and session handoffs for long-running multi-agent builds. Use this skill when managing context limits, performing session handoffs, compacting conversation history, or coordinating continuation agents. Trigger on: "compact this", "handoff this conversation", "we're running out of context", "save state", "transfer to a new session", "context is too full", "summarize this session for the next one", "continue in a fresh session".
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter

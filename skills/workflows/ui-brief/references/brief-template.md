@@ -238,7 +238,7 @@ A bullet list of skills that should naturally trigger during the build, with one
 - `ux-review` (the in-browser review with screenshots — catches "tests pass but UI looks wrong")
 - `superpowers:test-driven-development` (the primitives)
 - `superpowers:verification-before-completion` (load every route, no console errors)
-- `code-reviewer` (the review pass)
+- `code-review-agent` (the review pass)
 - `git-commit` + `git-pr` (the integration commit + PR)
 - `simplify` (after the build, review the diff for reuse and bloat)
 ```

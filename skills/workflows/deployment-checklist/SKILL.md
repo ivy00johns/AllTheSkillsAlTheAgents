@@ -2,7 +2,7 @@
 name: deployment-checklist
 version: 1.1.0
 description: |
-  Run pre-deployment verification checklists before pushing to staging or production. Use this skill when preparing for deployment, running pre-deploy checks, verifying environment configs, or validating build artifacts. Trigger for any deployment preparation or release readiness task.
+  Run pre-deployment verification checklists before pushing to staging or production. Use this skill when preparing for deployment, running pre-deploy checks, verifying environment configs, or validating build artifacts. Trigger on: "pre-deploy check", "deployment checklist", "ready to ship", "is this ready for prod", "deploy readiness", "release checklist", "can we deploy", "verify the build", "pre-flight check".
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter

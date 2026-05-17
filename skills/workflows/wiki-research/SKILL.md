@@ -4,7 +4,7 @@ version: 2.1.0
 description: |
   Use this skill BEFORE any codebase exploration, repo-deep-dive, or raw source reading when
   the project has an Obsidian-style wiki (index.md + wiki/ directory). Always invoke when an
-  orchestrator, code-reviewer, backend-agent, or any role skill needs project context,
+  orchestrator, code-review-agent, backend-agent, or any role skill needs project context,
   architecture understanding, component knowledge, or design decisions. Reading 3–4 wiki
   pages (~2,000 tokens) replaces crawling raw source directories (~100,000–500,000 tokens).
   Trigger on: "how does X work", "what is X", "what patterns does X use", "understand the
@@ -21,7 +21,7 @@ owns:
   shared_read: ["wiki/", "index.md"]
 allowed_tools: ["Read", "Glob", "Grep"]
 composes_with: ["repo-deep-dive", "llm-wiki", "project-profiler"]
-spawned_by: ["orchestrator", "code-reviewer", "repo-deep-dive", "project-profiler", "backend-agent", "frontend-agent", "security-agent", "plan-builder"]
+spawned_by: ["orchestrator", "code-review-agent", "repo-deep-dive", "project-profiler", "backend-agent", "frontend-agent", "security-agent", "plan-builder"]
 ---
 
 # Wiki-First Research Protocol
