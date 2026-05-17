@@ -10,6 +10,19 @@ REPO_SKILLS="$REPO_ROOT/skills"
 CLAUDE_SKILLS="$HOME/.claude/skills"
 CURSOR_SKILLS="$HOME/.cursor/skills-cursor"
 
+# Directories under skills/ that are NOT published — drafts and retired skills.
+# They are excluded from discovery so they never get symlinked into ~/.claude/skills/.
+SKIP_CATEGORIES=("archive" "in-progress")
+
+# Returns 0 if $1 is a skipped category, 1 otherwise.
+_is_skipped_category() {
+  local name="$1"
+  for skip in "${SKIP_CATEGORIES[@]}"; do
+    [[ "$name" == "$skip" ]] && return 0
+  done
+  return 1
+}
+
 # Skill categories in the repo (auto-discovered)
 discover_categories() {
   local cats=()
@@ -17,6 +30,7 @@ discover_categories() {
     [[ -d "$dir" ]] || continue
     local name
     name="$(basename "$dir")"
+    _is_skipped_category "$name" && continue
     cats+=("$name")
   done
   echo "${cats[@]+"${cats[@]}"}"
@@ -30,6 +44,7 @@ discover_skills() {
     [[ -d "$cat_dir" ]] || continue
     local cat
     cat="$(basename "$cat_dir")"
+    _is_skipped_category "$cat" && continue
 
     # Check for skill subdirectories (e.g., meta/skill-audit/SKILL.md)
     local has_subdirs=""

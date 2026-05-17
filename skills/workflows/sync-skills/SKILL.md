@@ -2,7 +2,7 @@
 name: sync-skills
 version: 2.0.0
 description: |
-  Sync skills between this repo and global locations for Claude Code and Cursor using symlinks (default) or copies. Use when the user wants to link, sync, publish, push, or copy skills to Claude Code or Cursor, make repo skills available globally, check sync status, see what's linked vs copied, unlink skills, or mentions "sync skills", "link skills", "publish skills", "skill status", or wants to use repo skills from another project.
+  Sync skills between this repo and global locations for Claude Code and Cursor using symlinks (default) or copies. Use when the user wants to link, sync, publish, push, or copy skills to Claude Code or Cursor, make repo skills available globally, check sync status, see what's linked vs copied, unlink skills, or wants to use repo skills from another project. Trigger on: "sync skills", "link skills", "publish skills", "skill status", "deploy skills globally", "/sync-skills", "publish to claude code", "are my skills linked", "unlink skills".
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -27,7 +27,16 @@ Link or copy skills between this repo and the global skill directories that Clau
 | Claude Code (global) | `~/.claude/skills/` | All Claude Code projects |
 | Cursor (global) | `~/.cursor/skills-cursor/` | All Cursor workspaces |
 
-The repo organizes skills into category directories (`contracts/`, `meta/`, `roles/`, `workflows/`, `orchestrator/`). For Claude Code, symlinks are **flattened** — each individual skill is linked directly under `~/.claude/skills/` (no category subdirs) because Claude Code only discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`. For Cursor, symlinks are created at the category level.
+The repo organizes skills into category directories (`contracts/`, `meta/`, `roles/`, `workflows/`, `orchestrator/`, `git/`). For Claude Code, symlinks are **flattened** — each individual skill is linked directly under `~/.claude/skills/` (no category subdirs) because Claude Code only discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`. For Cursor, symlinks are created at the category level.
+
+### Excluded directories
+
+Two top-level directories under `skills/` are excluded from discovery and never get symlinked:
+
+- `skills/archive/` — retired skills kept as reference-only audit trail
+- `skills/in-progress/` — drafts under active development
+
+The exclusion list lives in `SKIP_CATEGORIES` near the top of `scripts/sync-skills.sh`. Add a new entry there if another staging directory ever gets introduced. The corresponding paths must also be kept out of `.claude-plugin/plugin.json`'s `skills` array — otherwise the plugin would load them even though `sync-skills` doesn't.
 
 ## Quick Reference
 
