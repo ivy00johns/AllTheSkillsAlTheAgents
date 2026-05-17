@@ -1,0 +1,36 @@
+{
+  "name": "skill-madness",
+  "id": "skill-madness",
+  "owner": {
+    "name": "ivy00johns",
+    "url": "https://github.com/ivy00johns"
+  },
+  "metadata": {
+    "description": "All the skills, all the agents, all the chaos — a contract-first multi-agent orchestrator and the 41-skill library it draws from.",
+    "version": "0.1.0",
+    "homepage": "https://github.com/ivy00johns/Skill-Madness",
+    "license": "MIT"
+  },
+  "plugins": [
+    {
+      "name": "skill-madness",
+      "source": "./",
+      "description": "Install all 41 Skill-Madness skills: the 14-phase orchestrator, 9 role agents with exclusive file ownership, 3 contract skills (OpenAPI/AsyncAPI/Pydantic/TS/JSON Schema), 5 git workflow skills, 9 meta/skill-management skills, 13 cross-cutting workflows (plan-builder, repo-deep-dive, ui-brief, mermaid-charts, llm-wiki, …), and the interactive-doc workflow.",
+      "version": "0.1.0",
+      "author": {
+        "name": "ivy00johns"
+      },
+      "keywords": [
+        "orchestrator",
+        "multi-agent",
+        "contract-first",
+        "role-agents",
+        "claude-code",
+        "agent-team",
+        "qa-gate",
+        "parallel-dispatch"
+      ],
+      "category": "workflow"
+    }
+  ]
+}

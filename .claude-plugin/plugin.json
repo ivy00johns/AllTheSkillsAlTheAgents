@@ -1,0 +1,68 @@
+{
+  "name": "skill-madness",
+  "description": "Contract-first multi-agent orchestrator with 38 skills: a 14-phase orchestrator that authors machine-readable contracts before code, dispatches 10 role agents in parallel with exclusive file ownership, and blocks the merge on a structured QA report. Plus meta-skills, git conventions, and cross-cutting workflow tools (plan-builder, repo-deep-dive, ui-brief, mermaid-charts, llm-wiki, …).",
+  "version": "0.1.0",
+  "author": {
+    "name": "ivy00johns",
+    "url": "https://github.com/ivy00johns"
+  },
+  "homepage": "https://github.com/ivy00johns/Skill-Madness",
+  "repository": "https://github.com/ivy00johns/Skill-Madness",
+  "license": "MIT",
+  "keywords": [
+    "orchestrator",
+    "multi-agent",
+    "contract-first",
+    "role-agents",
+    "skills",
+    "claude-code",
+    "agent-team",
+    "qa-gate",
+    "parallel-dispatch"
+  ],
+  "skills": [
+    "./skills/orchestrator",
+
+    "./skills/roles/backend-agent",
+    "./skills/roles/frontend-agent",
+    "./skills/roles/infrastructure-agent",
+    "./skills/roles/qe-agent",
+    "./skills/roles/security-agent",
+    "./skills/roles/performance-agent",
+    "./skills/roles/observability-agent",
+    "./skills/roles/docs-agent",
+    "./skills/roles/db-migration-agent",
+    "./skills/roles/code-review-agent",
+
+    "./skills/contracts/contract-author",
+    "./skills/contracts/contract-auditor",
+
+    "./skills/git/git-commit",
+    "./skills/git/git-pr",
+    "./skills/git/git-pr-feedback",
+    "./skills/git/git-post-merge-cleanup",
+
+    "./skills/meta/skill-writer",
+    "./skills/meta/skill-review",
+    "./skills/meta/skill-update",
+    "./skills/meta/skill-explorer",
+
+    "./skills/workflows/plan-builder",
+    "./skills/workflows/context-manager",
+    "./skills/workflows/deployment-checklist",
+    "./skills/workflows/dependency-coordinator",
+    "./skills/workflows/project-profiler",
+    "./skills/workflows/wiki-research",
+    "./skills/workflows/interactive-doc",
+    "./skills/workflows/settings-consolidator",
+    "./skills/workflows/sync-skills",
+    "./skills/workflows/ui-brief",
+    "./skills/workflows/claude-design-brief",
+    "./skills/workflows/mermaid-charts",
+    "./skills/workflows/nano-banana",
+    "./skills/workflows/playwright",
+    "./skills/workflows/repo-deep-dive",
+    "./skills/workflows/llm-wiki",
+    "./skills/workflows/railway-deploy"
+  ]
+}
