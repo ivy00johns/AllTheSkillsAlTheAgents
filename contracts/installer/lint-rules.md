@@ -115,13 +115,13 @@ Exit codes:
 ## Output Format (text)
 
 ```
-Linting 38 skills...
+Linting 44 skills...
 
 ERROR  skills/roles/backend-agent/SKILL.md:2  name 'backend' does not match directory 'backend-agent'
 WARN   skills/workflows/ui-brief/SKILL.md     description is 215 chars (target ≤200)
 WARN   skills/meta/skill-audit/SKILL.md       composes_with references unknown skill 'skill-deepreview' (did you mean 'skill-deep-review'?)
 
-Results: 1 error, 2 warnings across 38 skills.
+Results: 1 error, 2 warnings across 44 skills.
 FAILED: fix the errors above before merging.
 ```
 

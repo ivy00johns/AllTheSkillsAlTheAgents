@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 40 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
+A multi-agent orchestration toolkit for Claude Code — 44 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
 
 The toolkit targets Claude Code as the primary host but the SKILL.md format is platform-agnostic — Claude.ai, Copilot CLI, Codex, and Gemini CLI all consume it. Skills should describe work in terms of capabilities ("read the file", "run the command") rather than Claude-Code-specific tool names where reasonable, so the same skill body works across hosts.
 
@@ -37,11 +37,11 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 ## Skill Categories
 
 - **`skills/orchestrator/`** (1) — Entry point. 14-phase build playbook, runtime detection, contract-first coordination. References: phase-guide, team-sizing, circuit-breaker, handoff-protocol.
-- **`skills/roles/`** (9) — Implementation agents (backend, frontend, infrastructure, qe, security, docs, observability, db-migration, performance). Each has a SKILL.md + reference files with validation checklists.
+- **`skills/roles/`** (10) — Implementation agents (backend, frontend, infrastructure, qe, security, performance, observability, docs, db-migration, code-review). Each has a SKILL.md + reference files with validation checklists.
 - **`skills/contracts/`** (2) — contract-author (generates contracts from templates) and contract-auditor (verifies implementations match). Templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema.
-- **`skills/meta/`** (8) — skill-writer, project-profiler, code-reviewer, skill-audit, skill-deep-review, skill-improvement-plan, skill-updater, wiki-research.
-- **`skills/git/`** (5) — Git workflow conventions: git-commit, git-pr, git-pr-feedback, git-branch-cleanup, git-clean-worktrees.
-- **`skills/workflows/`** (12) — context-manager, deployment-checklist, sync-skills, mermaid-charts, nano-banana, railway-deploy, plan-builder, settings-consolidator, llm-wiki, playwright, repo-deep-dive, ui-brief.
+- **`skills/meta/`** (4) — skill-writer, skill-review, skill-update, skill-explorer.
+- **`skills/git/`** (4) — Git workflow conventions: git-commit, git-pr, git-pr-feedback, git-post-merge-cleanup.
+- **`skills/workflows/`** (23) — plan-builder, context-manager, deployment-checklist, dependency-coordinator, project-profiler, wiki-research, interactive-doc, settings-consolidator, sync-skills, ui-brief, claude-design-brief, mermaid-charts, nano-banana, playwright, repo-deep-dive, llm-wiki, railway-deploy, architecture-rescue, caveman, diagnose-loop, grill-me, maintain-context, zoom-out.
 
 ## Key Design Decisions
 
