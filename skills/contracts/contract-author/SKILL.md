@@ -17,6 +17,20 @@ spawned_by: ["orchestrator"]
 
 # Contract Author
 
+> **Tradeoff:** Biases toward upfront design over fast iteration. For prototypes, skip contracts and use direct module imports.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
+
+<what-to-do>
+
 Generate machine-readable integration contracts before any implementation begins. Contracts are the foundation of reliable multi-agent builds — specification problems cause ~42% of multi-agent failures.
 
 ## Role
@@ -176,6 +190,14 @@ Match contract complexity to the project. A personal habit tracker with SQLite d
 
 Over-engineered contracts waste agent time implementing unnecessary complexity.
 
+## Anti-Pattern
+
+> **Forbidden:** Authoring contracts speculatively for future features. Author only contracts the current dispatch needs.
+
+</what-to-do>
+
+<supporting-info>
+
 ## Output
 
 Your deliverables (machine-readable formats — not markdown narratives):
@@ -199,3 +221,5 @@ The `schemas/` directory is for standalone JSON Schema files when the project us
 ## Naming Convention Rule
 
 When the API uses camelCase (OpenAPI/TypeScript) but the backend uses snake_case (Python), document the transform explicitly in `contracts/README.md`. The Pydantic template includes `alias_generator=to_camel` for this — both sides must agree on the wire format.
+
+</supporting-info>

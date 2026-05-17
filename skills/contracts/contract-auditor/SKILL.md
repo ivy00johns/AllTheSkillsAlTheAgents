@@ -1,8 +1,8 @@
 ---
 name: contract-auditor
 version: 1.1.0
-description: |
-  Audit implementations against integration contracts to find mismatches before integration testing. Use this skill when verifying API implementations match their contracts, checking frontend API calls match backend endpoints, or validating data layer conformance. Trigger for any contract compliance verification task within an orchestrated build.
+disable-model-invocation: true
+description: "Orchestrator-dispatched only. Audits implementations against integration contracts to find mismatches before integration testing. Composed by orchestrator during multi-agent builds. Not user-invocable."
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +17,19 @@ spawned_by: ["orchestrator"]
 
 # Contract Auditor
 
+> **Pipeline position.** Runs after implementation agents complete. Reads contracts from `contract-author`. Outputs findings consumed by `qe-agent`.
+
 Audit implementations against their integration contracts. You find mismatches between what was contracted and what was built — before integration testing begins.
+
+## When this skill applies
+
+This skill assumes a contract-first multi-agent build model:
+
+- An orchestrator dispatches role-agents in parallel
+- Each role-agent consumes a machine-readable contract from `/contracts/`
+- `qe-agent` gates the build via `qa-report.json`
+
+For single-agent or ad-hoc work, this skill is not the right tool.
 
 ## Role
 
