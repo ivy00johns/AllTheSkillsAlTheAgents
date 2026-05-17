@@ -15,6 +15,8 @@ composes_with: []
 spawned_by: []
 ---
 
+# caveman
+
 > Adapted from mattpocock/skills `caveman` (MIT). Same behavior, same examples.
 
 ## Persistence
