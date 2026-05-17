@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.7.2
+version: 1.8.0
 description: |
   Lead coordinator and conductor for multi-agent builds using Claude Code. Takes a plan or mission document, executes its phases end-to-end, and orchestrates parallel role-agents with a contract-first architecture. The orchestrator is the conductor — not the only player: it INVOKES other skills (nano-banana for imagery, ui-ux-pro-max + frontend-design for UI quality, ux-review for post-build validation, repo-deep-dive for reference research, llm-wiki for project knowledge bases, mermaid-charts for diagrams, deployment-checklist for ship readiness) at the appropriate phase, and DISPATCHES role-agents (backend, frontend, db, infra, security, observability, performance, docs, qe) for parallel implementation. Use this skill when building a project with multiple agents, coordinating an agent team build, executing a multi-phase mission document, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", a "MISSION.md" file, or wants to split work across multiple Claude sessions. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build. It does NOT preempt brainstorming, plan-builder, writing-plans, frontend-design, ui-ux-pro-max, nano-banana, claude-design-brief, ui-brief, repo-deep-dive, llm-wiki, ux-review, feature-dev, or claude-mem — it COMPOSES with them, invoking each at the phase where it earns its keep.
 requires_agent_teams: false
@@ -86,15 +86,22 @@ If the user says "merge it", "push to main", or "create a PR" — then and only 
    skill-trigger heuristic (when to fire each skill).
 
    **Skills mentioned in the mission but not invoked are a Definition-of-Done failure unless a written reason is recorded.**
-5. Size the team based on the work — see `references/team-sizing.md`
-6. **Pre-build creative + research skills** — invoke these BEFORE contracts where the mission asks for them: `nano-banana` (generates real seed imagery — hero banners, product photos, category icons), `claude-design-brief` or `ui-brief` (design direction document), `repo-deep-dive` (reference repo analysis), `llm-wiki` (project knowledge base bootstrap), `mermaid-charts` (architecture diagrams). These produce ARTIFACTS the agents will consume — running them first means agents get real images and real architecture refs instead of placeholders.
-7. Author contracts (the critical phase) — invoke the `contract-author` skill
-8. Spawn agents in parallel with distilled prompts — see `references/agent-spawning.md` for template, AFK/HITL classification, and a worked example. For frontend-agent dispatch, REQUIRE the agent to invoke `frontend-design` and `ui-ux-pro-max` during their build (not just mention them — actually call the Skill tool).
-9. **Spawn QE agent for testing** — this is mandatory, not optional (see below)
-10. Coordinate and validate (wave gates between every parallel wave)
-11. Gate on QA report
-12. **Post-build verification** — in this order: (a) confirm the dev stack is actually listening (`curl -fsS http://localhost:<port>/` or `lsof -i :<port>` — a "validation pass" against a dead port is the most expensive way to declare success); (b) invoke `render-sanity` for the four objective checks (visible-text smell scan, click-through every list, signed-out matrix, signed-in matrix) — this is a hard gate, the build is NOT done if render-sanity returns FAIL; (c) invoke `ux-review` for the subjective pass (visual hierarchy, responsive, accessibility); (d) `code-review` and `security-review` as a second pass; (e) `deployment-checklist` if shipping. None of these are optional when the mission asks for them.
-13. **Mission completion check** — re-read the original plan and tick every numbered step. For any step that wasn't done, write a one-line reason in `MISSION_SKILLS.md` or the build's final summary. The build isn't done until every numbered step is either ✅ done or has a written reason for being deferred.
+5. **Project agent-config audit** — read the three files under `docs/agents/` if they exist:
+   - `docs/agents/domain-docs.md` — declares single-context vs multi-context layout (where `CONTEXT.md` and `docs/adr/` live).
+   - `docs/agents/contract-format.md` — declares the repo's preferred contract format and output paths; `contract-author` honors this in Phase 4.
+   - `docs/agents/work-item-tracker.md` — declares where work items are logged (Beads `bd` CLI, GitHub issues, GitLab issues, or local `briefs/` markdown). Use this to wire the build's work-item handoff at the end.
+
+   If any of the three are missing, surface one prompt to the user: *"This repo isn't configured for Skill-Madness — `docs/agents/<file>` is missing. Run `/setup-project-skills` to make the choices durable, or I'll proceed with defaults (single-context, format-by-detection, local `briefs/`)."* Then proceed with defaults if they say yes. Do not silently default — these are sticky decisions that re-litigate themselves on every build without the config.
+
+6. Size the team based on the work — see `references/team-sizing.md`
+7. **Pre-build creative + research skills** — invoke these BEFORE contracts where the mission asks for them: `nano-banana` (generates real seed imagery — hero banners, product photos, category icons), `claude-design-brief` or `ui-brief` (design direction document), `repo-deep-dive` (reference repo analysis), `llm-wiki` (project knowledge base bootstrap), `mermaid-charts` (architecture diagrams). These produce ARTIFACTS the agents will consume — running them first means agents get real images and real architecture refs instead of placeholders.
+8. Author contracts (the critical phase) — invoke the `contract-author` skill
+9. Spawn agents in parallel with distilled prompts — see `references/agent-spawning.md` for template, AFK/HITL classification, and a worked example. For frontend-agent dispatch, REQUIRE the agent to invoke `frontend-design` and `ui-ux-pro-max` during their build (not just mention them — actually call the Skill tool).
+10. **Spawn QE agent for testing** — this is mandatory, not optional (see below)
+11. Coordinate and validate (wave gates between every parallel wave)
+12. Gate on QA report
+13. **Post-build verification** — in this order: (a) confirm the dev stack is actually listening (`curl -fsS http://localhost:<port>/` or `lsof -i :<port>` — a "validation pass" against a dead port is the most expensive way to declare success); (b) invoke `render-sanity` for the four objective checks (visible-text smell scan, click-through every list, signed-out matrix, signed-in matrix) — this is a hard gate, the build is NOT done if render-sanity returns FAIL; (c) invoke `ux-review` for the subjective pass (visual hierarchy, responsive, accessibility); (d) `code-review` and `security-review` as a second pass; (e) `deployment-checklist` if shipping. None of these are optional when the mission asks for them.
+14. **Mission completion check** — re-read the original plan and tick every numbered step. For any step that wasn't done, write a one-line reason in `MISSION_SKILLS.md` or the build's final summary. The build isn't done until every numbered step is either ✅ done or has a written reason for being deferred.
 
 For the full 14-phase playbook, read `references/phase-guide.md`. For mission-interpretation patterns and the skill-trigger heuristic table, read `references/mission-interpretation.md`.
 

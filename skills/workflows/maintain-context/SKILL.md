@@ -1,6 +1,6 @@
 ---
 name: maintain-context
-version: 1.0.0
+version: 1.1.0
 description: "Maintain a project's CONTEXT.md domain glossary and docs/adr/ decision records inline as understanding crystallizes. When the user uses an ambiguous term, propose the canonical form and update CONTEXT.md right there. When a hard-to-reverse decision is made, offer an ADR — but ONLY when all three are true: hard to reverse, surprising without context, real trade-off involved. If any condition is missing, skip. Use this skill after any architectural discussion, requirements clarification, or when shared terminology starts to drift. Trigger on: 'update the glossary', 'add to CONTEXT', 'record this as an ADR', 'what do we call this', 'is this the right term', 'we just decided something', 'document this decision'."
 requires_agent_teams: false
 requires_claude_code: true
@@ -61,6 +61,13 @@ See `references/context-format.md` for full structure and three worked examples.
 ## Cross-reference with code
 
 When the user states behavior — "Subscribers get a 30-day trial" — verify against the code before recording it. Use `Grep` for the relevant constant or model field. If the code disagrees, stop and ask which is wrong. Do not record a glossary entry or ADR that contradicts the codebase: one of them is going to be wrong, and the artifact that's supposed to disambiguate will become the thing that confuses people.
+
+## Project layout — read `docs/agents/domain-docs.md` first
+
+Before writing or reading any glossary entry or ADR, check whether the repo has `docs/agents/domain-docs.md`. That file (written by `/setup-project-skills`) declares whether this repo uses a single-context or multi-context layout, which controls where `CONTEXT.md` and `docs/adr/` live.
+
+- **If `docs/agents/domain-docs.md` exists:** read it. A single-context layout puts `CONTEXT.md` at the repo root and ADRs at `docs/adr/`. A multi-context monorepo puts them per-app at `apps/<app>/CONTEXT.md` and `apps/<app>/docs/adr/`. Use the declared paths — do not invent your own.
+- **If `docs/agents/domain-docs.md` is missing:** default to single-context (root `CONTEXT.md` and `docs/adr/`) and surface one prompt: *"This repo isn't configured for Skill-Madness yet. Run `/setup-project-skills` to make the layout choice durable; I'll use single-context defaults for this entry."* Do not silently assume — the wrong default in a monorepo lands an entry in the wrong vault.
 
 ## Lazy file creation
 

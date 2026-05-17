@@ -1,6 +1,6 @@
 ---
 name: contract-author
-version: 1.2.0
+version: 1.3.0
 description: |
   Generate machine-readable integration contracts (API, data layer, shared types, events) before any implementation begins in multi-agent builds. This is orchestrator Phase 4 — contracts are written here before any implementation agent is spawned. Use this skill when authoring API contracts, OpenAPI specs, AsyncAPI specs, Pydantic models, TypeScript interfaces, JSON Schema definitions, data layer interfaces, shared type schemas, integration boundaries between agents, or domain business rules for multi-agent coordination. Trigger for any contract creation task, especially before spawning implementation agents. Also trigger when the user says "write the API contract", "define the shared types", "spec out the endpoints", "create the OpenAPI", "author the contract", or when the orchestrator needs contracts authored for a plan document. Bundles 6 templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema, and a data-layer YAML — pick the one matching the project's stack.
 requires_agent_teams: false
@@ -43,7 +43,17 @@ Without contracts, agents independently invent their own endpoint URLs, response
 
 ## Process
 
-### 0. Extract Entities from the Plan
+### 0a. Read project config — `docs/agents/contract-format.md`
+
+Before extracting entities or touching a template, check for `docs/agents/contract-format.md`. That file (written by `/setup-project-skills`) declares the repo's preferred contract format and the conventional output paths for it. When present, use it as the source of truth for the rest of this skill:
+
+- It names one format: **OpenAPI**, **Pydantic**, **TypeScript**, or **JSON Schema**.
+- It names the output directory and filename convention (e.g. `contracts/openapi/<name>.openapi.yaml`).
+- It may name per-agent consumption notes (which agent generates types from the spec, which agent gates conformance).
+
+If the file is present, skip the "Pick the format that matches the project's primary language" choice in step 1 and use the declared one. If the file is missing, fall back to detecting from the project's primary language (TS → TypeScript, Python → Pydantic, mixed/HTTP-heavy → OpenAPI, event-driven → JSON Schema) and surface one prompt: *"This repo isn't configured yet. Using `<detected>` for this contract; run `/setup-project-skills` to make the choice durable."* Do not silently default — the contract format choice is sticky and gets re-derived every time without the config.
+
+### 0b. Extract Entities from the Plan
 
 Before writing any contract, read the plan and extract:
 

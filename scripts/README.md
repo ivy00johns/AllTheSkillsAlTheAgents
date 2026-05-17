@@ -60,7 +60,7 @@ See `contracts/installer/per-tool-output-spec.md` for the full specification. Su
 - Idempotent: re-running produces byte-identical output
 - Lossy: Claude-Code-only frontmatter fields (`owns`, `allowed_tools`, `composes_with`, `spawned_by`) are stripped with a stderr warning per skill
 - Skills marked `requires_claude_code: true` are skipped for non-Claude-Code targets
-- Stderr summary at end: `[convert] processed 44 skills across 11 tools (0 errors, 0 warnings)`
+- Stderr summary at end: `[convert] processed 46 skills across 11 tools (0 errors, 0 warnings)`
 
 **Examples:**
 
@@ -246,13 +246,13 @@ See `contracts/installer/lint-rules.md` for the authoritative reference and seve
 **Output Format (text):**
 
 ```
-Linting 44 skills...
+Linting 46 skills...
 
 ERROR  skills/roles/backend-agent/SKILL.md:2  name 'backend' does not match directory 'backend-agent'
 WARN   skills/workflows/ui-brief/SKILL.md     description is 215 chars (target ≤200)
 WARN   skills/meta/skill-audit/SKILL.md       composes_with references unknown skill 'skill-deepreview'
 
-Results: 1 error, 2 warnings across 44 skills.
+Results: 1 error, 2 warnings across 46 skills.
 FAILED: fix the errors above before merging.
 ```
 
