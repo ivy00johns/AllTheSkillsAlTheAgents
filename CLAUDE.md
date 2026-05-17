@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 38 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
+A multi-agent orchestration toolkit for Claude Code — 40 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
 
 The toolkit targets Claude Code as the primary host but the SKILL.md format is platform-agnostic — Claude.ai, Copilot CLI, Codex, and Gemini CLI all consume it. Skills should describe work in terms of capabilities ("read the file", "run the command") rather than Claude-Code-specific tool names where reasonable, so the same skill body works across hosts.
 

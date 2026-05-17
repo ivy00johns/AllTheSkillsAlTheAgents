@@ -113,3 +113,9 @@ PRs merge with a **squash merge** by default unless the branch has a meaningful 
 - [ ] Type is one of the allowed types above
 - [ ] Optional body explains the *why*, not the *what*
 - [ ] Branch: `type/short-description`
+
+---
+
+## Anti-Pattern
+
+> **Forbidden:** Amending commits unless the user explicitly asks. After a pre-commit hook failure, create a NEW commit.

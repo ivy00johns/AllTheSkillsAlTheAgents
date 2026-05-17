@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/ivy00johns/Skill-Madness/actions/workflows/lint-skills.yml"><img src="https://github.com/ivy00johns/Skill-Madness/actions/workflows/lint-skills.yml/badge.svg" alt="Skill Lint" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
-  <img src="https://img.shields.io/badge/skills-39-success.svg" alt="39 skills" />
+  <img src="https://img.shields.io/badge/skills-40-success.svg" alt="40 skills" />
   <img src="https://img.shields.io/badge/role%20agents-9-blueviolet.svg" alt="9 role agents" />
   <img src="https://img.shields.io/badge/orchestrator-14%20phases-success.svg" alt="14-phase orchestrator" />
   <img src="https://img.shields.io/badge/hosts-11-orange.svg" alt="11 hosts" />
@@ -40,13 +40,13 @@ Every AI coding tool ships the same trap: one agent, one context window, one set
 - 📜 **Contract-first** — `contract-author` writes OpenAPI / AsyncAPI / Pydantic / TypeScript / JSON Schema *before* a line of implementation. `contract-auditor` verifies every shipped module against the spec. Agents can't drift; the contract is the truth.
 - 🤖 **Nine role agents, exclusive ownership** — backend, frontend, infrastructure, QE, security, docs, observability, db-migration, performance. Each declares `owns.directories` / `owns.files` in its frontmatter. No two agents touch the same path. Conflicts get resolved before spawn, not after.
 - 🛡️ **QA gate that blocks** — `qe-agent` emits a `qa-report.json` with critical / high / medium / low findings plus contract-conformance and security scores. The orchestrator gates the merge on the report. Agents can't self-declare "done."
-- 🪜 **Progressive disclosure** — frontmatter (~100 tokens) always loaded, body loaded on trigger, references loaded on demand. A 39-skill library stays cheap to host.
+- 🪜 **Progressive disclosure** — frontmatter (~100 tokens) always loaded, body loaded on trigger, references loaded on demand. A 40-skill library stays cheap to host.
 - 🔁 **Two-runtime degradation** — Agent Teams (parallel tmux) → subagents (Task tool) → sequential. The orchestrator picks the highest mode the host supports; role skills work standalone in any of them.
-- 🧰 **39 skills, six categories, all CI-linted** — orchestrator, roles, contracts, meta-skills (skill-writer, skill-explorer, audit, deep-review), git workflow conventions, and 12 cross-cutting workflow skills (plan-builder, repo-deep-dive, ui-brief, mermaid-charts, …). Frontmatter, body length, and cross-skill ownership all gated on every push.
+- 🧰 **40 skills, six categories, all CI-linted** — orchestrator, roles, contracts, meta-skills (skill-writer, skill-explorer, audit, deep-review), git workflow conventions, and 13 cross-cutting workflow skills (plan-builder, repo-deep-dive, ui-brief, mermaid-charts, render-sanity, …). Frontmatter, body length, and cross-skill ownership all gated on every push.
 - 🌐 **Portable across eleven hosts** — `SKILL.md` is the canonical source; converters emit Claude Code, Copilot, Cursor, Aider, Windsurf, OpenCode, Qwen, OpenClaw, Gemini CLI, Antigravity, and Kimi formats. The orchestrator's parallel-dispatch metadata is Claude-Code-specific, but everything else (role definitions, contracts, workflows, git conventions, meta-skills) ports cleanly. See [Also works on ten other hosts](#-also-works-on-ten-other-hosts).
 
 > **Status — read before you pitch this to anyone:**
-> - **The orchestrator + 39-skill library is the mature part.** All bodies under 500 lines, zero ownership conflicts, zero broken cross-references, full Ubuntu + macOS lint matrix on every push.
+> - **The orchestrator + 40-skill library is the mature part.** All bodies under 500 lines, zero ownership conflicts, zero broken cross-references, full Ubuntu + macOS lint matrix on every push.
 > - **Claude Code is the end-to-end-verified host.** Multi-agent dispatch with file-ownership exclusivity and the `qa-report.json` gate runs live on Claude Code today. The other ten hosts receive skill *content* but don't run the orchestrator's parallel dispatch.
 > - **Lossy conversion is announced.** When a skill is converted to a non-Claude-Code host, orchestration-only fields (`allowed_tools`, `owns`, `composes_with`, `spawned_by`, `requires_agent_teams`) are stripped with a stderr line per skill. Skills marked `requires_claude_code: true` are skipped entirely for those targets. See `contracts/installer/per-tool-output-spec.md`.
 
@@ -66,6 +66,23 @@ Every AI coding tool ships the same trap: one agent, one context window, one set
 
 ### Install for Claude Code
 
+Two install paths. Pick one.
+
+#### Option A — Claude Code plugin manager (recommended for users)
+
+From inside Claude Code:
+
+```text
+/plugin marketplace add ivy00johns/Skill-Madness
+/plugin install skill-madness@skill-madness
+```
+
+That installs all 41 skills into Claude Code's plugin storage. No clone, no symlink, no edits-to-the-repo workflow. Use this if you just want the skills.
+
+To update later: `/plugin update skill-madness`.
+
+#### Option B — Clone + `/sync-skills` (recommended for contributors)
+
 Clone, then run `/sync-skills` from inside Claude Code. It creates flattened symlinks at `~/.claude/skills/<skill-name>` so edits in the repo are live in every session — no rebuild step.
 
 ```bash
@@ -77,6 +94,8 @@ cd Skill-Madness
 ```
 
 If you'd rather copy than symlink, the underlying script accepts `--copy` instead of `--link`. See `skills/workflows/sync-skills/SKILL.md`.
+
+Use this if you want to author skills, iterate on them, or contribute upstream.
 
 ### Install for any of the other ten hosts
 
@@ -113,79 +132,129 @@ Or invoke any skill standalone:
 
 ## 🧬 Architecture
 
-```
-                       ┌──────────────────┐
-                       │   orchestrator   │   14-phase build playbook
-                       │   (entry point)  │   runtime detection · team sizing
-                       └────────┬─────────┘   circuit breaker · handoff protocol
-                                │
-            ┌───────────────────┼────────────────────┐
-            ▼                   ▼                    ▼
-   ┌────────────────┐  ┌────────────────┐  ┌──────────────────┐
-   │   contracts/   │  │     roles/     │  │      meta/       │
-   │   (3 skills)   │  │   (9 agents)   │  │   (9 skills)     │
-   ├────────────────┤  ├────────────────┤  ├──────────────────┤
-   │ contract-author│  │ backend        │  │ skill-writer     │
-   │ contract-audit │  │ frontend       │  │ skill-explorer   │
-   │ dep-coordinator│  │ infrastructure │  │ skill-audit      │
-   └────────────────┘  │ qe (QA gate)   │  │ skill-deep-review│
-                       │ security       │  │ skill-improvement│
-                       │ docs           │  │ skill-updater    │
-                       │ observability  │  │ project-profiler │
-                       │ db-migration   │  │ code-reviewer    │
-                       │ performance    │  │ wiki-research    │
-                       └────────────────┘  └──────────────────┘
+The orchestrator sits above six skill categories — every build pulls from this library, every category lints clean, every category ports to all eleven hosts.
 
-       ┌──────────────────────────────┐    ┌──────────────────┐
-       │           git/               │    │    workflows/    │
-       │         (5 skills)           │    │   (12 skills)    │
-       ├──────────────────────────────┤    ├──────────────────┤
-       │ git-commit                   │    │ context-manager  │
-       │ git-pr                       │    │ deployment-check │
-       │ git-pr-feedback              │    │ sync-skills      │
-       │ git-branch-cleanup           │    │ plan-builder     │
-       │ git-clean-worktrees          │    │ repo-deep-dive   │
-       └──────────────────────────────┘    │ settings-consol  │
-                                           │ llm-wiki         │
-                                           │ mermaid-charts   │
-                                           │ playwright       │
-                                           │ nano-banana      │
-                                           │ railway-deploy   │
-                                           │ ui-brief         │
-                                           └──────────────────┘
+```mermaid
+flowchart TB
+    orch["👑 <b>orchestrator</b><br/><sub>14-phase build playbook · runtime detection<br/>team sizing · circuit breaker · handoff protocol</sub>"]:::entry
+
+    subgraph contracts["📜 contracts/ — 3 skills"]
+        direction TB
+        ca[contract-author]
+        cau[contract-auditor]
+        dc[dependency-coordinator]
+    end
+
+    subgraph roles["🤖 roles/ — 9 agents · exclusive file ownership"]
+        direction TB
+        be[backend]
+        fe[frontend]
+        infra[infrastructure]
+        qe["qe<br/><sub>(QA gate)</sub>"]:::gate
+        sec[security]
+        rdocs[docs]
+        obs[observability]
+        dbm[db-migration]
+        perf[performance]
+    end
+
+    subgraph meta["🧠 meta/ — 9 skills"]
+        direction TB
+        sw[skill-writer]
+        sx[skill-explorer]
+        sa[skill-audit]
+        sdr[skill-deep-review]
+        sip[skill-improvement-plan]
+        su[skill-updater]
+        pp[project-profiler]
+        crv[code-reviewer]
+        wr[wiki-research]
+    end
+
+    subgraph gitcat["🔁 git/ — 5 skills"]
+        direction TB
+        gcm[git-commit]
+        gpr[git-pr]
+        gpf[git-pr-feedback]
+        gbc[git-branch-cleanup]
+        gcw[git-clean-worktrees]
+    end
+
+    subgraph workflows["⚙️ workflows/ — 13 skills"]
+        direction TB
+        cm[context-manager]
+        dch[deployment-checklist]
+        ss[sync-skills]
+        pb[plan-builder]
+        rdd[repo-deep-dive]
+        sco[settings-consolidator]
+        lw[llm-wiki]
+        mc[mermaid-charts]
+        pw[playwright]
+        rs[render-sanity]
+        nb[nano-banana]
+        rd[railway-deploy]
+        ub[ui-brief]
+    end
+
+    orch --> contracts
+    orch --> roles
+    orch --> meta
+    orch --> gitcat
+    orch --> workflows
+
+    classDef entry fill:#7c3aed,stroke:#4c1d95,color:#fff,stroke-width:2px
+    classDef gate fill:#dc2626,stroke:#7f1d1d,color:#fff,stroke-width:1.5px
 ```
 
 ### How a build flows
 
-```
-    You ──▶  orchestrator  ──▶  detect runtime  ──▶  size team  ──▶  spawn
-                    │
-                    ▼
-             contract-author writes OpenAPI / Pydantic / TS specs FIRST
-                    │
-                    ▼
-   ┌────────────────┼────────────────┬─────────────────┐
-   ▼                ▼                ▼                 ▼
- backend         frontend         infrastructure      docs
- (owns api/)     (owns web/)      (owns infra/)       (owns docs/)
-   │                │                │                 │
-   └─────── exclusive file ownership — no overlapping writes ──────┐
-                                                                    ▼
-                                  contract-auditor + qe-agent + security-agent
-                                                    │
-                                                    ▼
-                                          qa-report.json gate
-                                                    │
-                                  ┌─────────────────┴──────────────────┐
-                                  ▼                                    ▼
-                              CRITICAL → block                pass → ship
+A one-line build request enters the orchestrator and exits as a shipped artifact only after the `qe-agent` writes a passing `qa-report.json`. Every other path blocks the merge.
+
+```mermaid
+flowchart TB
+    user(["🧑 You"]) -->|"build X — use an agent team"| orch[👑 orchestrator]
+    orch --> detect[/"detect runtime<br/><sub>Agent Teams · subagents · sequential</sub>"/]
+    detect --> size[/"size team"/]
+    size --> contracts["📜 <b>contract-author</b><br/><sub>OpenAPI · Pydantic · TypeScript<br/>written BEFORE any implementation</sub>"]:::contract
+
+    contracts --> dispatch{{"⚡ parallel dispatch<br/><sub>exclusive file ownership · no overlapping writes</sub>"}}
+
+    subgraph parallel["isolated worktrees"]
+        direction LR
+        be["🛠 backend<br/><sub>owns api/</sub>"]
+        fe["🎨 frontend<br/><sub>owns web/</sub>"]
+        infra["📦 infrastructure<br/><sub>owns infra/</sub>"]
+        docs["📚 docs<br/><sub>owns docs/</sub>"]
+    end
+
+    dispatch --> be
+    dispatch --> fe
+    dispatch --> infra
+    dispatch --> docs
+
+    be --> validate
+    fe --> validate
+    infra --> validate
+    docs --> validate
+
+    validate["🔬 contract-auditor<br/>+ qe-agent + security-agent"]:::validate
+    validate --> gate{"🚦 qa-report.json<br/>gate"}:::gate
+    gate -- "CRITICAL findings" --> block[/"⛔ block merge"/]:::fail
+    gate -- "all checks pass" --> ship[/"🚀 ship"/]:::pass
+
+    classDef contract fill:#1e40af,stroke:#1e3a8a,color:#fff,stroke-width:2px
+    classDef validate fill:#7c3aed,stroke:#5b21b6,color:#fff
+    classDef gate fill:#f59e0b,stroke:#b45309,color:#fff,stroke-width:2px
+    classDef fail fill:#dc2626,stroke:#7f1d1d,color:#fff
+    classDef pass fill:#16a34a,stroke:#14532d,color:#fff
 ```
 
 ---
 
 ## 🧰 Skill catalog
 
-39 skills organized into six categories. All bodies under 500 lines, all frontmatter validated, zero ownership conflicts, zero broken cross-references.
+40 skills organized into six categories. All bodies under 500 lines, all frontmatter validated, zero ownership conflicts, zero broken cross-references.
 
 <details>
 <summary><b>📚 Full skill table</b> (click to expand)</summary>
@@ -229,8 +298,9 @@ Or invoke any skill standalone:
 | 35 | `mermaid-charts` | workflow | Expert-quality diagrams (15–30+ node systems) |
 | 36 | `playwright` | workflow | Browser-based E2E + screenshots with visible Chrome |
 | 37 | `nano-banana` | workflow | Google Gemini Imagen 4 image generation |
-| 38 | `railway-deploy` | workflow | Deploy to Railway (Dockerfile, multi-service, GraphQL API) |
-| 39 | `ui-brief` | workflow | Opinionated UI design briefs (greenfield + rebuild) |
+| 38 | `render-sanity` | workflow | Outcome gate before "build done": smell scan, click-through every list, signed-out + signed-in matrices |
+| 39 | `railway-deploy` | workflow | Deploy to Railway (Dockerfile, multi-service, GraphQL API) |
+| 40 | `ui-brief` | workflow | Opinionated UI design briefs (greenfield + rebuild) |
 
 </details>
 
@@ -244,13 +314,13 @@ Or invoke any skill standalone:
 ├── CLAUDE.md                         # project guidance for Claude Code
 ├── AGENTS.md                         # shared instructions for AI agents
 │
-├── skills/                           # the canonical skill library (39)
+├── skills/                           # the canonical skill library (40)
 │   ├── orchestrator/                 # 1 — entry point
 │   ├── roles/                        # 9 — implementation agents
 │   ├── contracts/                    # 3 — contract-author / -auditor / dep-coord
 │   ├── meta/                         # 9 — skills that manage skills
 │   ├── git/                          # 5 — git workflow conventions
-│   └── workflows/                    # 12 — cross-cutting process skills
+│   └── workflows/                    # 13 — cross-cutting process skills
 │
 ├── scripts/                          # multi-tool installer
 │   ├── convert.sh                    # SKILL.md → 11 host-native formats
@@ -396,7 +466,7 @@ Almost always a `pyyaml` version skew. CI installs `pyyaml` explicitly on macOS 
 </details>
 
 <details>
-<summary><b>"My non-Claude-Code host doesn't see all 39 skills"</b></summary>
+<summary><b>"My non-Claude-Code host doesn't see all 40 skills"</b></summary>
 
 Expected. Skills with `requires_claude_code: true` (notably the `orchestrator` and most of `roles/`) are skipped for hosts that can't execute multi-agent dispatch. Run `./scripts/convert.sh --verbose` to see the skip list per host.
 </details>
@@ -423,7 +493,7 @@ Set the override env var documented in `scripts/README.md` (e.g. `CURSOR_RULES_D
 
 ## 🗺️  Roadmap
 
-- [x] **Skill library** — 39 skills, six categories, all linted
+- [x] **Skill library** — 40 skills, six categories, all linted
 - [x] **Multi-tool installer** — convert / install / lint, eleven host adapters
 - [x] **CI matrix** — Ubuntu + macOS lint on every push
 - [x] **Contract-first specs** — OpenAPI / AsyncAPI / Pydantic / TypeScript / JSON Schema templates

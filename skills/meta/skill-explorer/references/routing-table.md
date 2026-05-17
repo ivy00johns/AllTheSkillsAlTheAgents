@@ -40,13 +40,12 @@ Common user requests → recommended skill. Use this as a fallback when SKILL.md
 
 | User says... | Use | Notes |
 |---|---|---|
-| "review this PR / code" | `code-reviewer` or `code-review:code-review` | |
+| "review this PR / code" | `code-review-agent` or `code-review:code-review` | |
 | "security review / audit auth" | `security-agent` or `security-review` | |
 | "address PR feedback / copilot comments" | `git-pr-feedback` | |
-| "audit all my skills" / "skill ecosystem health" | `skill-audit` | Broad scan |
-| "deep review one skill" | `skill-deep-review` | Single skill |
-| "plan fixes from a skill review" | `skill-improvement-plan` | Consumes review output |
-| "execute a skill improvement plan" | `skill-updater` | Applies the plan |
+| "audit all my skills" / "skill ecosystem health" | `skill-review --scope=all` | Broad scan |
+| "deep review one skill" | `skill-review --scope=<skill-name>` | Single skill |
+| "apply the recommendations from a skill review" | `skill-update` | Plan + apply in one workflow |
 
 ### Skill ecosystem itself
 
@@ -54,8 +53,8 @@ Common user requests → recommended skill. Use this as a fallback when SKILL.md
 |---|---|
 | "what skills do I have" / "I forgot the name" / "which skill for X" | `skill-explorer` (this skill) |
 | "create a new skill" | `skill-writer` |
-| "audit / scan all skills" | `skill-audit` |
-| "deep review one skill" | `skill-deep-review` |
+| "audit / scan all skills" | `skill-review --scope=all` |
+| "deep review one skill" | `skill-review --scope=<skill-name>` |
 | "sync skills to global / link them" | `sync-skills` |
 | "consolidate Claude Code permissions / settings" | `settings-consolidator` |
 
@@ -66,8 +65,7 @@ Common user requests → recommended skill. Use this as a fallback when SKILL.md
 | "commit these changes" | `git-commit` or `commit-commands:commit` |
 | "open a PR" | `git-pr` or `commit-commands:commit-push-pr` |
 | "address PR comments" | `git-pr-feedback` |
-| "clean up branches" | `git-branch-cleanup` |
-| "clean up worktrees" | `git-clean-worktrees` |
+| "clean up branches" / "clean up worktrees" / "post-merge cleanup" | `git-post-merge-cleanup` |
 | "use a worktree for isolated work" | `superpowers:using-git-worktrees` |
 | "delete merged [gone] branches" | `commit-commands:clean_gone` |
 
@@ -135,8 +133,8 @@ Common user requests → recommended skill. Use this as a fallback when SKILL.md
 - **`orchestrator` vs `feature-dev:feature-dev`**: orchestrator coordinates *multiple* parallel agents on a multi-component build. feature-dev is for a single developer working through one feature. If the user is building one thing, use feature-dev.
 - **`ui-brief` vs `frontend-design:frontend-design`**: ui-brief writes the *brief* (positioning, design language, page treatment). frontend-design *executes* the build. Brief comes first if the design isn't decided.
 - **`plan-builder` vs `claude-mem:make-plan`**: plan-builder consumes research docs / PRDs / Compass artifacts to produce a build plan for orchestrator. make-plan is a lighter phased plan for direct execution by `claude-mem:do`.
-- **`skill-audit` vs `skill-deep-review`**: audit is bulk, deep-review is one skill at a time.
-- **`code-reviewer` (repo skill) vs `code-review:code-review` (plugin)**: repo's code-reviewer is the role-agent version used in orchestrated builds. The plugin code-review is for reviewing a PR end-to-end.
+- **`skill-review` modes**: `--scope=all` is the bulk ecosystem audit; `--scope=<skill-name>` is the deep dive on a single skill. One skill, two modes — pick by argument.
+- **`code-review-agent` (repo skill) vs `code-review:code-review` (plugin)**: repo's code-review-agent is the role-agent version used in orchestrated builds. The plugin code-review is for reviewing a PR end-to-end.
 - **`git-commit` vs `commit-commands:commit`**: git-commit is the repo's documented convention guide. commit-commands:commit is a plugin slash-command. Either works; prefer the convention guide when it matters that the message follows repo style.
 
 ## When no skill fits
