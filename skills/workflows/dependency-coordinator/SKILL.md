@@ -1,9 +1,18 @@
 ---
 name: dependency-coordinator
-version: 1.0.0
-disable-model-invocation: true
+version: 1.0.2
 description: "Orchestrator-dispatched only. Authors the cross-package dependency manifest before parallel implementation agents are dispatched, preventing transitive version drift. Composed by orchestrator during multi-agent builds. Not user-invocable."
-type: contract
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob"]
+disable-model-invocation: true
+requires_agent_teams: false
+requires_claude_code: true
+min_plan: starter
+owns:
+  directories: []
+  patterns: []
+  shared_read: ["contracts/", ".claude/profile.yaml"]
+composes_with: ["contract-author", "infrastructure-agent", "contract-auditor", "orchestrator"]
+spawned_by: ["orchestrator"]
 ---
 
 # Dependency Coordinator

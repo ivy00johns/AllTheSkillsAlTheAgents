@@ -163,10 +163,10 @@ but common subsystems include:
 | Language | Go | TypeScript | ... |
 | Scale | 377k LoC | 96k LoC | ... |
 
-**What {Project} Has That AllTheSkills Lacks** — Specific capabilities,
+**What {Project} Has That {reference-project} Lacks** — Specific capabilities,
 with enough detail to understand whether they're worth adopting.
 
-**What AllTheSkills Has That {Project} Lacks** — Same treatment, reversed.
+**What {reference-project} Has That {Project} Lacks** — Same treatment, reversed.
 
 **Shared DNA** — Where the projects converge philosophically or architecturally.
 

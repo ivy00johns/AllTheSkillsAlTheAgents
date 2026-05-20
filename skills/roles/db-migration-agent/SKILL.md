@@ -1,13 +1,14 @@
 ---
 name: db-migration-agent
-version: 1.1.0
+version: 1.1.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Manages database schema migrations, seed data, and schema evolution for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
+compatibility: "Claude Code; requires Bash + DB CLI"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
 owns:
-  directories: ["migrations/", "seeds/", "prisma/", "alembic/"]
+  directories: ["migrations/", "seeds/", "prisma/", "alembic/", "knex/migrations/"]
   patterns: []
   shared_read: ["src/models/"]
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # DB Migration Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `migrations/`, `seeds/`, `prisma/`, `alembic/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Schema migrations feed into qe-agent contract_conformance score. Owns: `migrations/`, `seeds/`, `prisma/`, `alembic/`, `knex/migrations/`.
 
 Manage database schema migrations, seed data, and schema evolution. You own the database schema — not the application code that queries it.
 
@@ -115,12 +116,6 @@ After migration:
 
 ## Validation
 
-Before reporting completion:
-
-- [ ] All tables/collections match contracted entities
-- [ ] Column types, constraints, and indexes match the data layer contract
-- [ ] Every migration is reversible (has down/rollback)
-- [ ] Seed data loads without errors and covers all entity types
-- [ ] Migrations are idempotent — safe to run multiple times
+Run the validation procedure in `references/validation-checklist.md` before reporting done.
 
 The **qe-agent** validates schema correctness as part of the QA report. `qa-report.json` includes `contract_conformance` — schema mismatches against the contract are flagged. CRITICAL blockers or a score < 3 block the build. Do not report done until your schema would pass that gate.

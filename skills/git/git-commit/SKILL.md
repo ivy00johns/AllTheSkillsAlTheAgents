@@ -1,6 +1,6 @@
 ---
 name: git-commit
-version: 1.2.0
+version: 1.2.1
 description: >
   Guide for creating git commits in this repository: conventional commit format,
   allowed types, and branch naming conventions.
@@ -17,7 +17,7 @@ owns:
   patterns: []
   shared_read: ["*"]
 allowed-tools: ["Read", "Bash"]
-composes_with: ["git-pr", "git-branch-cleanup"]
+composes_with: ["git-pr", "git-post-merge-cleanup"]
 spawned_by: []
 ---
 

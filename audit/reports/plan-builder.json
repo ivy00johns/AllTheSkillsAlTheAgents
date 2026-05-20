@@ -1,0 +1,35 @@
+{
+  "skill": "plan-builder",
+  "path": "skills/workflows/plan-builder/SKILL.md",
+  "version": "1.3.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields; semver 1.3.0; canonical allowed-tools; all 4 composes_with targets resolve."},
+    "description_quality": {"score": 4, "notes": "673 chars — under 1024 but ~3× target; strong trigger coverage; trimmable."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 121 lines; two references linked with purpose; no body/reference duplication."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; entry-detection table; Path A/B separation; explains WHY in behavior rules."},
+    "coordination": {"score": 5, "notes": "Empty owns; 4 composes_with all resolve; explicit handoff section."},
+    "completeness": {"score": 5, "notes": "Both references exist; output location defined; section templates concrete."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; explicit anti-pattern callout; xml-style section markers are quirky but harmless."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 673 chars — trimmable", "location": "SKILL.md:5", "fix": "Drop inline trigger-phrase enumeration; keep catch-all sentence + handoff clause"}
+    ],
+    "nits": [
+      {"item": "Body uses non-standard <what-to-do> / <supporting-info> XML-style section markers", "location": "SKILL.md:32,108,110,121", "fix": "Replace with standard ## H2 headings"},
+      {"item": "ASCII flow at lines 47-50 could be a real mermaid diagram", "location": "SKILL.md:47-50", "fix": "Convert to mermaid flowchart (compositional with composes_with target)"},
+      {"item": "compatibility field absent", "location": "SKILL.md:8", "fix": "Add compatibility string declaring Write access for docs/plans/"},
+      {"item": "References to 'brainstorming' and 'writing-plans' point to superpowers-namespace skills not in this repo", "location": "SKILL.md:42,44,80,99", "fix": "Footnote that these are superpowers plugin skills"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 673 to ~300 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Replace <what-to-do>/<supporting-info> XML-style tags with standard H2 headings", "file": "SKILL.md:32,108,110,121", "effort": "small"},
+    {"rank": 3, "fix": "Add compatibility field", "file": "SKILL.md:8", "effort": "small"}
+  ],
+  "broken_refs": []
+}

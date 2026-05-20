@@ -1,0 +1,36 @@
+{
+  "skill": "qe-agent",
+  "path": "skills/roles/qe-agent/SKILL.md",
+  "version": "1.3.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns block thorough with directories+patterns+shared_read; no compatibility/metadata"},
+    "description_quality": {"score": 4, "notes": "256 chars over 200 target; better trigger content than other role agents - states core capability (owns qa-report.json gate)"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 124 lines; 5 reference files all linked with when-to-read; no duplicate content"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; Phases 1-4 + Static Analysis Mode; explains WHY (stop on critical contract failures)"},
+    "coordination": {"score": 5, "notes": "Owns matches orchestrator map with explicit tests/performance/ carve-out; off-limits explicit; composes_with comprehensive"},
+    "completeness": {"score": 5, "notes": "All references exist; machine-readable JSON schema; right-sizing tradeoff in opening blockquote; anti-pattern callout"},
+    "anti_patterns": {"score": 5, "notes": "Clean — no hardcoded paths, WHY explained, no excessive MUST/NEVER"}
+  },
+  "average": 4.7,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 256 chars exceeds 200 target", "location": "SKILL.md:5", "fix": "Drop redundant 'Composed by orchestrator' clause"},
+      {"item": "Project-specific endpoint paths in checklist", "location": "references/validation-checklist.md:17,40,52,56,59,64", "fix": "Replace /api/v1/sessions with ${RESOURCE_PATH}"},
+      {"item": "Missing compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility: 'Claude Code; requires Bash + curl + python3'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:22", "fix": "Change 'Reports to qe-agent via qa-report.json' to 'Writes qa-report.json for the orchestrator'"},
+      {"item": "shared_read uses * wildcard", "location": "SKILL.md:12", "fix": "List explicit directories"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Fix self-referential pipeline blockquote", "file": "SKILL.md:22", "effort": "small"},
+    {"rank": 2, "fix": "Replace project-specific endpoints with placeholders", "file": "references/validation-checklist.md:17,40,52,56,59,64", "effort": "small"},
+    {"rank": 3, "fix": "Tighten description to ≤200 chars", "file": "SKILL.md:5", "effort": "small"}
+  ],
+  "broken_refs": []
+}

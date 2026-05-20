@@ -1,0 +1,33 @@
+{
+  "skill": "zoom-out",
+  "path": "skills/workflows/zoom-out/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description 412 chars; composes_with maintain-context exists; BUT disable-model-invocation: true is the same out-of-spec field as in setup-project-skills."},
+    "description_quality": {"score": 5, "notes": "412 chars; starts with 'Step back'; three trigger contexts; states exclusion ('Explicit invocation only')."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 24 lines — minimal by design for a single-prompt orientation skill."},
+    "instruction_clarity": {"score": 4, "notes": "Three short imperative lines; clear output format; explicit non-goal. No worked example."},
+    "coordination": {"score": 5, "notes": "composes_with maintain-context accurate; shared_read: ['*'] reasonable for read-only tool."},
+    "completeness": {"score": 4, "notes": "No worked example of output format; assumes CONTEXT.md convention without anchoring to setup-project-skills."},
+    "anti_patterns": {"score": 5, "notes": "No MUST/NEVER abuse; no hardcoded paths; non-goal correctly framed."}
+  },
+  "average": 4.57,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "disable-model-invocation: true is not in the frontmatter spec (same ecosystem-level issue as setup-project-skills)", "location": "skills/workflows/zoom-out/SKILL.md:5", "fix": "Document the field in skills/meta/skill-writer/references/frontmatter-spec.md OR migrate to metadata.invocation: explicit-only across both skills"}
+    ],
+    "nits": [
+      {"item": "No worked output example — 3-5 lines would remove format ambiguity", "location": "skills/workflows/zoom-out/SKILL.md:22", "fix": "Append code-fenced example showing numbered list with → arrows"},
+      {"item": "CONTEXT.md reference unanchored to setup-project-skills convention", "location": "skills/workflows/zoom-out/SKILL.md:20", "fix": "Add '(configured via setup-project-skills)' parenthetical"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Resolve ecosystem-level disable-model-invocation out-of-spec field (touches spec + 2 SKILL.md files)", "file": "skills/workflows/zoom-out/SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Add 3-5 line worked output example", "file": "skills/workflows/zoom-out/SKILL.md:22", "effort": "small"},
+    {"rank": 3, "fix": "Anchor CONTEXT.md reference to setup-project-skills convention", "file": "skills/workflows/zoom-out/SKILL.md:20", "effort": "small"}
+  ],
+  "broken_refs": []
+}

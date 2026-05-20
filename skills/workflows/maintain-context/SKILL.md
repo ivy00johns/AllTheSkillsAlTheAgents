@@ -1,6 +1,6 @@
 ---
 name: maintain-context
-version: 1.1.0
+version: 1.1.1
 description: "Maintain a project's CONTEXT.md domain glossary and docs/adr/ decision records inline as understanding crystallizes. When the user uses an ambiguous term, propose the canonical form and update CONTEXT.md right there. When a hard-to-reverse decision is made, offer an ADR — but ONLY when all three are true: hard to reverse, surprising without context, real trade-off involved. If any condition is missing, skip. Use this skill after any architectural discussion, requirements clarification, or when shared terminology starts to drift. Trigger on: 'update the glossary', 'add to CONTEXT', 'record this as an ADR', 'what do we call this', 'is this the right term', 'we just decided something', 'document this decision'."
 requires_agent_teams: false
 requires_claude_code: true
@@ -10,7 +10,7 @@ owns:
   patterns: ["CONTEXT.md", "docs/adr/**"]
   shared_read: []
 allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob"]
-composes_with: ["grill-me", "architecture-rescue"]
+composes_with: ["grill-me", "architecture-rescue", "setup-project-skills"]
 spawned_by: []
 ---
 

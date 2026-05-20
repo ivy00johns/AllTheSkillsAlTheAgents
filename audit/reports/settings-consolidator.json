@@ -1,0 +1,34 @@
+{
+  "skill": "settings-consolidator",
+  "path": "skills/workflows/settings-consolidator/SKILL.md",
+  "version": "1.2.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; no XML brackets in values; allowed-tools hyphenated; composes_with target sync-skills exists."},
+    "description_quality": {"score": 5, "notes": "1011 chars (under 1024); starts with 'Scan'; 10+ trigger keywords; very pushy."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 118 lines; two reference .md files plus a JSON template all linked with when-to-read guidance."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; Bootstrap + Consolidation modes clearly separated; six numbered steps each with rationale."},
+    "coordination": {"score": 5, "notes": "composes_with sync-skills accurate; owns.patterns settings.local.json no conflicts."},
+    "completeness": {"score": 5, "notes": "All references resolve including the autonomous-permissions.json template; edge cases enumerated."},
+    "anti_patterns": {"score": 4, "notes": "Description is 1011 chars — only 13 under the 1024 ceiling; risky for future edits. Otherwise clean."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description is 1011 chars — 13 chars under the 1024 hard ceiling; future edits risk FAIL", "location": "skills/workflows/settings-consolidator/SKILL.md:4-16", "fix": "Collapse the two trigger sentences and remove keyword duplicates to ≤800 chars"}
+    ],
+    "nits": [
+      {"item": "JSON template listed in reference files section without note that it's a template not docs", "location": "skills/workflows/settings-consolidator/SKILL.md:116", "fix": "Annotate '(template, not docs)' or move to separate Templates section"},
+      {"item": "'instead of (or before)' parenthetical is ambiguous", "location": "skills/workflows/settings-consolidator/SKILL.md:35", "fix": "Reword to 'Run the bootstrap workflow first; consolidation can follow on top of it.'"},
+      {"item": "Escaped asterisks in permission-categories.md table are visually noisy in raw form", "location": "skills/workflows/settings-consolidator/references/permission-categories.md:25-43", "fix": "Use HTML entity or backtick the patterns instead of escaping"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Tighten description to ≤800 chars to give breathing room under 1024 ceiling", "file": "skills/workflows/settings-consolidator/SKILL.md:4-16", "effort": "small"},
+    {"rank": 2, "fix": "Reword 'instead of (or before)' parenthetical for clarity", "file": "skills/workflows/settings-consolidator/SKILL.md:35", "effort": "small"},
+    {"rank": 3, "fix": "Annotate the JSON template entry in reference files list", "file": "skills/workflows/settings-consolidator/SKILL.md:116", "effort": "small"}
+  ],
+  "broken_refs": []
+}

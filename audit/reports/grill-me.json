@@ -1,0 +1,34 @@
+{
+  "skill": "grill-me",
+  "path": "skills/workflows/grill-me/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description 656 chars; allowed-tools hyphenated; composes_with all exist"},
+    "description_quality": {"score": 5, "notes": "Action verb 'Get'; 9 trigger phrases including conversational; methodology encoded"},
+    "progressive_disclosure": {"score": 5, "notes": "27 lines body — exceptionally tight; no refs needed; right-sized"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; 3 numbered rules with rationale; explicit exit condition + output format"},
+    "coordination": {"score": 5, "notes": "All 3 composes_with targets exist; body line 27 documents when to compose with each; symmetric with architecture-rescue"},
+    "completeness": {"score": 5, "notes": "No external refs to validate; complete for scope"},
+    "anti_patterns": {"score": 5, "notes": "Rules have rationale; explicitly forbids batch-question and ask-when-code-knows anti-patterns"}
+  },
+  "average": 4.9,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 656 chars vs 200 target", "location": "SKILL.md:4", "fix": "Trim methodology preamble (already in body lines 19-23)"}
+    ],
+    "nits": [
+      {"item": "Empty owns block on workflow skill", "location": "SKILL.md:8-11", "fix": "Remove"},
+      {"item": "Double-quoted YAML with embedded apostrophes is hard to read", "location": "SKILL.md:4", "fix": "Convert to '|' multiline scalar"},
+      {"item": "'Compose with:' line could be H2 for consistency", "location": "SKILL.md:27", "fix": "Make it '## Compose with'"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description to ≤200 chars; move methodology to body (already there)", "file": "SKILL.md:4", "effort": "small"},
+    {"rank": 2, "fix": "Remove empty owns block on workflow skill", "file": "SKILL.md:8-11", "effort": "small"},
+    {"rank": 3, "fix": "Convert description to multiline '|' YAML form", "file": "SKILL.md:4", "effort": "small"}
+  ],
+  "broken_refs": []
+}

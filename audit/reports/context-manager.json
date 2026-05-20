@@ -1,0 +1,34 @@
+{
+  "skill": "context-manager",
+  "path": "skills/workflows/context-manager/SKILL.md",
+  "version": "1.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields valid; description 481 chars; owns.directories matches v1.1 resolved conflict table; composes_with/spawned_by reciprocal with orchestrator"},
+    "description_quality": {"score": 4, "notes": "Action verb 'Manage'; 8 explicit trigger phrases; could be tighter to 200 target"},
+    "progressive_disclosure": {"score": 5, "notes": "106 lines body; one ref linked twice with when-to-read context; no duplication"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; clear Inputs/When to Act/Protocol; YAML schema inline; explicit quality gate at line 105"},
+    "coordination": {"score": 5, "notes": "Ownership matches v1.1 spec exactly; off-limits explicit; orchestrator boundary at line 106; reciprocal links"},
+    "completeness": {"score": 5, "notes": "Reference exists and linked; good/bad examples; recovery procedure documented"},
+    "anti_patterns": {"score": 5, "notes": "MUST rules have rationale; no hardcoding; no duplication"}
+  },
+  "average": 4.9,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 481 chars vs 200 target", "location": "SKILL.md:4-5", "fix": "Drop middle 'managing context limits...' repetition (already in trigger list)"}
+    ],
+    "nits": [
+      {"item": "Inline YAML handoff schema could be extracted", "location": "SKILL.md:50-81", "fix": "Move to references/handoff-schema.yaml for machine validation"},
+      {"item": "shared_read:['*'] is broad", "location": "SKILL.md:12", "fix": "Tighten to specific roots"},
+      {"item": "Context Efficiency Tips is short, could merge into compaction-guide", "location": "SKILL.md:91-98", "fix": "Consolidate into reference"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description to ≤200 chars by removing middle 'managing context limits...' repetition", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 2, "fix": "Move inline handoff YAML schema to references/handoff-schema.yaml", "file": "SKILL.md:50-81", "effort": "small"},
+    {"rank": 3, "fix": "Consolidate Context Efficiency Tips into compaction-guide.md", "file": "SKILL.md:91-98", "effort": "small"}
+  ],
+  "broken_refs": []
+}

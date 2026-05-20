@@ -12,13 +12,14 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:${FRONTEND_PORT}        
 ## Phase 1: Contract Conformance
 
 ```bash
-# For each contracted endpoint:
+# For each contracted endpoint (substitute ${RESOURCE_PATH} from your contract,
+# e.g. /api/v1/orders, /api/v1/users):
 # 1. Check route exists
-curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:${PORT}/api/v1/sessions \
+curl -s -o /dev/null -w "%{http_code}" -X POST "http://localhost:${PORT}${RESOURCE_PATH}" \
   -H "Content-Type: application/json" -d '{"title": "test"}'
 
 # 2. Check response shape
-curl -s -X POST http://localhost:${PORT}/api/v1/sessions \
+curl -s -X POST "http://localhost:${PORT}${RESOURCE_PATH}" \
   -H "Content-Type: application/json" -d '{"title": "test"}' | python3 -c "
 import json, sys
 resp = json.load(sys.stdin)
@@ -37,7 +38,7 @@ grep -rn "fetch\|axios\|\.get\|\.post\|\.put\|\.delete" frontend/src/ \
 
 ```bash
 # CORS check (#1 failure)
-curl -s -I -X OPTIONS http://localhost:${BACKEND_PORT}/api/v1/sessions \
+curl -s -I -X OPTIONS "http://localhost:${BACKEND_PORT}${RESOURCE_PATH}" \
   -H "Origin: http://localhost:${FRONTEND_PORT}" \
   -H "Access-Control-Request-Method: POST" | grep -i "access-control"
 
@@ -49,21 +50,21 @@ curl -s -I -X OPTIONS http://localhost:${BACKEND_PORT}/api/v1/sessions \
 
 ```bash
 # Empty body
-curl -s -w "\n%{http_code}" -X POST http://localhost:${PORT}/api/v1/sessions \
+curl -s -w "\n%{http_code}" -X POST "http://localhost:${PORT}${RESOURCE_PATH}" \
   -H "Content-Type: application/json" -d '{}'
 
 # Non-existent ID
-curl -s -w "\n%{http_code}" http://localhost:${PORT}/api/v1/sessions/nonexistent/messages
+curl -s -w "\n%{http_code}" "http://localhost:${PORT}${RESOURCE_PATH}/nonexistent"
 
 # XSS payload
-curl -s -X POST http://localhost:${PORT}/api/v1/sessions \
+curl -s -X POST "http://localhost:${PORT}${RESOURCE_PATH}" \
   -H "Content-Type: application/json" \
   -d '{"title": "<script>alert(1)</script>"}'
 
-# SQL injection
-curl -s -X POST http://localhost:${PORT}/api/v1/sessions \
+# SQL injection (replace <table> with the resource's underlying table name)
+curl -s -X POST "http://localhost:${PORT}${RESOURCE_PATH}" \
   -H "Content-Type: application/json" \
-  -d "{\"title\": \"'; DROP TABLE sessions;--\"}"
+  -d "{\"title\": \"'; DROP TABLE <table>;--\"}"
 ```
 
 ## Phase 4: QA Report Quality

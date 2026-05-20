@@ -1,6 +1,6 @@
 ---
 name: diagnose-loop
-version: 1.0.0
+version: 1.0.1
 description: |
   Disciplined bug-diagnosis loop where Phase 1 — building a fast deterministic feedback loop — IS the skill. The remaining phases (reproduce, hypothesize, instrument, fix, regression-test, cleanup) mechanically consume the loop's signal. Make sure to use this skill whenever the user reports a hard bug, a flaky test, a performance regression, or says they've been "staring at this for an hour." Trigger on: "diagnose this", "debug this", "why is this broken", "it sometimes fails", "performance regression", "I can't reproduce it", "what's wrong with this", "this test is flaky", "intermittent failure".
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: []
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
-composes_with: ["playwright", "qe-agent"]
+composes_with: ["playwright", "qe-agent", "architecture-rescue"]
 spawned_by: []
 ---
 

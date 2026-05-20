@@ -1,0 +1,37 @@
+{
+  "skill": "llm-wiki",
+  "path": "skills/workflows/llm-wiki/SKILL.md",
+  "version": "1.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description 846 chars; allowed-tools hyphenated; composes_with targets exist; owns.patterns are common filenames — potentially broad scope"},
+    "description_quality": {"score": 5, "notes": "Action verb 'Bootstrap and maintain'; 11+ triggers including in-vault ones; explicit RAG exclusion"},
+    "progressive_disclosure": {"score": 5, "notes": "202 lines body at 200-line soft threshold but justified by covering Setup+Ingest+Query+Lint; 2 refs linked with when-to-read"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; Entry Detection table routes modes; Announce at start; numbered steps; concrete templates"},
+    "coordination": {"score": 4, "notes": "All 4 composes_with targets exist; spawned_by:[] reasonable; owns.patterns unscoped"},
+    "completeness": {"score": 5, "notes": "Both refs exist and linked; schema uses {{PLACEHOLDER}} form; operations.md exhaustive across all 3 modes"},
+    "anti_patterns": {"score": 5, "notes": "No hardcoded paths; MUST rules have rationale; qmd suggestion optional/contextual"}
+  },
+  "average": 4.7,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "owns.patterns are common filenames potentially conflicting with other projects", "location": "SKILL.md:20", "fix": "Tighten to wiki/-prefixed paths or move to owns.directories:['wiki/']"},
+      {"item": "Description 846 chars vs 200 target", "location": "SKILL.md:4-14", "fix": "Trim 'Bootstrap...for any project or domain' preamble redundancy"},
+      {"item": "operations.md 253 lines without TOC", "location": "references/operations.md", "fix": "Add top-of-file H2 TOC linking to Ingest/Query/Lint sections"}
+    ],
+    "nits": [
+      {"item": "'Announce at start' pattern unusual", "location": "SKILL.md:33", "fix": "Normalize across skills"},
+      {"item": "qmd recommendation is third-party with no version pin", "location": "SKILL.md:197, references/operations.md:250", "fix": "Add version note or scope as optional"},
+      {"item": "shared_read redundant with owns.patterns", "location": "SKILL.md:21", "fix": "Consolidate"},
+      {"item": "Wiki CLAUDE.md vs project-profiler CLAUDE.md ownership note missing", "location": "SKILL.md", "fix": "Add disambiguation note"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Tighten owns.patterns to path-scoped form (wiki/-prefixed) or move to owns.directories", "file": "SKILL.md:20", "effort": "small"},
+    {"rank": 2, "fix": "Trim description to ≤200 chars; drop preamble and in-wiki trigger restatement", "file": "SKILL.md:4-14", "effort": "small"},
+    {"rank": 3, "fix": "Add TOC to operations.md (253 lines, 3 distinct workflows)", "file": "references/operations.md:1", "effort": "small"}
+  ],
+  "broken_refs": []
+}

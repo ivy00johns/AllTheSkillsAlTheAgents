@@ -1,0 +1,35 @@
+{
+  "skill": "skill-review",
+  "path": "skills/meta/skill-review/SKILL.md",
+  "version": "1.1.0",
+  "category": "meta",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; description 585 chars (under 1024 ceiling); no angle brackets; allowed-tools hyphenated; argument-hint present and concrete; owns correctly empty; shared_read declared."},
+    "description_quality": {"score": 4, "notes": "Action verb (Review), 10+ trigger variants, two-mode description. 585 chars overshoots 200-char target. References stale '100-line rule' instead of current 500-line/5000-word house style."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 143 lines / ~1149 words. All 3 references linked from body with when-to-read context. All references under 300-line TOC threshold."},
+    "instruction_clarity": {"score": 5, "notes": "Two-mode dispatch crisp. Numbered phases (A1-A3, B1-B3) with imperative voice. Each phase explains WHY. Output Handoff provides user-facing message template."},
+    "coordination": {"score": 5, "notes": "composes_with [skill-update, skill-writer] accurate. spawned_by empty correct for user-invoked. No ownership overlaps."},
+    "completeness": {"score": 5, "notes": "All 3 reference files exist and well-structured. report-format.md provides exact output schema. deep-review-rubric.md has full 1-5 scoring. audit-checklist.md has both per-skill and ecosystem checks."},
+    "anti_patterns": {"score": 5, "notes": "Guidelines actively prevent nitpicking. Imperative voice. No emojis. Mode A guards against over-reading. WHY explained for low-impact checks."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description references stale '100-line rule' but house style is 500 lines", "location": "SKILL.md:6", "fix": "Change '100-line rule' to '500-line/5000-word body guidelines' to match current standard."}
+    ],
+    "nits": [
+      {"item": "Description 585 chars overshoots 200-char target", "location": "SKILL.md:6", "fix": "Trim trigger-phrase list to strongest 5 variants; target ~400 chars."},
+      {"item": "Phase 4 (Report) naming breaks A1-A3/B1-B3 convention", "location": "SKILL.md:114", "fix": "Rename to 'Shared Phase: Report' or 'C: Report'."},
+      {"item": "skill-creator referenced at L96 but not in composes_with", "location": "SKILL.md:15", "fix": "Add skill-creator to composes_with or document as external optional integration."},
+      {"item": "Output path handling at L121 lacks concrete CLI example", "location": "SKILL.md:121", "fix": "Add example CLI flag form like --output=reports/."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Update stale '100-line rule' reference in description to current 500-line/5000-word guideline", "file": "SKILL.md:6", "effort": "small"},
+    {"rank": 2, "fix": "Trim description from 585 → ~400 chars by keeping strongest 5 trigger variants", "file": "SKILL.md:6", "effort": "small"},
+    {"rank": 3, "fix": "Add skill-creator to composes_with (or document as external optional)", "file": "SKILL.md:15", "effort": "small"}
+  ],
+  "broken_refs": []
+}

@@ -1,6 +1,6 @@
 ---
 name: sync-skills
-version: 2.0.0
+version: 2.0.1
 description: |
   Sync skills between this repo and global locations for Claude Code and Cursor using symlinks (default) or copies. Use when the user wants to link, sync, publish, push, or copy skills to Claude Code or Cursor, make repo skills available globally, check sync status, see what's linked vs copied, unlink skills, or wants to use repo skills from another project. Trigger on: "sync skills", "link skills", "publish skills", "skill status", "deploy skills globally", "/sync-skills", "publish to claude code", "are my skills linked", "unlink skills".
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: ["skills/"]
 allowed-tools: ["Read", "Bash"]
-composes_with: ["skill-updater", "skill-audit"]
+composes_with: ["skill-update", "skill-review"]
 spawned_by: []
 ---
 

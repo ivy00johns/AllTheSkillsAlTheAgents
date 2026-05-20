@@ -7,7 +7,7 @@ Thariq's consistent-hashing demo is the canonical example: a ring you can add an
 ## When this is the right pattern
 
 - "Explain how token buckets work"
-- "What is a SKILL.md and why does The Hive use them?"
+- "What is a SKILL.md and why does {example-project} use them?"
 - "How does the agent capability matcher decide?"
 - "Walk me through what happens during a memory consolidation"
 
@@ -163,7 +163,7 @@ related: ["[[hive-orchestrator]]", "[[agent-anatomy]]"]
 > [!tldr]
 > A SKILL.md is a markdown file with frontmatter that an agent reads when
 > invoked. It declares what the agent does, when to use it, and what to
-> expect. The Hive treats it as an operational contract — analogous to a
+> expect. {example-project} treats it as an operational contract — analogous to a
 > Jira ticket. Both describe a unit of work in a form humans and machines
 > can both read.
 
@@ -176,7 +176,7 @@ related: ["[[hive-orchestrator]]", "[[agent-anatomy]]"]
 ## Why a contract, not a function call?
 
 The orchestrator could call agents through TypeScript imports. That's
-what most frameworks do. The Hive doesn't, because...
+what most frameworks do. {example-project} doesn't, because...
 
 [prose argument]
 
@@ -211,7 +211,7 @@ The frontmatter has three required fields and several optional ones...
 | Lives with | the agent | the API | a project | the server |
 | ... | | | | |
 
-## In The Hive
+## In {example-project}
 
 [where SKILL.md files live, how the orchestrator loads them, the
 discovery flow]

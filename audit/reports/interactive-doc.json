@@ -1,0 +1,39 @@
+{
+  "skill": "interactive-doc",
+  "path": "skills/workflows/interactive-doc/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 2, "notes": "HARD FAIL: description 1417 chars exceeds 1024 ceiling. Missing allowed-tools, requires_claude_code, composes_with"},
+    "description_quality": {"score": 4, "notes": "Weak action verb ('Use this skill'); 10+ trigger phrases; explains 2 workflows; strong content but length violation"},
+    "progressive_disclosure": {"score": 3, "notes": "186 lines body at upper edge; 5 refs (1351 lines total) linked; some duplication body vs house-style.md; house-style.md 404 lines no TOC"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; clear A vs B workflow; cardinal rule callout; numbered steps + walk-throughs; anti-patterns explained"},
+    "coordination": {"score": 2, "notes": "No composes_with/spawned_by/owns declared in frontmatter; other skills can't discover composition signal"},
+    "completeness": {"score": 4, "notes": "All 5 refs exist and linked; evals/evals.json present (rare and excellent); but 'thariq's site' at line 164 lacks URL/context"},
+    "anti_patterns": {"score": 4, "notes": "Hardcoded 'thariq's site' pointer; pervasive 'Hive' examples throughout references"}
+  },
+  "average": 3.4,
+  "findings": {
+    "critical": [
+      {"item": "Description 1417 chars exceeds 1024 hard ceiling", "location": "SKILL.md:4-5", "fix": "Delete final 'Output is always a pair...' sentence and 'Especially trigger when...' repetition"}
+    ],
+    "important": [
+      {"item": "Missing composes_with/allowed-tools/requires_claude_code", "location": "SKILL.md:1-6", "fix": "Add standard fields"},
+      {"item": "house-style.md 404 lines without TOC", "location": "references/house-style.md", "fix": "Add H2 TOC at top"},
+      {"item": "'thariq's site' reference without URL/context", "location": "SKILL.md:164", "fix": "Generalize or add URL"},
+      {"item": "Hardcoded 'Hive' worked examples throughout references", "location": "references/architecture-map.md, references/concept-explainer.md", "fix": "Add disclaimer or anonymize"}
+    ],
+    "nits": [
+      {"item": "Trigger restatement in description is redundant", "location": "SKILL.md:4-5", "fix": "Drop 'Especially trigger when...' sentence"},
+      {"item": "House style essentials duplicates references/house-style.md", "location": "SKILL.md:150-161", "fix": "Make one canonical"},
+      {"item": "evals/evals.json is great — promote as pattern", "location": "evals/evals.json", "fix": "Consider as house-style convention"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 1417 to ≤1024 chars (HARD FAIL fix)", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 2, "fix": "Add standard frontmatter fields (allowed-tools, requires_claude_code, composes_with, metadata.category)", "file": "SKILL.md:1-6", "effort": "small"},
+    {"rank": 3, "fix": "Add H2 TOC to house-style.md (404 lines exceeds 300-line threshold)", "file": "references/house-style.md:1", "effort": "small"}
+  ],
+  "broken_refs": ["'thariq's site' (SKILL.md:164) — no URL/context"]
+}

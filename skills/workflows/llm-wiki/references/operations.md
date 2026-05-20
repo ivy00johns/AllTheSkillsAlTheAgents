@@ -2,6 +2,16 @@
 
 Detailed workflows for the three wiki operations: Ingest, Query, and Lint.
 
+## Contents
+
+- [Ingest](#ingest)
+- [Ingest log entry template](#yyyy-mm-dd-ingest--source-title)
+- [Query](#query)
+- [Lint](#lint)
+- [Lint report template](#lint-report--date)
+- [Lint log entry template](#yyyy-mm-dd-lint--health-check)
+- [Tips for large wikis](#tips-for-large-wikis)
+
 ---
 
 ## Ingest

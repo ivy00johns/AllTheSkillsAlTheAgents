@@ -1,0 +1,33 @@
+{
+  "skill": "caveman",
+  "path": "skills/workflows/caveman/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description ~620 chars (under 1024, over 200 target); allowed-tools:[] honest for a mode-flip skill; empty owns block unnecessary"},
+    "description_quality": {"score": 5, "notes": "Action verb 'Cuts'; 8+ trigger variants; explicit exit phrases; explicit auto-deactivation contexts; pushy"},
+    "progressive_disclosure": {"score": 5, "notes": "59 lines; no references needed; examples inline; right-sized"},
+    "instruction_clarity": {"score": 5, "notes": "Clear sections; imperative; concrete before/after examples; LLM-actionable"},
+    "coordination": {"score": 4, "notes": "composes_with/spawned_by accurately empty; standalone presentation mode"},
+    "completeness": {"score": 5, "notes": "3 before/after examples; attribution present; no external refs to validate"},
+    "anti_patterns": {"score": 5, "notes": "MUST rule has rationale; no duplication; allowed-tools honest"}
+  },
+  "average": 4.7,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 620 chars vs 200-char target", "location": "SKILL.md:4-5", "fix": "Trim by moving auto-deactivation enumeration to body (already in body)"}
+    ],
+    "nits": [
+      {"item": "Empty agent-role fields are noise", "location": "SKILL.md:9-12", "fix": "Remove owns block entirely"},
+      {"item": "mattpocock attribution lacks URL", "location": "SKILL.md:20", "fix": "Add upstream repo URL"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description to ≤200 chars; keep triggers, drop auto-deactivation enumeration (already in body)", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 2, "fix": "Remove empty owns block; caveman is a workflow not an agent role", "file": "SKILL.md:9-12", "effort": "small"},
+    {"rank": 3, "fix": "Add URL to mattpocock attribution for provenance", "file": "SKILL.md:20", "effort": "small"}
+  ],
+  "broken_refs": []
+}

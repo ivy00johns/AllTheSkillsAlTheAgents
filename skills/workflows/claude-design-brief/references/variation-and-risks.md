@@ -14,7 +14,7 @@ The biggest failure mode after question-loops: three "directions" that are the s
 | **Color discipline** | Cream + navy editorial · blackout + signal accent · bone + olive photojournalist · monochrome with one chromatic accent |
 | **Density** | Generous whitespace · file-document density · marketing-like sparse · operator-tool dense |
 
-Pick three or four axes; commit each direction to a different position on each axis. The Sovereign Sampson reference example uses: layout (editorial column / dossier split / broadsheet asymmetric) × register (serif / mono / italic display) × treatment (full-bleed / half-bleed-metadata / asymmetric-bleed-off) × color (cream-navy / blackout-signal / bone-olive). Three directions, four axes, twelve genuinely distinct moves.
+Pick three or four axes; commit each direction to a different position on each axis. The reference example uses: layout (editorial column / dossier split / broadsheet asymmetric) × register (serif / mono / italic display) × treatment (full-bleed / half-bleed-metadata / asymmetric-bleed-off) × color (cream-navy / blackout-signal / bone-olive). Three directions, four axes, twelve genuinely distinct moves.
 
 If the directions feel like "the same thing in three palettes," go back to this rubric.
 

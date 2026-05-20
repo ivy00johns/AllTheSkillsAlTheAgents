@@ -1,0 +1,34 @@
+{
+  "skill": "maintain-context",
+  "path": "skills/workflows/maintain-context/SKILL.md",
+  "version": "1.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; semver 1.1.0; canonical hyphenated allowed-tools; no </> in frontmatter; composes_with targets exist."},
+    "description_quality": {"score": 4, "notes": "729 chars, well under 1024 ceiling; strong trigger coverage with 7 phrases; could lose ~200 chars by removing inline gate recital."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 89 lines / 962 words; three references each linked with when-to-read pointers."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; explains WHY (e.g., 'Why this gate matters' line 29); ordered steps."},
+    "coordination": {"score": 5, "notes": "owns.patterns scoped to CONTEXT.md + docs/adr/**; no overlap; composes_with lists real skills."},
+    "completeness": {"score": 5, "notes": "All three reference files exist and are linked; thorough worked examples in adr-format.md and context-format.md."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; one MUST/Forbidden callout with rationale; no hardcoded project paths."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description is 729 chars — above 200-char target", "location": "SKILL.md:4", "fix": "Drop the inline three-condition recital (already in body); keep one summary clause + 7 trigger phrases"}
+    ],
+    "nits": [
+      {"item": "Minor duplication of three-condition gate between body (25-27) and references (5-7)", "location": "SKILL.md:25-27", "fix": "Accept as scannable-summary pattern, or trim body summary to a single sentence pointing at the reference"},
+      {"item": "composes_with omits setup-project-skills despite hard precondition on its output", "location": "SKILL.md:13", "fix": "Add 'setup-project-skills' to composes_with array"},
+      {"item": "Reference to setup-project-skills could be more explicit at line 70", "location": "SKILL.md:66-70", "fix": "Promote parenthetical mention to explicit skill path pointer"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 729 to ~300 chars by dropping the inline gate recital", "file": "SKILL.md:4", "effort": "small"},
+    {"rank": 2, "fix": "Add setup-project-skills to composes_with", "file": "SKILL.md:13", "effort": "small"},
+    {"rank": 3, "fix": "Add explicit cross-reference to setup-project-skills as the producer of docs/agents/domain-docs.md", "file": "SKILL.md:66-70", "effort": "small"}
+  ],
+  "broken_refs": []
+}

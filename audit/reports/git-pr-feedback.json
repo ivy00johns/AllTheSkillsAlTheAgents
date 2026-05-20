@@ -1,0 +1,34 @@
+{
+  "skill": "git-pr-feedback",
+  "path": "skills/git/git-pr-feedback/SKILL.md",
+  "version": "1.2.0",
+  "category": "git",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; description 553 chars folded (under 1024); > at L4 is YAML scalar marker (permitted); allowed-tools hyphenated; owns empty for workflow skill; composes_with lists real local skills."},
+    "description_quality": {"score": 5, "notes": "Action verb (Fetch, triage, and address), 9+ trigger keyword variants, proactive trigger statement for returning users."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 195 lines / ~1020 words. No references/ directory (operational runbook fits atomically). All gh CLI commands inline."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Workflow steps 1-7 with imperative voice. Triage table maps category → action with examples. Rationale for --paginate. Specific reviewer-type handling explicit."},
+    "coordination": {"score": 5, "notes": "composes_with [git-pr, git-commit] both exist and chain correctly. spawned_by empty. owns correctly empty for workflow over remote API + local files."},
+    "completeness": {"score": 5, "notes": "All workflow content self-contained. gh CLI with --paginate + WHY. Edge Cases explicit (already-replied, outdated, multiple commits, no comments). Reply templates by category."},
+    "anti_patterns": {"score": 5, "notes": "Triage guidelines guard against stale-diff acting. 'Verify before acting' for Copilot. 'Stage files by name not git add -p' with WHY. No emojis, no excessive MUST/NEVER."}
+  },
+  "average": 5.00,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "owns.shared_read uses wildcard ['*']", "location": "SKILL.md:19", "fix": "Correct for this skill (may read any commented file); could narrow but not necessary."},
+      {"item": "Description uses > folded scalar with semantically-meaningless line breaks", "location": "SKILL.md:4-12", "fix": "Stylistic consistency nit (same as other git/ skills)."},
+      {"item": "{owner}/{repo}/{pr} placeholders at L147-153 not shell variables — could confuse paste-and-run users", "location": "SKILL.md:147-153", "fix": "Add note above code block: 'Substitute {owner}/{repo}/{pr} from gh pr view --json url,number; these are not shell variables.'"},
+      {"item": "L128 'git-commit conventions' lacks explicit path", "location": "SKILL.md:128", "fix": "Change to '[git-commit](../git-commit/SKILL.md) conventions'."},
+      {"item": "'Already-replied comment' detection phrased differently at L68-70 vs L188-189", "location": "SKILL.md:68-70 and SKILL.md:188-189", "fix": "Pick one phrasing and use both places."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add explicit cross-link to git-commit at L128", "file": "SKILL.md:128", "effort": "small"},
+    {"rank": 2, "fix": "Clarify that {owner}/{repo}/{pr} are placeholders not shell variables", "file": "SKILL.md:147-153", "effort": "small"},
+    {"rank": 3, "fix": "Normalize 'already-replied comment' detection wording between L68-70 and L188-189", "file": "SKILL.md:68-70 and SKILL.md:188-189", "effort": "small"}
+  ],
+  "broken_refs": []
+}

@@ -1,0 +1,35 @@
+{
+  "skill": "playwright",
+  "path": "skills/workflows/playwright/SKILL.md",
+  "version": "1.2.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields; semver 1.2.0; canonical allowed-tools; composes_with + spawned_by all resolve and reciprocate."},
+    "description_quality": {"score": 4, "notes": "616 chars; strong trigger coverage with 10 phrases; trimmable due to overlap."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 84 lines; three references all linked with purpose; body delegates aggressively."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; two named modes; numbered 5-step workflow; concrete snippets."},
+    "coordination": {"score": 5, "notes": "Reciprocal spawned_by verified — qe-agent SKILL.md:14 + orchestrator SKILL.md:21 both list playwright."},
+    "completeness": {"score": 5, "notes": "All three references exist; full workflow defined; troubleshooting + output conventions specified."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; no hardcoded project paths; no body/reference duplication beyond minor scannable-quick-path setup commands."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 616 chars with overlapping trigger phrases", "location": "SKILL.md:5", "fix": "Consolidate 10 trigger phrases to 4-5 canonical ones"}
+    ],
+    "nits": [
+      {"item": "compatibility field absent", "location": "SKILL.md:8", "fix": "Add compatibility string declaring Bash + Node/npm + Chromium + Linux install-deps requirement"},
+      {"item": "Setup commands duplicated between body (38-49) and references/setup.md", "location": "SKILL.md:38-49", "fix": "Trim body to version-check + pointer; move install commands to reference"},
+      {"item": "Spot-Check Mode described twice", "location": "SKILL.md:28-30,63-65", "fix": "Merge or trim line 63-65 to one-line pointer"},
+      {"item": "Phase 2 (Integration Verification) terminology should cross-check with qe-agent's phase labels", "location": "SKILL.md:67-69", "fix": "Verify qe-agent uses exact 'Phase 2' label, or rephrase generically"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 616 to ~300 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Add compatibility field with Linux install-deps note", "file": "SKILL.md:8", "effort": "small"},
+    {"rank": 3, "fix": "Merge the two Spot-Check Mode sections", "file": "SKILL.md:28-30,63-65", "effort": "small"}
+  ],
+  "broken_refs": []
+}

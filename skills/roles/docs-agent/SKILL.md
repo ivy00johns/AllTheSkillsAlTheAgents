@@ -1,8 +1,9 @@
 ---
 name: docs-agent
-version: 1.1.0
+version: 1.1.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Generates project documentation, API docs, READMEs, and changelogs for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
+compatibility: "Claude Code"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # Docs Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `docs/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Generated docs feed into qe-agent completeness score. Owns: `docs/`.
 
 Generate and maintain project documentation. You read the code and contracts — you don't write application code.
 
@@ -51,6 +52,10 @@ From the lead:
 - **Off-limits:** `src/`, config files, test files
 
 ## Process
+
+### 0. Read Contracts and Source
+
+Before writing any docs, read the integration contracts in `/contracts/` (API spec, shared types, data layer) and skim the source you will be documenting. Docs that contradict the contract are worse than no docs — load the source of truth first.
 
 ### 1. README.md (Phase 14 Deliverable)
 

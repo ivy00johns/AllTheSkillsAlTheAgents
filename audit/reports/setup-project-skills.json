@@ -1,0 +1,34 @@
+{
+  "skill": "setup-project-skills",
+  "path": "skills/workflows/setup-project-skills/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields present and well-formed; disable-model-invocation: true is not in the frontmatter spec — needs spec alignment or move to metadata."},
+    "description_quality": {"score": 5, "notes": "819 chars; starts with 'Bootstrap'; 5 trigger phrases plus slash-command form; clear scope statement."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 125 lines; 10 small templates under references/templates/ all linked from body lines 66-68."},
+    "instruction_clarity": {"score": 5, "notes": "Three-question flow with per-question heuristics; idempotence rules explicit; failure-loud contract for downstream skills clearly stated."},
+    "coordination": {"score": 5, "notes": "owns.directories docs/agents/ exclusive; composes_with project-profiler + sync-skills both exist; compose-with section accurate."},
+    "completeness": {"score": 5, "notes": "All 10 templates exist; Agent skills block given verbatim; downstream consumer pattern documented."},
+    "anti_patterns": {"score": 4, "notes": "disable-model-invocation is an out-of-spec extension; MUST in failure-loud contract is justified. Hardcoded 'Skill-Madness toolkit' name acceptable."}
+  },
+  "average": 4.71,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "disable-model-invocation: true frontmatter field is not in the spec", "location": "skills/workflows/setup-project-skills/SKILL.md:6", "fix": "Document it in skills/meta/skill-writer/references/frontmatter-spec.md or move to metadata.invocation: explicit-only"}
+    ],
+    "nits": [
+      {"item": "Hardcoded 'Skill-Madness toolkit' name in body text", "location": "skills/workflows/setup-project-skills/SKILL.md:25,87", "fix": "Acceptable since project is the target; leave or parameterize"},
+      {"item": "Output mapping uses shorthand bullets where a table would be clearer", "location": "skills/workflows/setup-project-skills/SKILL.md:64-68", "fix": "Convert to 3-column Question/Answer/Template table"},
+      {"item": "Failure-loud contract uses MUST but lacks a concrete detection snippet for downstream skill authors", "location": "skills/workflows/setup-project-skills/SKILL.md:98-110", "fix": "Add a one-line example check + error message template"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Resolve out-of-spec disable-model-invocation: true frontmatter field (add to spec or move under metadata)", "file": "skills/workflows/setup-project-skills/SKILL.md:6", "effort": "small"},
+    {"rank": 2, "fix": "Convert answer→template mapping bullets to explicit table", "file": "skills/workflows/setup-project-skills/SKILL.md:64-68", "effort": "small"},
+    {"rank": 3, "fix": "Add a concrete downstream detection-pattern code snippet", "file": "skills/workflows/setup-project-skills/SKILL.md:98-110", "effort": "small"}
+  ],
+  "broken_refs": []
+}

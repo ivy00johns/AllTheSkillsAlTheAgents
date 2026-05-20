@@ -1,0 +1,1141 @@
+{
+  "scanned_at": "2026-05-20",
+  "skill_count": 47,
+  "inventory": [
+    {
+      "name": "contract-auditor",
+      "category": "contracts",
+      "version": "1.1.0",
+      "desc_chars": 201,
+      "body_lines": 163,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "contract-author",
+      "category": "contracts",
+      "version": "1.3.0",
+      "desc_chars": 984,
+      "body_lines": 219,
+      "refs_count": 6,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "git-commit",
+      "category": "git",
+      "version": "1.2.0",
+      "desc_chars": 502,
+      "body_lines": 99,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "git-post-merge-cleanup",
+      "category": "git",
+      "version": "1.0.0",
+      "desc_chars": 959,
+      "body_lines": 171,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "git-pr",
+      "category": "git",
+      "version": "1.2.0",
+      "desc_chars": 553,
+      "body_lines": 114,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "git-pr-feedback",
+      "category": "git",
+      "version": "1.2.0",
+      "desc_chars": 554,
+      "body_lines": 172,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "skill-explorer",
+      "category": "meta",
+      "version": "1.0.0",
+      "desc_chars": 1024,
+      "body_lines": 136,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "skill-review",
+      "category": "meta",
+      "version": "1.1.0",
+      "desc_chars": 586,
+      "body_lines": 126,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "skill-update",
+      "category": "meta",
+      "version": "1.1.0",
+      "desc_chars": 596,
+      "body_lines": 126,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "skill-writer",
+      "category": "meta",
+      "version": "1.2.0",
+      "desc_chars": 377,
+      "body_lines": 115,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "orchestrator",
+      "category": "orchestrator",
+      "version": "1.8.0",
+      "desc_chars": 1445,
+      "body_lines": 203,
+      "refs_count": 9,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 46
+    },
+    {
+      "name": "backend-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 177,
+      "body_lines": 147,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 6
+    },
+    {
+      "name": "code-review-agent",
+      "category": "roles",
+      "version": "1.2.0",
+      "desc_chars": 210,
+      "body_lines": 134,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 5
+    },
+    {
+      "name": "db-migration-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 193,
+      "body_lines": 110,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "docs-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 192,
+      "body_lines": 98,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 5
+    },
+    {
+      "name": "frontend-agent",
+      "category": "roles",
+      "version": "1.2.0",
+      "desc_chars": 208,
+      "body_lines": 143,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 8
+    },
+    {
+      "name": "infrastructure-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 201,
+      "body_lines": 86,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 5
+    },
+    {
+      "name": "observability-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 176,
+      "body_lines": 114,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "performance-agent",
+      "category": "roles",
+      "version": "1.2.0",
+      "desc_chars": 192,
+      "body_lines": 120,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "qe-agent",
+      "category": "roles",
+      "version": "1.3.0",
+      "desc_chars": 232,
+      "body_lines": 107,
+      "refs_count": 5,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 7
+    },
+    {
+      "name": "security-agent",
+      "category": "roles",
+      "version": "1.1.0",
+      "desc_chars": 232,
+      "body_lines": 136,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 5
+    },
+    {
+      "name": "architecture-rescue",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 747,
+      "body_lines": 51,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "caveman",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 629,
+      "body_lines": 43,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 0
+    },
+    {
+      "name": "claude-design-brief",
+      "category": "workflows",
+      "version": "1.3.0",
+      "desc_chars": 1191,
+      "body_lines": 104,
+      "refs_count": 6,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "context-manager",
+      "category": "workflows",
+      "version": "1.1.0",
+      "desc_chars": 481,
+      "body_lines": 90,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 1
+    },
+    {
+      "name": "dependency-coordinator",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 238,
+      "body_lines": 103,
+      "refs_count": 3,
+      "has_allowed_tools": false,
+      "has_requires_fields": false,
+      "composes_count": 0
+    },
+    {
+      "name": "deployment-checklist",
+      "category": "workflows",
+      "version": "1.1.0",
+      "desc_chars": 416,
+      "body_lines": 60,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "diagnose-loop",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 603,
+      "body_lines": 68,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "grill-me",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 656,
+      "body_lines": 12,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "interactive-doc",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 1416,
+      "body_lines": 180,
+      "refs_count": 5,
+      "has_allowed_tools": false,
+      "has_requires_fields": false,
+      "composes_count": 0
+    },
+    {
+      "name": "llm-wiki",
+      "category": "workflows",
+      "version": "1.1.0",
+      "desc_chars": 846,
+      "body_lines": 177,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "maintain-context",
+      "category": "workflows",
+      "version": "1.1.0",
+      "desc_chars": 717,
+      "body_lines": 74,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "mermaid-charts",
+      "category": "workflows",
+      "version": "2.3.0",
+      "desc_chars": 954,
+      "body_lines": 71,
+      "refs_count": 4,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 9
+    },
+    {
+      "name": "nano-banana",
+      "category": "workflows",
+      "version": "1.2.0",
+      "desc_chars": 615,
+      "body_lines": 114,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "plan-builder",
+      "category": "workflows",
+      "version": "1.3.0",
+      "desc_chars": 673,
+      "body_lines": 105,
+      "refs_count": 2,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 4
+    },
+    {
+      "name": "playwright",
+      "category": "workflows",
+      "version": "1.2.0",
+      "desc_chars": 616,
+      "body_lines": 68,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "project-profiler",
+      "category": "workflows",
+      "version": "1.1.0",
+      "desc_chars": 483,
+      "body_lines": 107,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "railway-deploy",
+      "category": "workflows",
+      "version": "1.2.0",
+      "desc_chars": 586,
+      "body_lines": 71,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "render-sanity",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 1388,
+      "body_lines": 201,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 6
+    },
+    {
+      "name": "repo-deep-dive",
+      "category": "workflows",
+      "version": "1.2.0",
+      "desc_chars": 745,
+      "body_lines": 72,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 5
+    },
+    {
+      "name": "settings-consolidator",
+      "category": "workflows",
+      "version": "1.2.0",
+      "desc_chars": 928,
+      "body_lines": 91,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 1
+    },
+    {
+      "name": "setup-project-skills",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 685,
+      "body_lines": 108,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "sync-skills",
+      "category": "workflows",
+      "version": "2.0.0",
+      "desc_chars": 544,
+      "body_lines": 120,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 2
+    },
+    {
+      "name": "ui-brief",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 1443,
+      "body_lines": 170,
+      "refs_count": 1,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 7
+    },
+    {
+      "name": "wiki-research",
+      "category": "workflows",
+      "version": "2.1.0",
+      "desc_chars": 902,
+      "body_lines": 146,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "work-item-brief",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 631,
+      "body_lines": 76,
+      "refs_count": 3,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 3
+    },
+    {
+      "name": "zoom-out",
+      "category": "workflows",
+      "version": "1.0.0",
+      "desc_chars": 394,
+      "body_lines": 8,
+      "refs_count": 0,
+      "has_allowed_tools": true,
+      "has_requires_fields": true,
+      "composes_count": 1
+    }
+  ],
+  "ownership_conflicts": [],
+  "broken_cross_refs": {
+    "real_bugs": [
+      {
+        "skill": "git-commit",
+        "field": "composes_with",
+        "ref": "git-branch-cleanup"
+      },
+      {
+        "skill": "skill-explorer",
+        "field": "composes_with",
+        "ref": "skill-audit"
+      },
+      {
+        "skill": "skill-explorer",
+        "field": "composes_with",
+        "ref": "skill-deep-review"
+      },
+      {
+        "skill": "sync-skills",
+        "field": "composes_with",
+        "ref": "skill-updater"
+      },
+      {
+        "skill": "sync-skills",
+        "field": "composes_with",
+        "ref": "skill-audit"
+      }
+    ],
+    "plugin_only": [
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "brainstorming"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "writing-plans"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "frontend-design"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "ui-ux-pro-max"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "ux-review"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "claude-api"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "feature-dev"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "claude-mem:mem-search"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "claude-mem:timeline-report"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "claude-mem:knowledge-agent"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "loop"
+      },
+      {
+        "skill": "orchestrator",
+        "field": "composes_with",
+        "ref": "schedule"
+      },
+      {
+        "skill": "frontend-agent",
+        "field": "composes_with",
+        "ref": "frontend-design"
+      },
+      {
+        "skill": "frontend-agent",
+        "field": "composes_with",
+        "ref": "ui-ux-pro-max"
+      },
+      {
+        "skill": "claude-design-brief",
+        "field": "composes_with",
+        "ref": "ui-ux-pro-max"
+      },
+      {
+        "skill": "claude-design-brief",
+        "field": "composes_with",
+        "ref": "frontend-design"
+      },
+      {
+        "skill": "claude-design-brief",
+        "field": "composes_with",
+        "ref": "brainstorming"
+      },
+      {
+        "skill": "render-sanity",
+        "field": "composes_with",
+        "ref": "ux-review"
+      },
+      {
+        "skill": "render-sanity",
+        "field": "composes_with",
+        "ref": "feature-dev"
+      },
+      {
+        "skill": "render-sanity",
+        "field": "spawned_by",
+        "ref": "ux-review"
+      },
+      {
+        "skill": "ui-brief",
+        "field": "composes_with",
+        "ref": "ui-ux-pro-max"
+      },
+      {
+        "skill": "ui-brief",
+        "field": "composes_with",
+        "ref": "frontend-design"
+      },
+      {
+        "skill": "ui-brief",
+        "field": "composes_with",
+        "ref": "ux-review"
+      },
+      {
+        "skill": "ui-brief",
+        "field": "composes_with",
+        "ref": "brainstorming"
+      }
+    ]
+  },
+  "coverage_gaps": {
+    "in_claude_md_not_in_repo": [
+      "allowed-tools"
+    ],
+    "in_repo_not_in_claude_md": [
+      "backend-agent",
+      "caveman",
+      "code-review-agent",
+      "contract-auditor",
+      "contract-author",
+      "db-migration-agent",
+      "docs-agent",
+      "frontend-agent",
+      "git-commit",
+      "git-post-merge-cleanup",
+      "git-pr",
+      "git-pr-feedback",
+      "infrastructure-agent",
+      "observability-agent",
+      "orchestrator",
+      "performance-agent",
+      "playwright",
+      "qe-agent",
+      "render-sanity",
+      "security-agent",
+      "skill-explorer",
+      "skill-review",
+      "skill-update",
+      "skill-writer"
+    ],
+    "in_file_ownership_not_in_repo": [
+      "multi-agent"
+    ]
+  },
+  "claude_md_count_drift": {
+    "documented_workflows": 25,
+    "actual_workflows": 26,
+    "missing_from_claude_md_workflows_list": [
+      "render-sanity"
+    ]
+  },
+  "frontmatter_drift": {
+    "underscore_allowed_tools": 0,
+    "underscore_allowed_tools_skills": [],
+    "missing_version": 0,
+    "missing_version_skills": [],
+    "missing_requires_fields": [
+      "dependency-coordinator",
+      "interactive-doc"
+    ],
+    "reserved_prefix": [
+      "claude-design-brief"
+    ],
+    "non_spec_fields": {
+      "disable-model-invocation": [
+        "contract-auditor",
+        "backend-agent",
+        "code-review-agent",
+        "db-migration-agent",
+        "docs-agent",
+        "frontend-agent",
+        "infrastructure-agent",
+        "observability-agent",
+        "performance-agent",
+        "qe-agent",
+        "security-agent",
+        "dependency-coordinator",
+        "setup-project-skills",
+        "zoom-out"
+      ],
+      "argument-hint": [
+        "skill-review"
+      ],
+      "type": [
+        "dependency-coordinator"
+      ]
+    }
+  },
+  "desc_over_ceiling": [
+    {
+      "name": "orchestrator",
+      "chars": 1445
+    },
+    {
+      "name": "ui-brief",
+      "chars": 1443
+    },
+    {
+      "name": "interactive-doc",
+      "chars": 1416
+    },
+    {
+      "name": "render-sanity",
+      "chars": 1388
+    },
+    {
+      "name": "claude-design-brief",
+      "chars": 1191
+    }
+  ],
+  "desc_at_ceiling": [
+    {
+      "name": "skill-explorer",
+      "chars": 1024
+    }
+  ],
+  "body_outliers": [],
+  "body_top10": [
+    {
+      "name": "contract-author",
+      "lines": 219,
+      "words": 1509
+    },
+    {
+      "name": "orchestrator",
+      "lines": 203,
+      "words": 3057
+    },
+    {
+      "name": "render-sanity",
+      "lines": 201,
+      "words": 2625
+    },
+    {
+      "name": "interactive-doc",
+      "lines": 180,
+      "words": 1828
+    },
+    {
+      "name": "llm-wiki",
+      "lines": 177,
+      "words": 1088
+    },
+    {
+      "name": "git-pr-feedback",
+      "lines": 172,
+      "words": 904
+    },
+    {
+      "name": "git-post-merge-cleanup",
+      "lines": 171,
+      "words": 881
+    },
+    {
+      "name": "ui-brief",
+      "lines": 170,
+      "words": 2329
+    },
+    {
+      "name": "contract-auditor",
+      "lines": 163,
+      "words": 1055
+    },
+    {
+      "name": "backend-agent",
+      "lines": 147,
+      "words": 1072
+    }
+  ],
+  "overlapping_triggers": [
+    {
+      "a": "claude-design-brief",
+      "b": "ui-brief",
+      "shared": "design brief / redesign",
+      "disambig": "YES \u2014 both produce briefs. claude-design-brief = short prompt for Claude Design canvas; ui-brief = long Markdown spec for Claude Code build. Disambiguation already exists in both descriptions but easy to confuse."
+    },
+    {
+      "a": "skill-writer",
+      "b": "skill-update",
+      "shared": "create / improve skill",
+      "disambig": "YES \u2014 skill-writer creates new, skill-update modifies existing. Already disambiguated in descriptions but adjacent."
+    },
+    {
+      "a": "skill-writer",
+      "b": "skill-review",
+      "shared": "skill quality",
+      "disambig": "PARTIAL \u2014 review audits, writer creates. Low confusion risk."
+    },
+    {
+      "a": "skill-review",
+      "b": "skill-update",
+      "shared": "audit / improve",
+      "disambig": "YES \u2014 review reports, update fixes. Already coupled (review outputs feed update)."
+    },
+    {
+      "a": "interactive-doc",
+      "b": "llm-wiki",
+      "shared": "wiki / knowledge base",
+      "disambig": "YES \u2014 interactive-doc produces single HTML+MD pair; llm-wiki produces persistent multi-doc vault. Different scopes."
+    },
+    {
+      "a": "interactive-doc",
+      "b": "wiki-research",
+      "shared": "wiki / research artifact",
+      "disambig": "PARTIAL \u2014 interactive-doc renders existing research, wiki-research conducts deep research. Sequential, not competing."
+    },
+    {
+      "a": "llm-wiki",
+      "b": "wiki-research",
+      "shared": "wiki / second brain",
+      "disambig": "PARTIAL \u2014 llm-wiki maintains, wiki-research generates one-shot research. Disambiguation in descriptions."
+    },
+    {
+      "a": "playwright",
+      "b": "render-sanity",
+      "shared": "browser / frontend check",
+      "disambig": "YES \u2014 playwright = general browser automation/testing; render-sanity = quick visual sanity check post-build. Worth tightening render-sanity to say 'lightweight visual sanity' explicitly."
+    }
+  ],
+  "overlapping_triggers_all_keyword_pairs": [
+    [
+      "claude-design-brief",
+      "ui-brief",
+      "design brief / mockup / redesign UI"
+    ],
+    [
+      "skill-writer",
+      "skill-update",
+      "create/update skill / improve skill"
+    ],
+    [
+      "skill-writer",
+      "skill-review",
+      "skill quality / create skill"
+    ],
+    [
+      "skill-review",
+      "skill-update",
+      "audit / improve skill"
+    ],
+    [
+      "repo-deep-dive",
+      "skill-review",
+      "deep dive"
+    ],
+    [
+      "frontend-agent",
+      "orchestrator",
+      "frontend"
+    ],
+    [
+      "claude-design-brief",
+      "orchestrator",
+      "frontend"
+    ],
+    [
+      "orchestrator",
+      "playwright",
+      "frontend"
+    ],
+    [
+      "orchestrator",
+      "render-sanity",
+      "frontend"
+    ],
+    [
+      "orchestrator",
+      "ui-brief",
+      "frontend"
+    ],
+    [
+      "claude-design-brief",
+      "frontend-agent",
+      "frontend"
+    ],
+    [
+      "frontend-agent",
+      "playwright",
+      "frontend"
+    ],
+    [
+      "frontend-agent",
+      "render-sanity",
+      "frontend"
+    ],
+    [
+      "frontend-agent",
+      "ui-brief",
+      "frontend"
+    ],
+    [
+      "claude-design-brief",
+      "playwright",
+      "frontend"
+    ],
+    [
+      "claude-design-brief",
+      "render-sanity",
+      "frontend"
+    ],
+    [
+      "playwright",
+      "render-sanity",
+      "frontend"
+    ],
+    [
+      "playwright",
+      "ui-brief",
+      "frontend"
+    ],
+    [
+      "render-sanity",
+      "ui-brief",
+      "frontend"
+    ],
+    [
+      "llm-wiki",
+      "orchestrator",
+      "knowledge base"
+    ],
+    [
+      "interactive-doc",
+      "orchestrator",
+      "wiki"
+    ],
+    [
+      "orchestrator",
+      "wiki-research",
+      "wiki"
+    ],
+    [
+      "interactive-doc",
+      "llm-wiki",
+      "wiki"
+    ],
+    [
+      "interactive-doc",
+      "wiki-research",
+      "wiki"
+    ],
+    [
+      "llm-wiki",
+      "wiki-research",
+      "wiki"
+    ],
+    [
+      "mermaid-charts",
+      "orchestrator",
+      "diagram"
+    ],
+    [
+      "interactive-doc",
+      "mermaid-charts",
+      "diagram"
+    ],
+    [
+      "infrastructure-agent",
+      "orchestrator",
+      "deploy"
+    ],
+    [
+      "deployment-checklist",
+      "orchestrator",
+      "deploy"
+    ],
+    [
+      "orchestrator",
+      "railway-deploy",
+      "deploy"
+    ],
+    [
+      "orchestrator",
+      "sync-skills",
+      "deploy"
+    ],
+    [
+      "deployment-checklist",
+      "infrastructure-agent",
+      "deploy"
+    ],
+    [
+      "infrastructure-agent",
+      "railway-deploy",
+      "deploy"
+    ],
+    [
+      "infrastructure-agent",
+      "sync-skills",
+      "deploy"
+    ],
+    [
+      "deployment-checklist",
+      "railway-deploy",
+      "deploy"
+    ],
+    [
+      "deployment-checklist",
+      "sync-skills",
+      "deploy"
+    ],
+    [
+      "railway-deploy",
+      "sync-skills",
+      "deploy"
+    ],
+    [
+      "interactive-doc",
+      "repo-deep-dive",
+      "deep research"
+    ]
+  ],
+  "dead_references": [
+    {
+      "skill": "db-migration-agent",
+      "unlinked": [
+        "validation-checklist.md"
+      ]
+    },
+    {
+      "skill": "claude-design-brief",
+      "unlinked": [
+        "direction-examples"
+      ]
+    },
+    {
+      "skill": "mermaid-charts",
+      "unlinked": [
+        "chart-types"
+      ]
+    },
+    {
+      "skill": "setup-project-skills",
+      "unlinked": [
+        "templates"
+      ]
+    }
+  ],
+  "stale_archive_refs": [
+    {
+      "skill": "git-commit",
+      "archived_ref": "git-branch-cleanup"
+    },
+    {
+      "skill": "skill-update",
+      "archived_ref": "skill-audit"
+    },
+    {
+      "skill": "skill-update",
+      "archived_ref": "skill-deep-review"
+    },
+    {
+      "skill": "skill-explorer",
+      "archived_ref": "skill-audit"
+    },
+    {
+      "skill": "skill-explorer",
+      "archived_ref": "skill-deep-review"
+    },
+    {
+      "skill": "sync-skills",
+      "archived_ref": "skill-audit"
+    },
+    {
+      "skill": "sync-skills",
+      "archived_ref": "skill-updater"
+    },
+    {
+      "skill": "skill-update",
+      "archived_ref": "skill-audit",
+      "in_file": "skills/meta/skill-update/references/plan-format.md"
+    }
+  ],
+  "summary": {
+    "critical_count": 17,
+    "important_count": 42
+  }
+}

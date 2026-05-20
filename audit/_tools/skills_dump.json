@@ -1,0 +1,2859 @@
+{
+  "skills": [
+    {
+      "name": "contract-auditor",
+      "path": "skills/contracts/contract-auditor/SKILL.md",
+      "category": "contracts",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Audits implementations against integration contracts to find mismatches before integration testing. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 201,
+      "body_lines": 165,
+      "body_words": 1055,
+      "refs": [
+        "pact-setup.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "pact-setup.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "contract-author",
+        "qe-agent",
+        "backend-agent",
+        "frontend-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "contract-author",
+      "path": "skills/contracts/contract-author/SKILL.md",
+      "category": "contracts",
+      "version": "1.3.0",
+      "description": "Generate machine-readable integration contracts (API, data layer, shared types, events) before any implementation begins in multi-agent builds. This is orchestrator Phase 4 \u2014 contracts are written here before any implementation agent is spawned. Use this skill when authoring API contracts, OpenAPI specs, AsyncAPI specs, Pydantic models, TypeScript interfaces, JSON Schema definitions, data layer interfaces, shared type schemas, integration boundaries between agents, or domain business rules for multi-agent coordination. Trigger for any contract creation task, especially before spawning implementation agents. Also trigger when the user says \"write the API contract\", \"define the shared types\", \"spec out the endpoints\", \"create the OpenAPI\", \"author the contract\", or when the orchestrator needs contracts authored for a plan document. Bundles 6 templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema, and a data-layer YAML \u2014 pick the one matching the project's stack.\n",
+      "desc_len": 984,
+      "body_lines": 221,
+      "body_words": 1509,
+      "refs": [
+        "asyncapi-template.yaml",
+        "typescript-template.ts",
+        "openapi-template.yaml",
+        "json-schema-template.json",
+        "data-layer-template.yaml",
+        "pydantic-template.py"
+      ],
+      "refs_count": 6,
+      "body_ref_links": [
+        "json-schema-template.json",
+        "data-layer-template.yaml",
+        "pydantic-template.py",
+        "asyncapi-template.yaml",
+        "openapi-template.yaml",
+        "typescript-template.ts"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "frontend-agent",
+        "contract-auditor",
+        "qe-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "contracts/",
+          "schemas/"
+        ],
+        "patterns": [
+          "openapi.yaml",
+          "asyncapi.yaml"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "git-commit",
+      "path": "skills/git/git-commit/SKILL.md",
+      "category": "git",
+      "version": "1.2.0",
+      "description": "Guide for creating git commits in this repository: conventional commit format, allowed types, and branch naming conventions. Use when staging changes and writing a commit message, creating a branch, or naming a branch. Trigger on: \"commit\", \"create a commit\", \"git commit\", \"stage changes\", \"write a commit message\", \"make a commit\", \"branch name\", \"new branch\", \"create branch\". Also use proactively whenever you are about to run `git commit` \u2014 even if the user did not explicitly mention this skill.\n",
+      "desc_len": 502,
+      "body_lines": 101,
+      "body_words": 369,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "git-pr",
+        "git-branch-cleanup"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "git-post-merge-cleanup",
+      "path": "skills/git/git-post-merge-cleanup/SKILL.md",
+      "category": "git",
+      "version": "1.0.0",
+      "description": "Clean up everything stale after merges in one pass: local branches fully merged into the default branch, remote-tracking refs whose remote is gone, and worktrees that look \"modified\" but are already on main. Scans, classifies, presents a clear plan, and only acts on confirmation. Supports `--dry-run` and `--yes`. Use whenever the user mentions cleaning up branches OR worktrees, tidying git state after a batch of PRs landed, or noticing stale debris. Trigger on: \"clean up branches\", \"delete merged branches\", \"prune branches\", \"stale branches\", \"branch cleanup\", \"tidy branches\", \"remove old branches\", \"clean up worktrees\", \"remove old worktrees\", \"worktree confusion\", \"phantom modified files\", \"tidy git state\", \"lots of things merged\", \"post-merge cleanup\", \"I have too many branches\", \"clean up my git\". Also trigger proactively when `git worktree list` shows entries beyond the main worktree, or after a run of `git-pr` merges several PRs in a row.\n",
+      "desc_len": 959,
+      "body_lines": 173,
+      "body_words": 881,
+      "refs": [
+        "branch-classification.md",
+        "worktree-cleanup-rules.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "branch-classification.md",
+        "worktree-cleanup-rules.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "git-commit",
+        "git-pr"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "git-pr",
+      "path": "skills/git/git-pr/SKILL.md",
+      "category": "git",
+      "version": "1.2.0",
+      "description": "Guide for creating and updating GitHub pull requests in this repository: PR title format, body structure, clean descriptions, and the gh CLI workflow. Use when creating a pull request, writing a PR description, updating a PR, or preparing changes for review. Trigger on: \"create a PR\", \"open a PR\", \"pull request\", \"PR description\", \"PR body\", \"ready for review\", \"gh pr create\", \"open pull request\", \"submit PR\", \"PR template\". Also use proactively whenever you are about to run `gh pr create` \u2014 even if the user did not explicitly mention this skill.\n",
+      "desc_len": 553,
+      "body_lines": 116,
+      "body_words": 430,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "git-commit",
+        "git-pr-feedback"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "git-pr-feedback",
+      "path": "skills/git/git-pr-feedback/SKILL.md",
+      "category": "git",
+      "version": "1.2.0",
+      "description": "Fetch, triage, and address PR review comments from GitHub Copilot and human reviewers. Use when the user asks to check PR feedback, review comments, address reviewer suggestions, or fix PR issues. Trigger on: \"check PR comments\", \"what did copilot say\", \"address PR feedback\", \"fix review comments\", \"handle PR suggestions\", \"review feedback\", \"PR comments\", \"copilot review\", \"reviewer feedback\", or any mention of responding to pull request comments. Also trigger when the user returns to a PR after some time and wants to handle accumulated feedback.\n",
+      "desc_len": 554,
+      "body_lines": 174,
+      "body_words": 904,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "git-pr",
+        "git-commit"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "skill-explorer",
+      "path": "skills/meta/skill-explorer/SKILL.md",
+      "category": "meta",
+      "version": "1.0.0",
+      "description": "Help the user discover, recall, understand, and pick the right skill from the available toolkit.\nUse this skill whenever the user is trying to find a skill (\"I forgot the name of the one that does X\",\n\"what was that skill called\", \"I had a skill for this\"), asking what skills exist (\"what skills do I\nhave\", \"show me the catalog\", \"list all my skills\", \"what can you do here\"), asking what a specific\nskill does (\"what does X do\", \"explain the X skill\", \"tell me about Y\"), asking how skills relate\n(\"how do these connect\", \"what works with X\", \"what does orchestrator spawn\"), OR asking for routing\nhelp (\"which skill for this task\", \"what should I use to Y\", \"I want to do Z \u2014 which skill\"). Also\ntrigger when the user starts a session by reaching for orchestrator on something that isn't a\nmulti-agent build, or asks any meta-question about the skill ecosystem itself. This is the entry\npoint for \"I don't know what to use\" \u2014 it names the right skill and explains why; it does NOT\ninvoke the skill on the user's behalf.\n",
+      "desc_len": 1024,
+      "body_lines": 138,
+      "body_words": 1186,
+      "refs": [
+        "routing-table.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "routing-table.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "skill-audit",
+        "skill-deep-review",
+        "skill-writer"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "skills/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "skill-review",
+      "path": "skills/meta/skill-review/SKILL.md",
+      "category": "meta",
+      "version": "1.1.0",
+      "description": "Review skills for quality, consistency, triggering accuracy, and adherence to the 100-line rule. Two modes: 'all' (bulk ecosystem-wide scan for ownership conflicts, gaps, length outliers, weak triggers) or a single skill name (deep dive on description quality, body structure, anti-pattern naming, cross-references). Outputs a structured report consumable by skill-update. Trigger on: 'audit skills', 'review this skill', 'health check skills', 'skill ecosystem health', 'is this skill any good', 'scan all skills', 'check my skills', 'deep review', 'bulk review', 'what needs fixing'.\n",
+      "desc_len": 586,
+      "body_lines": 128,
+      "body_words": 1033,
+      "refs": [
+        "deep-review-rubric.md",
+        "report-format.md",
+        "audit-checklist.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "audit-checklist.md",
+        "report-format.md",
+        "deep-review-rubric.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "skill-update",
+        "skill-writer"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "skills/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "argument-hint",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "skill-update",
+      "path": "skills/meta/skill-update/SKILL.md",
+      "category": "meta",
+      "version": "1.1.0",
+      "description": "Plan and apply changes to an existing skill in one workflow. Reads a skill-deep-review or skill-audit report (or inline findings), drafts an edit list with the agent's recommended answer attached to each item, walks the user through the changes one at a time, applies them, and re-runs lint and frontmatter checks. Use after running skill-review or skill-audit and you are ready to ship changes. Trigger on: \"apply the review\", \"update this skill\", \"fix the skill\", \"ship the recommendations\", \"edit this skill\", \"let's improve it\", \"apply the plan\", \"implement the changes\", \"make those edits\".\n",
+      "desc_len": 596,
+      "body_lines": 128,
+      "body_words": 890,
+      "refs": [
+        "validation-checklist.md",
+        "plan-format.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "validation-checklist.md",
+        "frontmatter-spec.md",
+        "plan-format.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "skill-review",
+        "skill-writer",
+        "sync-skills"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [
+          "skills/"
+        ],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "skill-writer",
+      "path": "skills/meta/skill-writer/SKILL.md",
+      "category": "meta",
+      "version": "1.2.0",
+      "description": "Generate new SKILL.md files conforming to the ecosystem's frontmatter spec and structure conventions. Use this skill when creating any new skill, agent role definition, or workflow skill. Trigger whenever someone says \"create a skill\", \"new agent\", \"write a SKILL.md\", or needs to add a role to the skill ecosystem. Also use when reviewing existing skills for spec compliance.\n",
+      "desc_len": 377,
+      "body_lines": 117,
+      "body_words": 729,
+      "refs": [
+        "frontmatter-spec.md",
+        "description-patterns.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "description-patterns.md",
+        "frontmatter-spec.md",
+        "validation-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "project-profiler",
+        "orchestrator"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "orchestrator",
+      "path": "skills/orchestrator/SKILL.md",
+      "category": "orchestrator",
+      "version": "1.8.0",
+      "description": "Lead coordinator and conductor for multi-agent builds using Claude Code. Takes a plan or mission document, executes its phases end-to-end, and orchestrates parallel role-agents with a contract-first architecture. The orchestrator is the conductor \u2014 not the only player: it INVOKES other skills (nano-banana for imagery, ui-ux-pro-max + frontend-design for UI quality, ux-review for post-build validation, repo-deep-dive for reference research, llm-wiki for project knowledge bases, mermaid-charts for diagrams, deployment-checklist for ship readiness) at the appropriate phase, and DISPATCHES role-agents (backend, frontend, db, infra, security, observability, performance, docs, qe) for parallel implementation. Use this skill when building a project with multiple agents, coordinating an agent team build, executing a multi-phase mission document, or when the user mentions \"agent team\", \"parallel build\", \"multi-agent\", \"swarm build\", \"team build\", a \"MISSION.md\" file, or wants to split work across multiple Claude sessions. Trigger even for simple build requests like \"build X \u2014 use an agent team\". This is the primary entry point for any orchestrated build. It does NOT preempt brainstorming, plan-builder, writing-plans, frontend-design, ui-ux-pro-max, nano-banana, claude-design-brief, ui-brief, repo-deep-dive, llm-wiki, ux-review, feature-dev, or claude-mem \u2014 it COMPOSES with them, invoking each at the phase where it earns its keep.\n",
+      "desc_len": 1445,
+      "body_lines": 205,
+      "body_words": 3057,
+      "refs": [
+        "wave-gate.md",
+        "team-sizing.md",
+        "circuit-breaker.md",
+        "mission-interpretation.md",
+        "file-ownership.md",
+        "agent-spawning.md",
+        "handoff-protocol.md",
+        "workspace-bootstrap.md",
+        "phase-guide.md"
+      ],
+      "refs_count": 9,
+      "body_ref_links": [
+        "phase-guide.md",
+        "file-ownership.md",
+        "qa-report-schema.json",
+        "workspace-bootstrap.md",
+        "agent-spawning.md",
+        "mission-interpretation.md",
+        "team-sizing.md",
+        "wave-gate.md",
+        "handoff-protocol.md",
+        "circuit-breaker.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "wiki-research",
+        "llm-wiki",
+        "repo-deep-dive",
+        "brainstorming",
+        "plan-builder",
+        "writing-plans",
+        "backend-agent",
+        "frontend-agent",
+        "infrastructure-agent",
+        "qe-agent",
+        "security-agent",
+        "docs-agent",
+        "observability-agent",
+        "db-migration-agent",
+        "performance-agent",
+        "contract-author",
+        "contract-auditor",
+        "dependency-coordinator",
+        "context-manager",
+        "deployment-checklist",
+        "code-review-agent",
+        "project-profiler",
+        "mermaid-charts",
+        "playwright",
+        "claude-design-brief",
+        "ui-brief",
+        "frontend-design",
+        "ui-ux-pro-max",
+        "ux-review",
+        "render-sanity",
+        "nano-banana",
+        "claude-api",
+        "feature-dev",
+        "git-commit",
+        "git-pr",
+        "git-pr-feedback",
+        "git-post-merge-cleanup",
+        "claude-mem:mem-search",
+        "claude-mem:timeline-report",
+        "claude-mem:knowledge-agent",
+        "skill-writer",
+        "skill-review",
+        "skill-update",
+        "railway-deploy",
+        "loop",
+        "schedule"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          ".gitignore"
+        ],
+        "shared_read": [
+          "contracts/",
+          ".claude/handoffs/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "backend-agent",
+      "path": "skills/roles/backend-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Builds API servers, business logic, and data layers for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 177,
+      "body_lines": 149,
+      "body_words": 1072,
+      "refs": [
+        "validation-checklist.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "validation-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "frontend-agent",
+        "qe-agent",
+        "infrastructure-agent",
+        "contract-author",
+        "db-migration-agent",
+        "observability-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "src/api/",
+          "src/services/",
+          "src/models/",
+          "src/middleware/",
+          "src/utils/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "contracts/",
+          "shared/",
+          "src/types/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "code-review-agent",
+      "path": "skills/roles/code-review-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.2.0",
+      "description": "Orchestrator-dispatched only. Reviews code for quality, correctness, security, and adherence to project conventions in multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 210,
+      "body_lines": 136,
+      "body_words": 724,
+      "refs": [
+        "review-rubric.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "review-rubric.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "wiki-research",
+        "qe-agent",
+        "security-agent",
+        "backend-agent",
+        "frontend-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "db-migration-agent",
+      "path": "skills/roles/db-migration-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Manages database schema migrations, seed data, and schema evolution for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 193,
+      "body_lines": 112,
+      "body_words": 715,
+      "refs": [
+        "validation-checklist.md",
+        "migration-checklist.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "migration-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "infrastructure-agent",
+        "qe-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "migrations/",
+          "seeds/",
+          "prisma/",
+          "alembic/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "src/models/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "docs-agent",
+      "path": "skills/roles/docs-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Generates project documentation, API docs, READMEs, and changelogs for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 192,
+      "body_lines": 100,
+      "body_words": 545,
+      "refs": [
+        "doc-templates.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "doc-templates.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "frontend-agent",
+        "infrastructure-agent",
+        "mermaid-charts",
+        "contract-author"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "docs/"
+        ],
+        "patterns": [
+          "README.md",
+          "CHANGELOG.md",
+          "CONTRIBUTING.md"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "frontend-agent",
+      "path": "skills/roles/frontend-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.2.0",
+      "description": "Orchestrator-dispatched only. Builds user interfaces, client-side state, and presentation layers for multi-agent builds. Composes with frontend-design and ui-ux-pro-max for visual quality. Not user-invocable.",
+      "desc_len": 208,
+      "body_lines": 145,
+      "body_words": 1030,
+      "refs": [
+        "validation-checklist.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "validation-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "qe-agent",
+        "infrastructure-agent",
+        "contract-author",
+        "frontend-design",
+        "ui-ux-pro-max",
+        "ui-brief",
+        "nano-banana"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "src/components/",
+          "src/pages/",
+          "src/hooks/",
+          "src/styles/",
+          "public/"
+        ],
+        "patterns": [
+          "*.tsx",
+          "*.jsx",
+          "*.vue",
+          "*.svelte",
+          "*.css"
+        ],
+        "shared_read": [
+          "contracts/",
+          "shared/",
+          "src/types/",
+          "assets/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "infrastructure-agent",
+      "path": "skills/roles/infrastructure-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Builds containerization, orchestration, CI/CD, and deployment configuration for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 201,
+      "body_lines": 88,
+      "body_words": 567,
+      "refs": [
+        "validation-checklist.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "validation-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "frontend-agent",
+        "qe-agent",
+        "deployment-checklist",
+        "observability-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          ".github/workflows/",
+          "nginx/",
+          "k8s/",
+          "terraform/",
+          "scripts/deploy/"
+        ],
+        "patterns": [
+          "Dockerfile*",
+          "docker-compose*",
+          "Makefile",
+          "justfile"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "observability-agent",
+      "path": "skills/roles/observability-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Sets up logging, monitoring, metrics, and alerting for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 176,
+      "body_lines": 116,
+      "body_words": 697,
+      "refs": [
+        "monitoring-patterns.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "monitoring-patterns.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "infrastructure-agent",
+        "frontend-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "src/telemetry/",
+          "src/logging/",
+          "monitoring/",
+          "alerts/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "src/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "performance-agent",
+      "path": "skills/roles/performance-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.2.0",
+      "description": "Orchestrator-dispatched only. Designs and executes performance tests, load tests, and benchmarks for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 192,
+      "body_lines": 122,
+      "body_words": 841,
+      "refs": [
+        "k6-patterns.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "k6-patterns.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "infrastructure-agent",
+        "qe-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "tests/performance/",
+          "load-tests/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "qe-agent",
+      "path": "skills/roles/qe-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.3.0",
+      "description": "Orchestrator-dispatched only. Verifies implementations match contracts, integrations connect, and edge cases are handled \u2014 owns the `qa-report.json` build gate. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 232,
+      "body_lines": 109,
+      "body_words": 963,
+      "refs": [
+        "qa-report-schema.json",
+        "validation-checklist.md",
+        "qa-report-schema.md",
+        "llm-judge-rubrics.md",
+        "severity-thresholds.md"
+      ],
+      "refs_count": 5,
+      "body_ref_links": [
+        "validation-checklist.md",
+        "qa-report-schema.json",
+        "qa-report-schema.md",
+        "severity-thresholds.md",
+        "llm-judge-rubrics.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "frontend-agent",
+        "infrastructure-agent",
+        "security-agent",
+        "contract-auditor",
+        "performance-agent",
+        "playwright"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          "tests/",
+          "e2e/",
+          "__tests__/"
+        ],
+        "patterns": [
+          "*.test.*",
+          "*.spec.*",
+          "qa-report.md",
+          "qa-report.json"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "security-agent",
+      "path": "skills/roles/security-agent/SKILL.md",
+      "category": "roles",
+      "version": "1.1.0",
+      "description": "Orchestrator-dispatched only. Audits codebases for security vulnerabilities, reviews auth implementations, and verifies OWASP compliance for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 232,
+      "body_lines": 138,
+      "body_words": 779,
+      "refs": [
+        "owasp-checklist.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "owasp-checklist.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "backend-agent",
+        "frontend-agent",
+        "qe-agent",
+        "code-review-agent",
+        "infrastructure-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          ".github/security/"
+        ],
+        "patterns": [
+          "SECURITY.md"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "architecture-rescue",
+      "path": "skills/workflows/architecture-rescue/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Find deepening opportunities in a codebase: shallow modules, missing seams, leaky abstractions. Apply the deletion test (would removing this module concentrate complexity or just move it?) and the two-adapter rule (one adapter = hypothetical seam, two = real seam). Present numbered candidates with locality/leverage benefits. Drop into a grilling session before proposing concrete interfaces. Use this skill when the codebase feels tangled, tests are hard to write, modules feel 'shallow', or it's time for a quarterly architecture review. Trigger on: 'improve architecture', 'rescue this codebase', 'find refactoring opportunities', 'this is a mess', 'ball of mud', 'consolidate modules', 'make it testable', 'shallow modules', 'deepen modules'.",
+      "desc_len": 747,
+      "body_lines": 53,
+      "body_words": 561,
+      "refs": [
+        "architecture-language.md",
+        "interface-design.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "interface-design.md",
+        "architecture-language.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "grill-me",
+        "maintain-context",
+        "diagnose-loop"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "caveman",
+      "path": "skills/workflows/caveman/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Ultra-compressed communication mode. Cuts response token usage ~75% by dropping articles (a/an/the), filler (just/really/basically), pleasantries, and hedging while preserving full technical accuracy. ACTIVE EVERY RESPONSE once triggered; off only when user says 'stop caveman' or 'normal mode'. Automatically de-activates temporarily for security warnings, irreversible-action confirmations, multi-step sequences where fragment order risks misread, or when the user asks for clarification. Trigger on: 'caveman mode', 'talk like caveman', 'less tokens', 'be terse', 'compress', '/caveman', 'fewer tokens', 'stop being verbose'.\n",
+      "desc_len": 629,
+      "body_lines": 45,
+      "body_words": 245,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "claude-design-brief",
+      "path": "skills/workflows/claude-design-brief/SKILL.md",
+      "category": "workflows",
+      "version": "1.3.0",
+      "description": "Generate paste-ready prompts for Claude Design (the artifact / design-canvas tool at claude.ai, distinct from Claude Code) that are so specific and committed that Claude Design skips its Q&A loop and goes straight to building. Use this skill whenever the user wants to produce hi-fi design mockups, an interactive prototype, an artifact-based mockup canvas, multiple design directions on a canvas, or compare safe / bold / experimental directions inside Claude. Trigger on phrases like \"build mockups in Claude Design\", \"design canvas prompt\", \"hi-fi design mockup\", \"interactive prototype in claude\", \"claude design prompt\", \"make me a mockup prompt\", \"I want directions A/B/C in claude\", \"stop letting claude design ask me 15 questions\", \"claude design keeps asking\", \"compare safe / bold / experimental\", or \"build me variations on a design canvas\". Distinguish from `ui-brief`: ui-brief produces a long Markdown spec for Claude Code / a frontend agent to BUILD the production site; this skill produces a short paste-ready prompt for Claude Design's canvas to MOCK UP variations. Works for any product type \u2014 personal brand sites, advocacy sites, dashboards, marketing sites, portfolios.\n",
+      "desc_len": 1191,
+      "body_lines": 106,
+      "body_words": 1253,
+      "refs": [
+        "variation-and-risks.md",
+        "usage-modes.md",
+        "anti-patterns.md",
+        "prompt-template.md",
+        "canvas-constraints.md",
+        "direction-examples/bold.md",
+        "direction-examples/safe.md",
+        "direction-examples/experimental.md"
+      ],
+      "refs_count": 8,
+      "body_ref_links": [
+        "usage-modes.md",
+        "direction-examples/",
+        "variation-and-risks.md",
+        "prompt-template.md",
+        "anti-patterns.md",
+        "direction-examples/bold.md",
+        "canvas-constraints.md",
+        "direction-examples/safe.md",
+        "frontmatter-spec.md",
+        "direction-examples/experimental.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "ui-brief",
+        "ui-ux-pro-max",
+        "frontend-design",
+        "brainstorming"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "context-manager",
+      "path": "skills/workflows/context-manager/SKILL.md",
+      "category": "workflows",
+      "version": "1.1.0",
+      "description": "Manage context window usage, compaction strategy, and session handoffs for long-running multi-agent builds. Use this skill when managing context limits, performing session handoffs, compacting conversation history, or coordinating continuation agents. Trigger on: \"compact this\", \"handoff this conversation\", \"we're running out of context\", \"save state\", \"transfer to a new session\", \"context is too full\", \"summarize this session for the next one\", \"continue in a fresh session\".\n",
+      "desc_len": 481,
+      "body_lines": 92,
+      "body_words": 509,
+      "refs": [
+        "compaction-guide.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "compaction-guide.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "orchestrator"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [
+          ".claude/handoffs/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "dependency-coordinator",
+      "path": "skills/workflows/dependency-coordinator/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Orchestrator-dispatched only. Authors the cross-package dependency manifest before parallel implementation agents are dispatched, preventing transitive version drift. Composed by orchestrator during multi-agent builds. Not user-invocable.",
+      "desc_len": 238,
+      "body_lines": 105,
+      "body_words": 979,
+      "refs": [
+        "pinning-strategies.md",
+        "dependencies-md-template.md",
+        "known-conflict-deps.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "dependencies-md-template.md",
+        "pinning-strategies.md",
+        "known-conflict-deps.md"
+      ],
+      "has_allowed_tools_hyphen": false,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": false,
+      "has_requires_claude_code": false,
+      "has_min_plan": false,
+      "has_version": true,
+      "has_composes_with": false,
+      "has_spawned_by": false,
+      "has_owns": false,
+      "composes_with": [],
+      "spawned_by": [],
+      "owns": {},
+      "raw_field_order": [
+        "name",
+        "version",
+        "disable-model-invocation",
+        "description",
+        "type"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "deployment-checklist",
+      "path": "skills/workflows/deployment-checklist/SKILL.md",
+      "category": "workflows",
+      "version": "1.1.0",
+      "description": "Run pre-deployment verification checklists before pushing to staging or production. Use this skill when preparing for deployment, running pre-deploy checks, verifying environment configs, or validating build artifacts. Trigger on: \"pre-deploy check\", \"deployment checklist\", \"ready to ship\", \"is this ready for prod\", \"deploy readiness\", \"release checklist\", \"can we deploy\", \"verify the build\", \"pre-flight check\".\n",
+      "desc_len": 416,
+      "body_lines": 62,
+      "body_words": 366,
+      "refs": [
+        "pre-deploy.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "pre-deploy.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "infrastructure-agent",
+        "qe-agent",
+        "security-agent",
+        "observability-agent"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "diagnose-loop",
+      "path": "skills/workflows/diagnose-loop/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Disciplined bug-diagnosis loop where Phase 1 \u2014 building a fast deterministic feedback loop \u2014 IS the skill. The remaining phases (reproduce, hypothesize, instrument, fix, regression-test, cleanup) mechanically consume the loop's signal. Make sure to use this skill whenever the user reports a hard bug, a flaky test, a performance regression, or says they've been \"staring at this for an hour.\" Trigger on: \"diagnose this\", \"debug this\", \"why is this broken\", \"it sometimes fails\", \"performance regression\", \"I can't reproduce it\", \"what's wrong with this\", \"this test is flaky\", \"intermittent failure\".\n",
+      "desc_len": 603,
+      "body_lines": 70,
+      "body_words": 891,
+      "refs": [
+        "hypothesis-format.md",
+        "feedback-loop-recipes.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "hypothesis-format.md",
+        "feedback-loop-recipes.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "playwright",
+        "qe-agent"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "grill-me",
+      "path": "skills/workflows/grill-me/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Get relentlessly interviewed about a plan, design, or change until every branch of the decision tree is resolved. The agent walks the design tree depth-first, asks ONE question at a time, attaches its recommended answer to each question, and prefers exploring the codebase over asking when an answer can be found in code. Use this skill before any non-trivial change, when scope feels fuzzy, or when stress-testing a plan before committing. Trigger on: 'grill me', 'interview me', 'challenge my plan', 'ask me questions', 'I'm not sure what I want', 'help me think this through', 'is this the right approach', 'walk me through it', 'stress test this plan'.",
+      "desc_len": 656,
+      "body_lines": 14,
+      "body_words": 176,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "architecture-rescue",
+        "maintain-context",
+        "plan-builder"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "interactive-doc",
+      "path": "skills/workflows/interactive-doc/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Use this skill whenever the user wants rich documentation as a paired Obsidian-friendly markdown source plus an HTML companion built from it \u2014 the \"unreasonable effectiveness of HTML\" pattern with the .md as canonical source of truth. Two workflows: (A) render an existing research markdown file into an HTML companion (the .md stays read-only by default), or (B) create both files for a new doc, with the .md written first as the substantive source and the HTML derived from it. Trigger this for architecture deep-dives, module maps, concept explainers (interactive demos), side-by-side comparisons of repos or approaches, feature walkthroughs, and any time the user mentions \"interactive doc\", \"wiki page\", \"Obsidian doc\", \"explainer\", \"render this research\", \"architecture diagram\", \"compare these repos\", or wants documentation that goes beyond a markdown wall of text. Especially trigger when the user has done deep research in markdown and wants an HTML companion humans will actually read, or when they want a new doc that lives in their Obsidian vault but also has a beautiful rendered version. Output is always a pair: a fully-substantive `.md` (Obsidian-native: YAML frontmatter, wiki links, callouts, Mermaid diagrams) and a self-contained `.html` companion (inline SVG, collapsibles, tabs, on-page nav, optional interactive demos). One self-contained HTML file per doc, no build step, opens in a browser.\n",
+      "desc_len": 1417,
+      "body_lines": 182,
+      "body_words": 1828,
+      "refs": [
+        "comparison.md",
+        "house-style.md",
+        "markdown-document.md",
+        "architecture-map.md",
+        "concept-explainer.md"
+      ],
+      "refs_count": 5,
+      "body_ref_links": [
+        "comparison.md",
+        "markdown-document.md",
+        "house-style.md",
+        "architecture-map.md",
+        "concept-explainer.md"
+      ],
+      "has_allowed_tools_hyphen": false,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": false,
+      "has_requires_claude_code": false,
+      "has_min_plan": false,
+      "has_version": true,
+      "has_composes_with": false,
+      "has_spawned_by": false,
+      "has_owns": false,
+      "composes_with": [],
+      "spawned_by": [],
+      "owns": {},
+      "raw_field_order": [
+        "name",
+        "version",
+        "description"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "llm-wiki",
+      "path": "skills/workflows/llm-wiki/SKILL.md",
+      "category": "workflows",
+      "version": "1.1.0",
+      "description": "Bootstrap and maintain LLM-powered personal knowledge bases (wikis) for any project or\ndomain. Use when the user wants to create a \"second brain\", knowledge base, personal wiki,\nresearch tracker, reading companion, competitive analysis wiki, team knowledge base, or\nproject notes. Trigger when the user says \"set up a wiki for X\", \"I want to track my\nresearch on Y\", \"build me a knowledge base\", \"create an llm wiki\", \"organize my notes\",\n\"set up my second brain\", \"I'm reading a book and want to track it\", or \"maintain a wiki\nfor this project\". Also trigger when already inside a wiki directory for ingest, query, or\nlint operations \u2014 \"add this article to the wiki\", \"what does the wiki say about X\",\n\"clean up the wiki\", \"process this source\". This is distinct from RAG: the wiki is a\npersistent, maintained artifact that compounds over time.\n",
+      "desc_len": 846,
+      "body_lines": 179,
+      "body_words": 1088,
+      "refs": [
+        "operations.md",
+        "wiki-schema-template.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "wiki-schema-template.md",
+        "operations.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "wiki-research",
+        "repo-deep-dive",
+        "project-profiler",
+        "mermaid-charts"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "index.md",
+          "log.md",
+          "overview.md"
+        ],
+        "shared_read": [
+          "raw/",
+          "wiki/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "maintain-context",
+      "path": "skills/workflows/maintain-context/SKILL.md",
+      "category": "workflows",
+      "version": "1.1.0",
+      "description": "Maintain a project's CONTEXT.md domain glossary and docs/adr/ decision records inline as understanding crystallizes. When the user uses an ambiguous term, propose the canonical form and update CONTEXT.md right there. When a hard-to-reverse decision is made, offer an ADR \u2014 but ONLY when all three are true: hard to reverse, surprising without context, real trade-off involved. If any condition is missing, skip. Use this skill after any architectural discussion, requirements clarification, or when shared terminology starts to drift. Trigger on: 'update the glossary', 'add to CONTEXT', 'record this as an ADR', 'what do we call this', 'is this the right term', 'we just decided something', 'document this decision'.",
+      "desc_len": 717,
+      "body_lines": 76,
+      "body_words": 822,
+      "refs": [
+        "three-condition-gate.md",
+        "context-format.md",
+        "adr-format.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "adr-format.md",
+        "three-condition-gate.md",
+        "context-format.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "grill-me",
+        "architecture-rescue"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "CONTEXT.md",
+          "docs/adr/**"
+        ],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "mermaid-charts",
+      "path": "skills/workflows/mermaid-charts/SKILL.md",
+      "category": "workflows",
+      "version": "2.3.0",
+      "description": "Create expert-quality mermaid diagrams \u2014 flowcharts, sequence diagrams, architecture maps, state machines, ER diagrams, Gantt charts, mindmaps, and more. Handles complex systems with 15-30+ nodes across multiple architectural layers without losing readability. Use this skill whenever the user asks to visualize, diagram, chart, map, or illustrate any system, process, workflow, architecture, data model, timeline, or relationship. Also trigger when documenting complex systems, generating architecture diagrams, creating technical illustrations, mapping multi-project ecosystems, comparing system architectures, or when another skill needs a mermaid diagram embedded in its output. Even if the user doesn't say \"mermaid\" explicitly \u2014 if they want a visual representation of something technical, this is the skill. Trigger for \"draw this\", \"show me how X works\", \"map the architecture\", \"diagram the flow\", or any request involving system visualization.\n",
+      "desc_len": 954,
+      "body_lines": 73,
+      "body_words": 635,
+      "refs": [
+        "advanced-patterns.md",
+        "complexity-and-output.md",
+        "styling.md",
+        "chart-types/er.md",
+        "chart-types/state.md",
+        "chart-types/mindmap.md",
+        "chart-types/flowchart.md",
+        "chart-types/other.md",
+        "chart-types/sequence.md"
+      ],
+      "refs_count": 9,
+      "body_ref_links": [
+        "chart-types/er.md",
+        "advanced-patterns.md",
+        "styling.md",
+        "chart-types/mindmap.md",
+        "chart-types/flowchart.md",
+        "chart-types/state.md",
+        "chart-types/*.md",
+        "chart-types/other.md",
+        "complexity-and-output.md",
+        "chart-types/sequence.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "docs-agent",
+        "backend-agent",
+        "frontend-agent",
+        "skill-writer",
+        "project-profiler",
+        "orchestrator",
+        "infrastructure-agent",
+        "contract-author",
+        "observability-agent"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "nano-banana",
+      "path": "skills/workflows/nano-banana/SKILL.md",
+      "category": "workflows",
+      "version": "1.2.0",
+      "description": "Generate images using Google's Nano Banana (Gemini Image Generation) API and save them to the project. Use this skill whenever the user asks to generate images, create product photos, make hero banners, generate lifestyle shots, produce visual content, or mentions \"Nano Banana\", \"generate an image\", \"we need a photo of\", \"create a product shot\", \"make a banner\", or wants to batch-generate images. Also trigger for any AI image generation task using Gemini models, even if they just say \"let's do images\", \"generate the rest\", or \"make me a picture of\". This is the go-to skill for any image generation workflow.\n",
+      "desc_len": 615,
+      "body_lines": 116,
+      "body_words": 884,
+      "refs": [
+        "example-project-config.md",
+        "imagen-4-prompting.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "imagen-4-prompting.md",
+        "example-project-config.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "frontend-agent",
+        "docs-agent"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "plan-builder",
+      "path": "skills/workflows/plan-builder/SKILL.md",
+      "category": "workflows",
+      "version": "1.3.0",
+      "description": "Transform research documents, Compass artifacts, PRDs, reference materials, and conversational goals into structured project plans ready for the orchestrator to execute. Use this skill when the user has source material and wants to build something from it, when the user says \"make a plan\", \"plan this out\", \"I want to build X from this research\", or when a plan is needed before invoking the orchestrator. Also trigger when @-mentioned files or attached documents accompany a build request, when the user wants to turn research into a website/app/tool, or when orchestrator would be invoked but no plan exists yet. This skill produces the plan \u2014 orchestrator consumes it.\n",
+      "desc_len": 673,
+      "body_lines": 107,
+      "body_words": 934,
+      "refs": [
+        "research-extraction.md",
+        "plan-format.md"
+      ],
+      "refs_count": 2,
+      "body_ref_links": [
+        "research-extraction.md",
+        "plan-format.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "orchestrator",
+        "project-profiler",
+        "mermaid-charts",
+        "contract-author"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "playwright",
+      "path": "skills/workflows/playwright/SKILL.md",
+      "category": "workflows",
+      "version": "1.2.0",
+      "description": "Run browser-based E2E tests, capture screenshots, and validate user flows using Playwright with visible Chrome. Use this skill when testing a web UI end-to-end, capturing screenshots for visual review, running user journey validation, checking responsive layouts, verifying frontend behavior in a real browser, or performing accessibility audits. Trigger on: \"browser test\", \"screenshot\", \"e2e test\", \"visual regression\", \"test in chrome\", \"playwright\", \"click through the UI\", \"verify the user flow\", \"responsive layout check\", \"accessibility audit\". Also use when qe-agent needs browser-level integration testing.\n",
+      "desc_len": 616,
+      "body_lines": 70,
+      "body_words": 532,
+      "refs": [
+        "selectors-guide.md",
+        "setup.md",
+        "screenshot-workflow.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "setup.md",
+        "screenshot-workflow.md",
+        "selectors-guide.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "qe-agent",
+        "frontend-agent",
+        "deployment-checklist"
+      ],
+      "spawned_by": [
+        "orchestrator",
+        "qe-agent"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "project-profiler",
+      "path": "skills/workflows/project-profiler/SKILL.md",
+      "category": "workflows",
+      "version": "1.1.0",
+      "description": "Analyze a codebase and generate a project profile (CLAUDE.md + profile.yaml) for multi-agent builds. Use this skill when onboarding a new project, generating project documentation for agents, creating CLAUDE.md files, or profiling a codebase's tech stack and conventions. Trigger on: \"profile this project\", \"generate CLAUDE.md\", \"create profile.yaml\", \"onboard this codebase\", \"what is this project\", \"describe this repo\", \"set up this repo for agents\", \"scan the codebase for me\".\n",
+      "desc_len": 483,
+      "body_lines": 109,
+      "body_words": 489,
+      "refs": [
+        "profile-schema.yaml"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "profile-schema.yaml"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "skill-writer",
+        "contract-author",
+        "orchestrator"
+      ],
+      "spawned_by": [
+        "orchestrator"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "CLAUDE.md",
+          ".claude/profile.yaml"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "railway-deploy",
+      "path": "skills/workflows/railway-deploy/SKILL.md",
+      "category": "workflows",
+      "version": "1.2.0",
+      "description": "Deploy projects to Railway \u2014 handles Dockerfile creation, railway.toml config, environment variables, multi-service setups (web + worker), and deployment via CLI or GraphQL API. Use this skill whenever the user mentions \"deploy\", \"Railway\", \"push to production\", \"ship it\", \"put this online\", \"deploy to staging\", or wants to set up hosting for a web app, API, or background worker. Also trigger when the user asks about Railway configuration, health checks, deployment status, or environment variable management on Railway. This is the go-to skill for any Railway deployment workflow.\n",
+      "desc_len": 586,
+      "body_lines": 73,
+      "body_words": 449,
+      "refs": [
+        "deploy-script.md",
+        "dockerfile-recipes.md",
+        "multi-service-setup.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "multi-service-setup.md",
+        "deploy-script.md",
+        "dockerfile-recipes.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "infrastructure-agent",
+        "deployment-checklist"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "railway.toml"
+        ],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "render-sanity",
+      "path": "skills/workflows/render-sanity/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Catch the failure modes that pass a \"tests green + dev server boots + 0 console errors\" gate but visibly break the app when a human clicks around \u2014 stale mock IDs leaking into \"live\" pages, lone `?` / `\u2014` / `undefined` / `Loading\u2026` text where real data should be, repeated generic-fallback labels (the default string a component renders when its data prop is missing) appearing across rows that should show distinct content, \"Couldn't load X\" / \"Unauthorized\" / \"Failed to fetch\" dead-end shells on auth-gated routes, and lists that render plausibly but link to dead targets. Use this skill whenever a build is wrapping up and someone is about to claim \"the UI works\" without having clicked through it as a real user; whenever ux-review or qe-agent finishes its screenshot/contract pass; whenever the user says \"is it actually working\", \"did anyone click around\", \"fix the app\", \"broken pages\", \"dead links\", or after they paste a screenshot showing visible garbage like `?`, `\u2014`, `undefined`, `null`, or a \"Not found\" detail page. Triggers BEFORE the build is declared done, not after the user finds the bug themselves. Also invoke proactively when a frontend agent has just rewired data sources from mocks \u2192 real backend, when auth was added to previously-public routes, when seed data was regenerated, or when a previously-broken page was \"fixed\" without a click-through verification.\n",
+      "desc_len": 1388,
+      "body_lines": 203,
+      "body_words": 2625,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": false,
+      "has_requires_claude_code": true,
+      "has_min_plan": false,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": false,
+      "composes_with": [
+        "ux-review",
+        "qe-agent",
+        "orchestrator",
+        "frontend-agent",
+        "feature-dev",
+        "playwright"
+      ],
+      "spawned_by": [
+        "orchestrator",
+        "ux-review",
+        "qe-agent"
+      ],
+      "owns": {},
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_claude_code",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "repo-deep-dive",
+      "path": "skills/workflows/repo-deep-dive/SKILL.md",
+      "category": "workflows",
+      "version": "1.2.0",
+      "description": "Perform a comprehensive technical deep dive on an open-source repository, combining a deep-research markdown document with hands-on codebase analysis to produce a structured 12-14 document reference series. Use this skill whenever the user wants to deeply analyze a repo, do a deep dive on a project, reverse-engineer a codebase, create a technical reference for an open-source tool, understand how a project works inside and out, or compare another project's architecture against a reference project. Also trigger when the user mentions \"deep dive\", \"deep research\", \"analyze this repo\", \"break down this codebase\", \"technical reference\", \"how does this project work\", or has a deep-research markdown alongside a cloned repo ready for analysis.",
+      "desc_len": 745,
+      "body_lines": 74,
+      "body_words": 757,
+      "refs": [
+        "phases.md",
+        "parallelization.md",
+        "document-template.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "phases.md",
+        "parallelization.md",
+        "document-template.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "project-profiler",
+        "plan-builder",
+        "mermaid-charts",
+        "wiki-research",
+        "llm-wiki"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "settings-consolidator",
+      "path": "skills/workflows/settings-consolidator/SKILL.md",
+      "category": "workflows",
+      "version": "1.2.0",
+      "description": "Scan all .claude/settings.local.json files across the user's home directory, deduplicate permissions, collapse supersets, and merge everything into the global ~/.claude/settings.local.json with a categorized report. Also bootstraps comprehensive permissions for autonomous/unattended sessions using a 350+ command baseline with shell operators, Claude tools, and safety deny list. Use this skill whenever the user mentions consolidating settings, merging permissions, scanning settings, deduping permissions, compiling settings, says they're tired of approving commands, wants to set up permissions for overnight builds, mentions \"stop prompting me\", \"bootstrap permissions\", \"autonomous mode\", \"I want to go to sleep and let this run\", \"unattended session\", or asks about reducing permission prompts. Also trigger when users want to upgrade colon-wildcards to space-wildcards or manage Claude Code permissions across projects.\n",
+      "desc_len": 928,
+      "body_lines": 93,
+      "body_words": 810,
+      "refs": [
+        "autonomous-permissions.json",
+        "permission-categories.md",
+        "safety-deny-list.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "permission-categories.md",
+        "autonomous-permissions.json",
+        "safety-deny-list.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "sync-skills"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "settings.local.json"
+        ],
+        "shared_read": [
+          "~/.claude/",
+          "**/.claude/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "setup-project-skills",
+      "path": "skills/workflows/setup-project-skills/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Bootstrap per-repo configuration that other Skill-Madness skills consume: domain doc layout (CONTEXT.md location, ADR directory), preferred contract format (OpenAPI vs Pydantic vs TS), default role-agent set for orchestrator dispatch, work-item tracker (Beads / GitHub / local markdown). Writes a docs/agents/ directory + adds an '## Agent skills' block to CLAUDE.md or AGENTS.md (never both, never overwriting). Other skills check for this config and prompt the user to run THIS skill if it's missing. Run once per repository. Trigger on: 'setup project skills', 'configure project skills', 'bootstrap this repo for Skill-Madness', '/setup-project-skills', 'initialize agent config'.\n",
+      "desc_len": 685,
+      "body_lines": 110,
+      "body_words": 736,
+      "refs": [
+        "templates/contract-format-jsonschema.md",
+        "templates/work-item-tracker-gitlab.md",
+        "templates/contract-format-pydantic.md",
+        "templates/work-item-tracker-local.md",
+        "templates/domain-docs-multi.md",
+        "templates/work-item-tracker-beads.md",
+        "templates/work-item-tracker-github.md",
+        "templates/contract-format-openapi.md",
+        "templates/contract-format-ts.md",
+        "templates/domain-docs-single.md"
+      ],
+      "refs_count": 10,
+      "body_ref_links": [
+        "templates/contract-format-{openapi|pydantic|ts|jsonschema}.md",
+        "templates/",
+        "templates/domain-docs-{single|multi}.md",
+        "templates/work-item-tracker-{beads|github|gitlab|local}.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "project-profiler",
+        "sync-skills"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [
+          "docs/agents/"
+        ],
+        "patterns": [],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "disable-model-invocation",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "sync-skills",
+      "path": "skills/workflows/sync-skills/SKILL.md",
+      "category": "workflows",
+      "version": "2.0.0",
+      "description": "Sync skills between this repo and global locations for Claude Code and Cursor using symlinks (default) or copies. Use when the user wants to link, sync, publish, push, or copy skills to Claude Code or Cursor, make repo skills available globally, check sync status, see what's linked vs copied, unlink skills, or wants to use repo skills from another project. Trigger on: \"sync skills\", \"link skills\", \"publish skills\", \"skill status\", \"deploy skills globally\", \"/sync-skills\", \"publish to claude code\", \"are my skills linked\", \"unlink skills\".\n",
+      "desc_len": 544,
+      "body_lines": 122,
+      "body_words": 819,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "skill-updater",
+        "skill-audit"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [
+          "skills/workflows/sync-skills/"
+        ],
+        "patterns": [],
+        "shared_read": [
+          "skills/"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "ui-brief",
+      "path": "skills/workflows/ui-brief/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Generate opinionated, design-led briefs for building or rebuilding UIs that lead with the product's actual moat instead of converging on generic SaaS dashboard patterns. Use this skill whenever the user wants a detailed UI prompt or spec to hand off \u2014 for a fresh greenfield build OR a rebuild of an existing UI. Trigger on phrases like \"write me a UI brief\", \"the current UI sucks, redesign it\", \"make this not look like every shadcn admin\", \"I need a prompt for the frontend\", \"design brief for X\", \"the design feels generic\", \"build a UI for [project] but make it look like [reference]\", or when the user wants a paste-into-fresh-session brief to hand to a frontend agent or orchestrator. Works across every domain \u2014 operator consoles, dashboards, marketing sites, e-commerce, social, creative tools, mobile apps. Also trigger before invoking ui-ux-pro-max / frontend-design / frontend-agent on any non-trivial UI work, when the user names a target reference app (Linear, Notion, Figma, Arc, Stripe, Vercel, Datadog, Bloomberg, Posthog, etc.) or a named style (bento-grid, glassmorphism, claymorphism, brutalism, neumorphism, minimalism, skeuomorphism), or when prior chat history shows the user just wrote one of these briefs and wants to capture the pattern. Produces a standalone Markdown file with positioning, design-language rules, page-by-page treatment, component primitives, motion discipline, and a verifiable Definition of Done.\n",
+      "desc_len": 1443,
+      "body_lines": 172,
+      "body_words": 2329,
+      "refs": [
+        "brief-template.md"
+      ],
+      "refs_count": 1,
+      "body_ref_links": [
+        "brief-template.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "ui-ux-pro-max",
+        "frontend-design",
+        "frontend-agent",
+        "orchestrator",
+        "ux-review",
+        "playwright",
+        "brainstorming"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "wiki-research",
+      "path": "skills/workflows/wiki-research/SKILL.md",
+      "category": "workflows",
+      "version": "2.1.0",
+      "description": "Use this skill BEFORE any codebase exploration, repo-deep-dive, or raw source reading when\nthe project has an Obsidian-style wiki (index.md + wiki/ directory). Always invoke when an\norchestrator, code-review-agent, backend-agent, or any role skill needs project context,\narchitecture understanding, component knowledge, or design decisions. Reading 3\u20134 wiki\npages (~2,000 tokens) replaces crawling raw source directories (~100,000\u2013500,000 tokens).\nTrigger on: \"how does X work\", \"what is X\", \"what patterns does X use\", \"understand the\narchitecture\", \"review this code\", \"build X\" (when project context is needed), or any task\nwhere understanding the system before touching files would save re-work. If unsure whether a\nwiki exists, spend 5 seconds checking \u2014 the payoff is enormous. Skip only when the task is\npurely mechanical (rename a variable, fix a typo) and requires zero project understanding.\n",
+      "desc_len": 902,
+      "body_lines": 148,
+      "body_words": 1018,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "repo-deep-dive",
+        "llm-wiki",
+        "project-profiler"
+      ],
+      "spawned_by": [
+        "orchestrator",
+        "code-review-agent",
+        "repo-deep-dive",
+        "project-profiler",
+        "backend-agent",
+        "frontend-agent",
+        "security-agent",
+        "plan-builder"
+      ],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "wiki/",
+          "index.md"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "work-item-brief",
+      "path": "skills/workflows/work-item-brief/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Produce a durable, agent-ready work-item brief that captures intent precisely enough for an autonomous agent to grab and finish unattended. FORBIDDEN: file paths, line numbers, references to \"the file we just edited\" \u2014 these go stale fast. REQUIRED: behavioral acceptance criteria, named interfaces (types and signatures), explicit out-of-scope list. Pairs with the work-item / Beads model. Use after a grilling session or plan-builder session, before dispatching to an agent. Trigger on: \"make a work-item brief\", \"write the agent brief\", \"agent-ready ticket\", \"make this dispatchable\", \"package this for an agent\", \"brief this\".\n",
+      "desc_len": 631,
+      "body_lines": 78,
+      "body_words": 616,
+      "refs": [
+        "brief-format.md",
+        "afk-hitl-rubric.md",
+        "out-of-scope-pattern.md"
+      ],
+      "refs_count": 3,
+      "body_ref_links": [
+        "out-of-scope-pattern.md",
+        "afk-hitl-rubric.md",
+        "brief-format.md"
+      ],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "grill-me",
+        "plan-builder",
+        "contract-author"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [
+          "briefs/**/*.md"
+        ],
+        "shared_read": []
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    },
+    {
+      "name": "zoom-out",
+      "path": "skills/workflows/zoom-out/SKILL.md",
+      "category": "workflows",
+      "version": "1.0.0",
+      "description": "Step back from the current code and give a higher-level perspective: which modules are involved, how do they connect, what is this change touching that I'm not seeing? Uses the project's CONTEXT.md / domain glossary when available. Explicit invocation only \u2014 does not auto-fire. Use when feeling stuck in detail, when a change feels bigger than expected, or before making a structural decision.",
+      "desc_len": 394,
+      "body_lines": 10,
+      "body_words": 54,
+      "refs": [],
+      "refs_count": 0,
+      "body_ref_links": [],
+      "has_allowed_tools_hyphen": true,
+      "has_allowed_tools_underscore": false,
+      "has_requires_agent_teams": true,
+      "has_requires_claude_code": true,
+      "has_min_plan": true,
+      "has_version": true,
+      "has_composes_with": true,
+      "has_spawned_by": true,
+      "has_owns": true,
+      "composes_with": [
+        "maintain-context"
+      ],
+      "spawned_by": [],
+      "owns": {
+        "directories": [],
+        "patterns": [],
+        "shared_read": [
+          "*"
+        ]
+      },
+      "raw_field_order": [
+        "name",
+        "version",
+        "description",
+        "disable-model-invocation",
+        "requires_agent_teams",
+        "requires_claude_code",
+        "min_plan",
+        "owns",
+        "allowed-tools",
+        "composes_with",
+        "spawned_by"
+      ],
+      "metadata": {},
+      "compatibility": "",
+      "license": ""
+    }
+  ],
+  "all_names": [
+    "architecture-rescue",
+    "backend-agent",
+    "caveman",
+    "claude-design-brief",
+    "code-review-agent",
+    "context-manager",
+    "contract-auditor",
+    "contract-author",
+    "db-migration-agent",
+    "dependency-coordinator",
+    "deployment-checklist",
+    "diagnose-loop",
+    "docs-agent",
+    "frontend-agent",
+    "git-commit",
+    "git-post-merge-cleanup",
+    "git-pr",
+    "git-pr-feedback",
+    "grill-me",
+    "infrastructure-agent",
+    "interactive-doc",
+    "llm-wiki",
+    "maintain-context",
+    "mermaid-charts",
+    "nano-banana",
+    "observability-agent",
+    "orchestrator",
+    "performance-agent",
+    "plan-builder",
+    "playwright",
+    "project-profiler",
+    "qe-agent",
+    "railway-deploy",
+    "render-sanity",
+    "repo-deep-dive",
+    "security-agent",
+    "settings-consolidator",
+    "setup-project-skills",
+    "skill-explorer",
+    "skill-review",
+    "skill-update",
+    "skill-writer",
+    "sync-skills",
+    "ui-brief",
+    "wiki-research",
+    "work-item-brief",
+    "zoom-out"
+  ]
+}

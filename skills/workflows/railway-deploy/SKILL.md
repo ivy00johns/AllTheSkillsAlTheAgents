@@ -1,6 +1,6 @@
 ---
 name: railway-deploy
-version: 1.2.0
+version: 1.2.1
 description: >
   Deploy projects to Railway — handles Dockerfile creation, railway.toml config, environment variables,
   multi-service setups (web + worker), and deployment via CLI or GraphQL API. Use this skill whenever
@@ -30,7 +30,7 @@ Railway builds and runs your app from a Dockerfile (or auto-detects with Nixpack
 
 ## Prerequisites
 
-**Railway credentials** (for GraphQL API deployments) go in the Skill Madness root `.env` file — see `.env.example` for the full list. Get your API token at https://railway.app/account/tokens.
+**Railway credentials** (for GraphQL API deployments) go in the current project's repo-root `.env` file — see `.env.example` for the full list. Get your API token at https://railway.app/account/tokens.
 
 **Railway CLI** should be installed and authenticated. Verify:
 
@@ -79,7 +79,7 @@ Best for projects with multiple services (web + worker), automated deployments, 
 
 5. **Add a health check endpoint.** Railway uses it to know when the app is ready. Python/FastAPI and Node/Express snippets are in `references/dockerfile-recipes.md`.
 
-6. **Optional: Procfile fallback.** Railway prefers Dockerfile but falls back to Procfile — see `references/dockerfile-recipes.md`.
+> **Optional fallback:** Railway prefers Dockerfile but falls back to a Procfile if present — only relevant when you can't ship a Dockerfile. See the Procfile section in `references/dockerfile-recipes.md`.
 
 ## Environment Variables, Multi-Service, Troubleshooting
 

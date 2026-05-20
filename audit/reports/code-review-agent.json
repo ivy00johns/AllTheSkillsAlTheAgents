@@ -1,0 +1,38 @@
+{
+  "skill": "code-review-agent",
+  "path": "skills/roles/code-review-agent/SKILL.md",
+  "version": "1.2.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns.directories empty by design (read-only role); body uses allowed_tools (underscore) vs canonical allowed-tools (hyphen) in frontmatter"},
+    "description_quality": {"score": 3, "notes": "218 chars over target; intentionally narrow as spawned-only"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 151 lines; review-rubric.md focused; well-linked"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered steps; wiki-research integration explicit; report template included"},
+    "coordination": {"score": 5, "notes": "Owns empty by design; clearest QE/security handoff among role agents; composes_with comprehensive including wiki-research"},
+    "completeness": {"score": 5, "notes": "review-rubric covers all 5 dimensions + severity defs; report template inline; Step 0 implicit via Step 2"},
+    "anti_patterns": {"score": 4, "notes": "Body line 141 references allowed_tools (underscore alias) vs canonical hyphen form in frontmatter"}
+  },
+  "average": 4.4,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Body uses allowed_tools underscore vs canonical allowed-tools hyphen", "location": "SKILL.md:141", "fix": "Change (allowed_tools: Read, Grep, Glob) to (allowed-tools: Read, Grep, Glob)"},
+      {"item": "Missing explicit Step 0: Read Contracts", "location": "SKILL.md:46-60", "fix": "Promote Step 2's contract-reading bullet to Step 0 matching other role agents"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:20", "fix": "Reword to 'Review report feeds into qe-agent correctness/code_quality/contract_conformance scores'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "No compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility line"},
+      {"item": "Description 218 chars over target", "location": "SKILL.md:5", "fix": "Drop redundant 'Composed by orchestrator' clause"},
+      {"item": "No right-sizing tradeoff", "location": "SKILL.md", "fix": "Add tradeoff blockquote"},
+      {"item": "Report template uses [brackets] vs ${} convention", "location": "SKILL.md:99-126", "fix": "Standardize on ${PLACEHOLDER}"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Harmonize allowed-tools doc reference", "file": "SKILL.md:141", "effort": "small"},
+    {"rank": 2, "fix": "Promote contract-reading to Step 0", "file": "SKILL.md:46-60", "effort": "small"},
+    {"rank": 3, "fix": "Fix self-referential pipeline blockquote", "file": "SKILL.md:20", "effort": "small"}
+  ],
+  "broken_refs": []
+}

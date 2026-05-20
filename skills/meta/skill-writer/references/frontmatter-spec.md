@@ -69,6 +69,13 @@ See `description-patterns.md` for templates and worked examples.
 
 ## Optional Fields — Anthropic Spec
 
+### argument-hint
+
+- **Type:** string (short)
+- **Purpose:** Hint shown in Claude Code's slash-command UI for skills that take a positional argument.
+- **Example:** `argument-hint: 'skill-name or "all"'`
+- **Used by:** `skill-review` (`--scope=all` vs `--scope=<name>`).
+
 ### compatibility
 
 - **Type:** string
@@ -110,6 +117,14 @@ See `description-patterns.md` for templates and worked examples.
     category: workflows
     tags: [planning, multi-agent]
   ```
+
+### disable-model-invocation
+
+- **Type:** boolean
+- **Default:** false
+- **Purpose:** Set to `true` for skills that should be invocable only by an orchestrator or explicit slash-command — not by Claude's normal model-driven skill auto-trigger. Use for: role-agent skills dispatched by the orchestrator, contract-management skills (`dependency-coordinator`), and project-setup skills (`setup-project-skills`, `zoom-out`) that need user intent to fire.
+- **Note:** This is a real Claude Code field — recognized by the runtime. Documenting here for spec coverage.
+- **Used by:** all 10 role agents, `dependency-coordinator`, `setup-project-skills`, `zoom-out`.
 
 ## Optional Fields — Multi-Agent Extensions
 
@@ -161,6 +176,19 @@ This repo's extensions for orchestrated builds. Not part of Anthropic's spec; pa
 
 - **Type:** string[]
 - **Purpose:** Which skills spawn this one
+
+## Plugin-External References
+
+When a skill's `composes_with` or `spawned_by` references a skill from another plugin pack (rather than this repo), prefix the skill name with the plugin namespace:
+
+- `superpowers:brainstorming` (skill lives in `superpowers` plugin)
+- `superpowers:ui-ux-pro-max` (plugin)
+- `claude-mem:mem-search` (claude-mem plugin)
+- `bare-name` (in-repo skill — no prefix)
+
+This makes the audit pass: in-repo references can be verified against `skills/`; plugin-namespaced refs are treated as external dependencies.
+
+In-repo skills using this convention: `orchestrator` (claude-mem:*), `ui-brief`, `render-sanity`, `claude-design-brief`, `frontend-agent` (all using `superpowers:` prefix).
 
 ## Forbidden in Frontmatter
 

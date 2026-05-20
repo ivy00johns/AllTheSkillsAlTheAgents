@@ -1,0 +1,33 @@
+{
+  "skill": "wiki-research",
+  "path": "skills/workflows/wiki-research/SKILL.md",
+  "version": "2.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present and valid; allowed-tools hyphenated; description 928 chars (under 1024); all composes_with and 8 spawned_by targets exist."},
+    "description_quality": {"score": 4, "notes": "928 chars; pushy with 8+ trigger phrases and exclusions; starts with 'Use' (could be sharper action verb)."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 171 lines; no references needed for this compact protocol skill."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; four-step protocol; token-cost table gives WHY; three escalation branches; anti-patterns table."},
+    "coordination": {"score": 5, "notes": "All 3 composes_with and all 8 spawned_by targets exist; non-agent skill so no ownership conflicts."},
+    "completeness": {"score": 5, "notes": "All cross-references resolve; three deployment patterns covered (in-repo, external, multi-cluster)."},
+    "anti_patterns": {"score": 5, "notes": "No hardcoded paths; MUST/NEVER not abused; anti-pattern table explains WHY; self-aware about alternative layouts."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "Description starts with 'Use this skill BEFORE' — softer than ideal action-verb start", "location": "skills/workflows/wiki-research/SKILL.md:5", "fix": "Change to 'Read the project's wiki BEFORE any codebase exploration...'"},
+      {"item": "Description at 928 chars (under ceiling but past 200-char target)", "location": "skills/workflows/wiki-research/SKILL.md:5-14", "fix": "Optionally collapse 'Trigger on:' enumeration to 3-4 most distinctive phrases"},
+      {"item": "spawned_by lists 8 skills — verify each actually invokes wiki-research in its body", "location": "skills/workflows/wiki-research/SKILL.md:24", "fix": "Grep each listed skill for wiki-research mentions; remove non-reciprocating entries OR add invocations to those skills"},
+      {"item": "No references/ directory; a references/page-templates.md could help downstream wiki authoring", "location": "skills/workflows/wiki-research/", "fix": "Optional: add concrete entity/concept/source page templates"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Strengthen description's opening action verb (Use → Read)", "file": "skills/workflows/wiki-research/SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Verify spawned_by reciprocity for all 8 listed skills", "file": "skills/workflows/wiki-research/SKILL.md:24", "effort": "medium"},
+    {"rank": 3, "fix": "Tighten description to ~700 chars by collapsing 'Trigger on:' list", "file": "skills/workflows/wiki-research/SKILL.md:5-14", "effort": "small"}
+  ],
+  "broken_refs": []
+}

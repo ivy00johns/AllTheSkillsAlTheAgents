@@ -2,6 +2,22 @@
 
 Loose but coherent. Same tokens and components everywhere; layout is per-doc.
 
+## Contents
+
+- [.md → HTML translation rules](#md--html-translation-rules)
+- [CSS variables (paste into every doc's `:root`)](#css-variables-paste-into-every-docs-root)
+- [Typography](#typography)
+- [Standard components](#standard-components)
+  - [`.files` — the credibility header](#files--the-credibility-header)
+  - [`.tldr` — the standing summary](#tldr--the-standing-summary)
+  - [`.nav` — on-page nav strip](#nav--on-page-nav-strip)
+  - [`<details>` — collapsibles for step-throughs](#details--collapsibles-for-step-throughs)
+  - [`.tabs` — tabbed code examples](#tabs--tabbed-code-examples)
+  - [`.badge` — layer / status pills](#badge--layer--status-pills)
+  - [`.callout` — sidebar / aside](#callout--sidebar--aside)
+- [Body skeleton](#body-skeleton)
+- [What "loose" means](#what-loose-means)
+
 ## .md → HTML translation rules
 
 The .md is the source. The HTML renders it. These are the translation rules — apply them mechanically when going from canonical markdown to the HTML companion:
@@ -81,7 +97,7 @@ The HTML must **never** add content the .md lacks. If the rendering reveals a ga
 }
 ```
 
-Dark mode is opt-in per doc — don't include the `@media` block if the doc is intentionally light-only (e.g. a printed-feeling reference). For Hive docs, default to including it.
+Dark mode is opt-in per doc — don't include the `@media` block if the doc is intentionally light-only (e.g. a printed-feeling reference). For most project docs, default to including it.
 
 ## Typography
 
@@ -359,7 +375,7 @@ Every doc body starts roughly like this:
 ```html
 <body>
   <p class="files">Files read · <code>...</code></p>
-  <p class="kicker">Architecture · The Hive</p>   <!-- doc-type kicker, optional -->
+  <p class="kicker">Architecture · {project-name}</p>   <!-- doc-type kicker, optional -->
   <h1>The actual title</h1>
   <div class="tldr">...</div>
   <nav class="nav">...</nav>

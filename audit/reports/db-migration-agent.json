@@ -1,0 +1,37 @@
+{
+  "skill": "db-migration-agent",
+  "path": "skills/roles/db-migration-agent/SKILL.md",
+  "version": "1.1.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns 4 dirs non-overlapping; missing knex/migrations/ mentioned in body; no compatibility/metadata"},
+    "description_quality": {"score": 3, "notes": "197 chars under target; intentionally narrow"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 127 lines; two refs (migration-checklist 154 lines, validation-checklist 104 lines)"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; Step 0 Read Data Layer Contract explicit; migration quality attrs listed"},
+    "coordination": {"score": 5, "notes": "Owns non-overlapping; coordination with backend (models handoff)/infra/qe explicit"},
+    "completeness": {"score": 4, "notes": "validation-checklist.md exists but NOT linked from body — Validation section uses inline list instead"},
+    "anti_patterns": {"score": 4, "notes": "Stack-specific Drizzle/tsx note bulky; tenant-scoping in validation is project-specific concern"}
+  },
+  "average": 4.3,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "validation-checklist.md exists but NOT linked from body", "location": "SKILL.md:116-124", "fix": "Replace inline list with 'Run references/validation-checklist.md before reporting done'"},
+      {"item": "owns missing knex/migrations/ mentioned in body", "location": "SKILL.md:10 vs body:50", "fix": "Add knex/migrations/ to owns.directories or remove body parenthetical"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:20", "fix": "Reword to 'Schema feeds qe-agent contract_conformance'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "No compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility line"},
+      {"item": "Tenant-scoping guidance in generic checklist", "location": "references/validation-checklist.md:96-103", "fix": "Extract to tenant-scoping reference"},
+      {"item": "No right-sizing tradeoff", "location": "SKILL.md", "fix": "Add 'skip migrations for prototype/SQLite' tradeoff"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Link validation-checklist.md from body", "file": "SKILL.md:116", "effort": "small"},
+    {"rank": 2, "fix": "Reconcile owns.directories with body (knex/migrations/)", "file": "SKILL.md:10", "effort": "small"},
+    {"rank": 3, "fix": "Fix self-referential pipeline blockquote", "file": "SKILL.md:20", "effort": "small"}
+  ],
+  "broken_refs": []
+}

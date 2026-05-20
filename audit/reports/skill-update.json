@@ -1,0 +1,40 @@
+{
+  "skill": "skill-update",
+  "path": "skills/meta/skill-update/SKILL.md",
+  "version": "1.1.0",
+  "category": "meta",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 3, "notes": "Required fields present; valid semver; no angle brackets; allowed-tools hyphenated. owns.directories ['skills/'] is a meta-level claim that conflicts ideologically with the agent ownership model. Description 595 chars (under ceiling, over target)."},
+    "description_quality": {"score": 2, "notes": "Action verb and 9 keyword variants, but references stale skill names (skill-deep-review, skill-audit) which are both archived. 595 chars ~3x the 200-char target."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 142 lines / ~1017 words. Both references linked with when-to-read context. Both under 300-line TOC threshold."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Steps 1-5 with imperative voice. Impact/Effort scoring explicit. Explicit edit-application rules. Error Handling and Guidelines concrete."},
+    "coordination": {"score": 4, "notes": "composes_with [skill-review, skill-writer, sync-skills] all real. spawned_by empty correct. owns.directories ['skills/'] is broad — could conflict but is probably correct as meta-level claim."},
+    "completeness": {"score": 4, "notes": "Both reference files exist. Validation checklist concrete. BUT: 5 stale references to archived skills erode trust in the doc."},
+    "anti_patterns": {"score": 4, "notes": "Guidelines warn against batch reformatting and pure-style edits. Imperative voice. Read-before-edit rule. No emojis. Minor: L100 says '~100 lines' but house style is 200/500."}
+  },
+  "average": 3.86,
+  "findings": {
+    "critical": [
+      {"item": "Body and description reference archived skills skill-deep-review and skill-audit (5 instances)", "location": "SKILL.md:5,24,29,33,45", "fix": "Replace all references with skill-review (the consolidated skill that now covers both modes via --scope=all and --scope=<name>)."}
+    ],
+    "important": [
+      {"item": "Line-count guidance at L100 says '~100 lines' but house style is 200/500", "location": "SKILL.md:100", "fix": "Change to '≤5,000 words and ≤500 lines (soft warnings); flag past ~200 lines when content could move to references.'"},
+      {"item": "owns.directories ['skills/'] may collide with agent-ownership model", "location": "SKILL.md:10", "fix": "Add body comment noting this is a meta-level write claim distinct from agent-role ownership map for project source directories."}
+    ],
+    "nits": [
+      {"item": "Description 595 chars overshoots 200-char target", "location": "SKILL.md:5", "fix": "After replacing stale skill names, trim trigger-phrase list to 5 strongest variants."},
+      {"item": "Frontmatter spec reference uses full path inconsistent with sibling refs", "location": "SKILL.md:99", "fix": "Decide on a consistent reference style (full path vs relative)."},
+      {"item": "Hardcoded sync-skills.sh path at L120 is brittle", "location": "SKILL.md:120", "fix": "Invoke as /sync-skills slash command instead of hardcoded script path."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Replace all 5 stale references to skill-deep-review and skill-audit with skill-review", "file": "SKILL.md:5,24,29,33,45", "effort": "small"},
+    {"rank": 2, "fix": "Update line-count guidance at L100 to match house style (500 lines / 5000 words)", "file": "SKILL.md:100", "effort": "small"},
+    {"rank": 3, "fix": "Document meta-level scope of owns.directories ['skills/'] in body Guidelines", "file": "SKILL.md:10", "effort": "small"}
+  ],
+  "broken_refs": [
+    "skill-deep-review (in skills/archive/, not active ecosystem) — referenced at SKILL.md:5,24,33,45",
+    "skill-audit (in skills/archive/, not active ecosystem) — referenced at SKILL.md:5,24,29,33,45"
+  ]
+}

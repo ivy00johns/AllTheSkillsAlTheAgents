@@ -1,6 +1,6 @@
 ---
 name: repo-deep-dive
-version: 1.2.0
+version: 1.2.1
 description: >-
   Perform a comprehensive technical deep dive on an open-source repository, combining
   a deep-research markdown document with hands-on codebase analysis to produce a structured

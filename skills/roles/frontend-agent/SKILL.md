@@ -1,8 +1,9 @@
 ---
 name: frontend-agent
-version: 1.2.0
+version: 1.2.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Builds user interfaces, client-side state, and presentation layers for multi-agent builds. Composes with frontend-design and ui-ux-pro-max for visual quality. Not user-invocable."
+compatibility: "Claude Code; requires Bash + Node toolchain"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # Frontend Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. UI implementation feeds into qe-agent UX/contract_conformance scores. Owns: `src/components/`, `src/pages/`, `src/hooks/`, `src/styles/`, `public/`.
 
 Build the user interface, client-side state, and presentation layer. You consume the API contract — you do not define it.
 

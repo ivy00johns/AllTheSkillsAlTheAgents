@@ -1,8 +1,9 @@
 ---
 name: performance-agent
-version: 1.2.0
+version: 1.2.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Designs and executes performance tests, load tests, and benchmarks for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
+compatibility: "Claude Code; requires Bash + k6"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # Performance Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `tests/performance/`, `load-tests/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Performance run results feed into qe-agent performance score. Owns: `tests/performance/`, `load-tests/`.
 
 Design and execute performance tests. You measure and report — you don't optimize application code.
 

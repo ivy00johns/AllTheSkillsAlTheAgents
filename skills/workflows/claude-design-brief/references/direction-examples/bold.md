@@ -14,7 +14,7 @@ A "bold" direction means: a layout system or color discipline that announces wha
 
 The bold direction's job is to be the version that makes the moat unignorable. If the safe direction is "this could be published in the magazine you know," the bold direction is "this could only be from THIS project."
 
-## Worked Sample — Sovereign Sampson "Blackout Dossier"
+## Worked Sample — {political-advocacy-site} "Blackout Dossier"
 
 ```text
 Direction B: Blackout Dossier

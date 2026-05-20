@@ -1,0 +1,35 @@
+{
+  "skill": "contract-auditor",
+  "path": "skills/contracts/contract-auditor/SKILL.md",
+  "version": "1.1.0",
+  "category": "contracts",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields present, valid semver, no angle brackets. Non-standard field 'disable-model-invocation: true' at L4 (intentional but undocumented in frontmatter-spec). Description 201 chars (1 over target, within 1024 ceiling). shared_read uses wildcard ['*']."},
+    "description_quality": {"score": 4, "notes": "Action verb (Audits), declares dispatch model, states pipeline position. Lacks user-facing keyword variants — appropriate since skill is intentionally not user-invocable."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 179 lines / ~1111 words. Single reference (pact-setup.md, 142 lines) linked at L170 with when-to-read guidance."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Process steps 1-8 with imperative voice and Check: bullets. Explains WHY ('#1 cause of field-naming drift', 'unique value the auditor provides that qe-agent cannot'). Severity Guidelines explicit."},
+    "coordination": {"score": 5, "notes": "Read-only correctly declared. Coordination Rules distinguish auditor vs qe-agent (static vs runtime) and vs contract-author (verify vs generate). composes_with all resolve. spawned_by [orchestrator] accurate."},
+    "completeness": {"score": 5, "notes": "pact-setup.md reference exists. Inline audit report template at L138-159. Severity guidelines bounded. Inputs (contracts/, agent_ownership, tech_stack, service_map) enumerated upfront."},
+    "anti_patterns": {"score": 5, "notes": "Rare explicit 'when NOT to act' rules: Read-only, Contract is truth, flag ambiguities. No hardcoded paths (uses placeholders). Grep commands use realistic --include flags."}
+  },
+  "average": 4.71,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Non-standard frontmatter field 'disable-model-invocation' not documented in frontmatter-spec", "location": "SKILL.md:4", "fix": "Either add to frontmatter-spec.md as a house extension or remove the field and rely on the description signal alone."}
+    ],
+    "nits": [
+      {"item": "owns.shared_read uses wildcard ['*']", "location": "SKILL.md:12", "fix": "Replace with explicit list ['contracts/', 'src/', 'backend/', 'frontend/', 'docs/']."},
+      {"item": "Description is 201 chars — just over 200-char target", "location": "SKILL.md:5", "fix": "Remove redundant 'Composed by orchestrator during multi-agent builds.' sentence."},
+      {"item": "description uses quoted single-line string instead of multiline | block scalar", "location": "SKILL.md:5", "fix": "Convert to | block scalar for consistency with other skills."},
+      {"item": "Field order drift: disable-model-invocation between version and description", "location": "SKILL.md:4", "fix": "Move to between min_plan and owns if field is kept."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Document or remove the non-standard disable-model-invocation frontmatter field", "file": "SKILL.md:4", "effort": "small"},
+    {"rank": 2, "fix": "Replace owns.shared_read wildcard with explicit directory list", "file": "SKILL.md:12", "effort": "small"},
+    {"rank": 3, "fix": "Trim description to under 200 chars by removing redundant sentence", "file": "SKILL.md:5", "effort": "small"}
+  ],
+  "broken_refs": []
+}

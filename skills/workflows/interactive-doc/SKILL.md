@@ -1,8 +1,16 @@
 ---
 name: interactive-doc
-version: 1.0.0
+version: 1.0.1
 description: |
   Use this skill whenever the user wants rich documentation as a paired Obsidian-friendly markdown source plus an HTML companion built from it — the "unreasonable effectiveness of HTML" pattern with the .md as canonical source of truth. Two workflows: (A) render an existing research markdown file into an HTML companion (the .md stays read-only by default), or (B) create both files for a new doc, with the .md written first as the substantive source and the HTML derived from it. Trigger this for architecture deep-dives, module maps, concept explainers (interactive demos), side-by-side comparisons of repos or approaches, feature walkthroughs, and any time the user mentions "interactive doc", "wiki page", "Obsidian doc", "explainer", "render this research", "architecture diagram", "compare these repos", or wants documentation that goes beyond a markdown wall of text. Especially trigger when the user has done deep research in markdown and wants an HTML companion humans will actually read, or when they want a new doc that lives in their Obsidian vault but also has a beautiful rendered version. Output is always a pair: a fully-substantive `.md` (Obsidian-native: YAML frontmatter, wiki links, callouts, Mermaid diagrams) and a self-contained `.html` companion (inline SVG, collapsibles, tabs, on-page nav, optional interactive demos). One self-contained HTML file per doc, no build step, opens in a browser.
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
+metadata:
+  category: workflows
+requires_agent_teams: false
+requires_claude_code: true
+min_plan: starter
+composes_with: ["llm-wiki", "wiki-research", "docs-agent"]
+spawned_by: []
 ---
 
 # Interactive Doc
@@ -161,7 +169,7 @@ Full reference in `references/house-style.md`. The non-negotiables:
 
 ## Optional: index page
 
-Once the user has 3+ docs, offer to generate `index.html` — a landing page linking all docs, grouped by type, with the same house style. Great for an Obsidian vault folder you want to share externally. See thariq's site for the canonical example.
+Once the user has 3+ docs, offer to generate `index.html` — a landing page linking all docs, grouped by type, with the same house style. Great for an Obsidian vault folder you want to share externally.
 
 ## Anti-patterns
 

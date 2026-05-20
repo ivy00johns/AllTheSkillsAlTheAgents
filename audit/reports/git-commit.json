@@ -1,0 +1,37 @@
+{
+  "skill": "git-commit",
+  "path": "skills/git/git-commit/SKILL.md",
+  "version": "1.2.0",
+  "category": "git",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields present; valid semver; description 501 chars folded (well under 1024). The > at L4 is YAML scalar style marker (permitted by frontmatter-spec). allowed-tools hyphenated. composes_with includes archived git-branch-cleanup — broken cross-skill reference."},
+    "description_quality": {"score": 5, "notes": "Action verb (Guide for creating), 9 keyword variants, proactive trigger statement. 501 chars (folded) under ceiling."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 121 lines / ~476 words. No references/ directory (correct — tight reference card). All content fits atomically."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered sections with imperative voice. Allowed Types table explicit and bounded. Multiple worked examples. Quick Checklist summarizes rules. Anti-Pattern callout explicit."},
+    "coordination": {"score": 2, "notes": "composes_with [git-pr, git-branch-cleanup] — git-branch-cleanup is archived (now git-post-merge-cleanup). 1 of 2 composed skills is broken. Should also include git-pr-feedback."},
+    "completeness": {"score": 5, "notes": "All content self-contained. No reference files needed. Examples concrete. Quick Checklist captures rules. No dead links in body."},
+    "anti_patterns": {"score": 5, "notes": "Explicit Anti-Pattern callout forbids amending without permission, with rationale. Imperative voice. No emojis. No excessive MUST/NEVER. Branch naming has '3-5 meaningful words' guidance preventing both extremes."}
+  },
+  "average": 4.43,
+  "findings": {
+    "critical": [
+      {"item": "composes_with references archived skill git-branch-cleanup", "location": "SKILL.md:20", "fix": "Change to composes_with: ['git-pr', 'git-post-merge-cleanup', 'git-pr-feedback'] — git-post-merge-cleanup is the active replacement."}
+    ],
+    "important": [],
+    "nits": [
+      {"item": "owns.shared_read uses wildcard ['*']", "location": "SKILL.md:18", "fix": "Change to [] (skill operates via git commands, not file reads) or ['./']."},
+      {"item": "Description uses > folded scalar with line breaks that have no semantic meaning", "location": "SKILL.md:4-11", "fix": "Stylistic — consider | block scalar or single line for clarity."},
+      {"item": "Fenced code block at L29 tagged 'text' instead of a syntax-aware language", "location": "SKILL.md:29", "fix": "Tag as 'gitcommit' or 'markdown' for better rendering."},
+      {"item": "Merge Strategy default ('squash merge') is a workflow assumption", "location": "SKILL.md:106", "fix": "Append '; check the repo's CONTRIBUTING.md if it disagrees.'"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Replace archived git-branch-cleanup with git-post-merge-cleanup in composes_with", "file": "SKILL.md:20", "effort": "small"},
+    {"rank": 2, "fix": "Tighten or remove owns.shared_read wildcard", "file": "SKILL.md:18", "effort": "small"},
+    {"rank": 3, "fix": "Add a note that Merge Strategy default is repo-conventional", "file": "SKILL.md:106", "effort": "small"}
+  ],
+  "broken_refs": [
+    "git-branch-cleanup (archived) referenced in composes_with at SKILL.md:20"
+  ]
+}

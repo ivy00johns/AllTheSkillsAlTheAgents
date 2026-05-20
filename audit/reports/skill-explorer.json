@@ -1,0 +1,46 @@
+{
+  "skill": "skill-explorer",
+  "path": "skills/meta/skill-explorer/SKILL.md",
+  "version": "1.0.0",
+  "category": "meta",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 3, "notes": "All required fields present; valid semver; no angle brackets; allowed-tools hyphenated. Description 1023 chars — 1 under 1024 ceiling, dangerously close. composes_with includes two archived skills."},
+    "description_quality": {"score": 3, "notes": "Action verb (Help), 15+ concrete trigger phrases, very pushy. But 1023 chars at the ceiling and multiline scalar with awkward wraps."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 162 lines / ~1405 words. Single reference routing-table.md (148 lines) linked with when-to-read context. Below TOC threshold. Bonus evals/ directory for trigger testing."},
+    "instruction_clarity": {"score": 5, "notes": "Four modes (Recall/Catalog/Explain/Route) in clear table. Each mode has output format example. Imperative voice. Core principle 'name, don't invoke' well-articulated with exception clause."},
+    "coordination": {"score": 2, "notes": "composes_with at L24 lists archived skill-audit and skill-deep-review — broken cross-skill references. Body at L131 and L144 also reference dead skills, so the skill would actively misroute users."},
+    "completeness": {"score": 4, "notes": "routing-table.md exists. Output format examples comprehensive. L30 hardcodes '38 repo skills' which is stale (CLAUDE.md says ~46). Evals infrastructure present."},
+    "anti_patterns": {"score": 4, "notes": "Excellent anti-patterns table with rationale. 'When NOT to invoke' actively prevents over-triggering. Imperative voice. But routing rule at L131 directs users to dead skills."}
+  },
+  "average": 3.71,
+  "findings": {
+    "critical": [
+      {"item": "composes_with references two archived skills (skill-audit, skill-deep-review)", "location": "SKILL.md:24", "fix": "Replace with composes_with: ['skill-review', 'skill-writer', 'skill-update']."},
+      {"item": "Routing rule at L131 sends users to dead skills", "location": "SKILL.md:131", "fix": "Change to '\"Audit / review my skills\" → skill-review (--scope=all for broad, --scope=<name> for deep)'."},
+      {"item": "'When NOT to invoke' rule at L144 references dead skill-audit", "location": "SKILL.md:144", "fix": "Change 'skill-audit' to 'skill-review'."}
+    ],
+    "important": [
+      {"item": "Description at 1023 chars is 1 char under the 1024 hard ceiling", "location": "SKILL.md:5-15", "fix": "Tighten multi-clause sentence at L11-15 to drop ~200 chars while keeping strongest 4-5 trigger contexts."},
+      {"item": "Hardcoded '38 repo skills' is stale (CLAUDE.md says ~46)", "location": "SKILL.md:30", "fix": "Change to '40+ repo skills plus plugin skills' or omit the number entirely."}
+    ],
+    "nits": [
+      {"item": "Description uses multiline | block scalar with hard wraps that don't add value", "location": "SKILL.md:5-15", "fix": "Consider folding to single paragraph for better readability."},
+      {"item": "Mermaid rendering suggestion at L121 doesn't reference mermaid-charts skill", "location": "SKILL.md:121", "fix": "Point at mermaid-charts as the proper implementation skill."},
+      {"item": "Plugin location at L62 is environment-dependent", "location": "SKILL.md:62", "fix": "Add 'or wherever Claude Code is configured to load them.'"},
+      {"item": "Anti-patterns table at L149-157 uses double-line formatting inconsistent with other tables", "location": "SKILL.md:149-157", "fix": "Normalize to standard pipe-table formatting matching L35-40."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Replace archived-skill references (skill-audit, skill-deep-review) with current skill-review across composes_with and body routing rules", "file": "SKILL.md:24,131,144", "effort": "small"},
+    {"rank": 2, "fix": "Trim description below 800 chars to leave headroom under the 1024 ceiling", "file": "SKILL.md:5-15", "effort": "medium"},
+    {"rank": 3, "fix": "Update stale '38 repo skills' count to current number or drop entirely", "file": "SKILL.md:30", "effort": "small"}
+  ],
+  "broken_refs": [
+    "skill-audit (archived) referenced in composes_with at SKILL.md:24",
+    "skill-deep-review (archived) referenced in composes_with at SKILL.md:24",
+    "skill-audit (archived) referenced in body routing rule at SKILL.md:131",
+    "skill-deep-review (archived) referenced in body routing rule at SKILL.md:131",
+    "skill-audit (archived) referenced in 'When NOT to invoke' at SKILL.md:144"
+  ]
+}

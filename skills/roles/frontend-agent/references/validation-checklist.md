@@ -67,8 +67,6 @@ The relative path inside a JS import is stable because Vite resolves it against 
 
 If you genuinely need the CSS imported from another CSS file (e.g., a Tailwind layer), use Vite's plugin layer (`vite-plugin-postcss-import` with a custom resolver) — but for 95% of cases, importing from `main.tsx` is the right answer.
 
-## Build Verification (continued)
-
 ## Dev Server
 
 ```bash
