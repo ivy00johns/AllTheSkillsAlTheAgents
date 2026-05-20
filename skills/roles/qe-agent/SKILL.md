@@ -10,7 +10,7 @@ owns:
   directories: ["tests/", "e2e/", "__tests__/"]
   patterns: ["*.test.*", "*.spec.*", "qa-report.md", "qa-report.json"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent", "security-agent", "contract-auditor", "performance-agent", "playwright"]
 spawned_by: ["orchestrator"]
 ---

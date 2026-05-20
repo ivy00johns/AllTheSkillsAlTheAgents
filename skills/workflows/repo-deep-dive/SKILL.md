@@ -18,7 +18,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent"]
 composes_with: ["project-profiler", "plan-builder", "mermaid-charts", "wiki-research", "llm-wiki"]
 spawned_by: []
 ---

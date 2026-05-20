@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: [".gitignore"]
   shared_read: ["contracts/", ".claude/handoffs/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: [
   "wiki-research", "llm-wiki", "repo-deep-dive",
   "brainstorming", "plan-builder", "writing-plans",

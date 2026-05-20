@@ -10,7 +10,7 @@ owns:
   directories: ["docs/"]
   patterns: ["README.md", "CHANGELOG.md", "CONTRIBUTING.md"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["backend-agent", "frontend-agent", "infrastructure-agent", "mermaid-charts", "contract-author"]
 spawned_by: ["orchestrator"]
 ---

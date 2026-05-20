@@ -10,7 +10,7 @@ For every SKILL.md modified in the pass:
 
 - [ ] YAML parses cleanly (no tab/space mix, no unclosed quotes)
 - [ ] Field order matches house style: `name`, `version`, `description`, `compatibility`, `license`, `allowed-tools`, `metadata`, `requires_agent_teams`, `requires_claude_code`, `min_plan`, `owns`, `composes_with`, `spawned_by`
-- [ ] `name` is kebab-case, ≤64 chars, unique across the ecosystem, does NOT start with `claude-` or `anthropic-`
+- [ ] `name` is kebab-case, ≤64 chars, unique across the ecosystem. `claude-*` / `anthropic-*` names are discouraged (reserved by Anthropic) but acceptable as a documented exception when the skill targets the corresponding Anthropic product.
 - [ ] No `<` or `>` anywhere in the frontmatter block (security rule)
 - [ ] `version` is valid semver — bump MINOR for new behavior, PATCH for fixes, MAJOR for breaks
 - [ ] `description` includes at least one action verb and one trigger phrase

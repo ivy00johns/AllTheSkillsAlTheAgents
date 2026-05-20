@@ -11,7 +11,7 @@ owns:
   directories: ["docs/agents/"]
   patterns: []
   shared_read: []
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 composes_with: ["project-profiler", "sync-skills"]
 spawned_by: []
 ---

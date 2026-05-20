@@ -4,7 +4,7 @@ version: 1.0.0
 description: |
   Catch the failure modes that pass a "tests green + dev server boots + 0 console errors" gate but visibly break the app when a human clicks around — stale mock IDs leaking into "live" pages, lone `?` / `—` / `undefined` / `Loading…` text where real data should be, repeated generic-fallback labels (the default string a component renders when its data prop is missing) appearing across rows that should show distinct content, "Couldn't load X" / "Unauthorized" / "Failed to fetch" dead-end shells on auth-gated routes, and lists that render plausibly but link to dead targets. Use this skill whenever a build is wrapping up and someone is about to claim "the UI works" without having clicked through it as a real user; whenever ux-review or qe-agent finishes its screenshot/contract pass; whenever the user says "is it actually working", "did anyone click around", "fix the app", "broken pages", "dead links", or after they paste a screenshot showing visible garbage like `?`, `—`, `undefined`, `null`, or a "Not found" detail page. Triggers BEFORE the build is declared done, not after the user finds the bug themselves. Also invoke proactively when a frontend agent has just rewired data sources from mocks → real backend, when auth was added to previously-public routes, when seed data was regenerated, or when a previously-broken page was "fixed" without a click-through verification.
 requires_claude_code: true
-allowed_tools: ["Read", "Bash", "Glob", "Grep",
+allowed-tools: ["Read", "Bash", "Glob", "Grep",
   "mcp__plugin_playwright_playwright__browser_navigate",
   "mcp__plugin_playwright_playwright__browser_snapshot",
   "mcp__plugin_playwright_playwright__browser_click",

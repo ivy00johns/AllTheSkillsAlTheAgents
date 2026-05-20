@@ -19,7 +19,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["wiki/", "index.md"]
-allowed_tools: ["Read", "Glob", "Grep"]
+allowed-tools: ["Read", "Glob", "Grep"]
 composes_with: ["repo-deep-dive", "llm-wiki", "project-profiler"]
 spawned_by: ["orchestrator", "code-review-agent", "repo-deep-dive", "project-profiler", "backend-agent", "frontend-agent", "security-agent", "plan-builder"]
 ---

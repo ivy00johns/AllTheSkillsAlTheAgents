@@ -9,7 +9,7 @@ owns:
   directories: []
   patterns: []
   shared_read: []
-allowed_tools: ["Read", "Grep", "Glob"]
+allowed-tools: ["Read", "Grep", "Glob"]
 composes_with: ["architecture-rescue", "maintain-context", "plan-builder"]
 spawned_by: []
 ---

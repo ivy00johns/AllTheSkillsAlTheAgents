@@ -43,7 +43,7 @@ spawned_by: ["orchestrator"]
 - **Type:** string
 - **Format:** kebab-case (lowercase, hyphens). No spaces, no capitals, no underscores.
 - **Max length:** 64 characters
-- **Reserved prefixes:** must not start with `claude-` or `anthropic-` — reserved by Anthropic for first-party skills
+- **Reserved prefixes:** should not start with `claude-` or `anthropic-` — reserved by Anthropic for first-party skills. **Exception:** skills that explicitly target an Anthropic product or feature (e.g., `claude-design-brief` for Claude's design canvas) may use the prefix when the name precisely describes the target. Document the exception in the skill body so future maintainers know it's intentional. `skill-review` WARNs on this pattern; it does not FAIL.
 - **Must match** the skill folder name
 - **Must be unique** across the ecosystem
 - **Examples:** `backend-agent`, `contract-author`, `skill-writer`
@@ -166,9 +166,12 @@ This repo's extensions for orchestrated builds. Not part of Anthropic's spec; pa
 
 These rules come from Anthropic's spec. `skill-review` enforces them.
 
-- **XML angle brackets `<` and `>`** anywhere in the frontmatter — security risk, since frontmatter loads into Claude's system prompt
-- **Names starting with `claude-` or `anthropic-`** — reserved by Anthropic for first-party skills
+- **XML angle brackets `<` and `>`** in field values — security risk, since frontmatter loads into Claude's system prompt. (YAML scalar style markers like `description: >` are structural and not affected by this rule.)
 - **Code execution in YAML** — parsers use safe-YAML; tagged Python objects and similar constructs will fail to parse
+
+## Discouraged in Frontmatter
+
+- **Names starting with `claude-` or `anthropic-`** — reserved by Anthropic for first-party skills; using these prefixes risks collision if Anthropic ships a first-party skill with the same name. Acceptable as a documented exception when the skill targets the corresponding Anthropic product (e.g., `claude-design-brief` for Claude Design). `skill-review` WARNs on this pattern; it does not FAIL.
 
 ## Body Length Guidance
 
@@ -215,7 +218,7 @@ When declaring `owns`, follow these precedence rules:
 
 `skill-review` enforces these.
 
-1. `name` is kebab-case, ≤64 chars, unique, and does NOT start with `claude-` or `anthropic-`
+1. `name` is kebab-case, ≤64 chars, and unique. Names starting with `claude-` or `anthropic-` trigger a WARN (not a FAIL) — acceptable when the skill targets the corresponding Anthropic product and the exception is documented in the skill body.
 2. `version` is valid semver (top-level or under `metadata`)
 3. `description` is present, ≤1024 chars, contains no `<` or `>`
 4. No `<` or `>` anywhere in frontmatter

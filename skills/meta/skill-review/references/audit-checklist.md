@@ -9,7 +9,7 @@ Run these for every skill in scope. In Mode A (bulk) they roll up to PASS / WARN
 ### Frontmatter
 
 - [ ] `name` field present, kebab-case, ≤64 chars
-- [ ] `name` does NOT start with `claude-` or `anthropic-` (reserved by Anthropic) — **FAIL**
+- [ ] `name` starting with `claude-` or `anthropic-` (reserved by Anthropic) — **WARN**, not FAIL. Acceptable when the skill targets the corresponding Anthropic product and the exception is documented in the skill body (e.g., `claude-design-brief` for Claude Design). Confirm the documented exception exists before clearing the warning.
 - [ ] `name` matches the directory name
 - [ ] `version` field present (top-level), valid semver
 - [ ] `description` field present

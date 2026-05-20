@@ -10,7 +10,7 @@ owns:
   directories: ["src/components/", "src/pages/", "src/hooks/", "src/styles/", "public/"]
   patterns: ["*.tsx", "*.jsx", "*.vue", "*.svelte", "*.css"]
   shared_read: ["contracts/", "shared/", "src/types/", "assets/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "qe-agent", "infrastructure-agent", "contract-author", "frontend-design", "ui-ux-pro-max", "ui-brief", "nano-banana"]
 spawned_by: ["orchestrator"]
 ---

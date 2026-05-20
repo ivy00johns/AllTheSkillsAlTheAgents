@@ -10,7 +10,7 @@ owns:
   directories: ["skills/workflows/sync-skills/"]
   patterns: []
   shared_read: ["skills/"]
-allowed_tools: ["Read", "Bash"]
+allowed-tools: ["Read", "Bash"]
 composes_with: ["skill-updater", "skill-audit"]
 spawned_by: []
 ---

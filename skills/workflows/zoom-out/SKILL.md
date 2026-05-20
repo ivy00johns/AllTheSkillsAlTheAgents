@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Grep", "Glob"]
+allowed-tools: ["Read", "Grep", "Glob"]
 composes_with: ["maintain-context"]
 spawned_by: []
 ---

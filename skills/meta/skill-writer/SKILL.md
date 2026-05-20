@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: []
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["project-profiler", "orchestrator"]
 spawned_by: []
 ---
@@ -64,7 +64,7 @@ Every SKILL.md starts with YAML frontmatter. See `references/frontmatter-spec.md
 
 Required fields:
 
-- `name` — kebab-case, max 64 chars, must NOT start with `claude-` or `anthropic-` (reserved)
+- `name` — kebab-case, max 64 chars. `claude-*` / `anthropic-*` prefixes are reserved by Anthropic; use them only as a documented exception when the skill targets the corresponding Anthropic product (e.g., `claude-design-brief`).
 - `version` — semver (start at 1.0.0), top-level
 - `description` — `[What] + [When] + [Capabilities]` anatomy (≤200 chars target, 1024 hard ceiling)
 
@@ -107,7 +107,7 @@ before reporting done.
 ### Step 5: Validate the Skill
 
 - [ ] Frontmatter has all required fields
-- [ ] `name` is kebab-case and does NOT start with `claude-` or `anthropic-`
+- [ ] `name` is kebab-case. If it starts with `claude-` or `anthropic-`, that's a documented exception (skill targets the corresponding Anthropic product)
 - [ ] No `<` or `>` anywhere in frontmatter
 - [ ] Description is ≤200 chars (target) and "pushy"; never exceeds 1024 chars (ceiling)
 - [ ] Body is ≤5,000 words (soft warning past 500 lines)

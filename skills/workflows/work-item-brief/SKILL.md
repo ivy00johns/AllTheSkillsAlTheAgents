@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: ["briefs/**/*.md"]
   shared_read: []
-allowed_tools: ["Read", "Write", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Grep", "Glob"]
 composes_with: ["grill-me", "plan-builder", "contract-author"]
 spawned_by: []
 ---

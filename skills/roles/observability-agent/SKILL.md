@@ -10,7 +10,7 @@ owns:
   directories: ["src/telemetry/", "src/logging/", "monitoring/", "alerts/"]
   patterns: []
   shared_read: ["src/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "infrastructure-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
 ---

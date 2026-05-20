@@ -32,7 +32,7 @@ skill-name/
 └── references/           # On-demand reference files (unlimited size)
 ```
 
-All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-writer/references/frontmatter-spec.md`. This spec aligns with Anthropic's official Agent Skills standard. Required fields: `name` (kebab-case, no `claude-`/`anthropic-` prefix), `version` (semver, top-level), `description` (trigger text, ≤1024 chars, no `<` or `>`). Optional Anthropic fields: `compatibility`, `license`, `allowed-tools` (hyphen canonical; `allowed_tools` accepted as alias), `metadata`. Agent roles also declare `owns`, `composes_with`, `spawned_by`.
+All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-writer/references/frontmatter-spec.md`. This spec aligns with Anthropic's official Agent Skills standard. Required fields: `name` (kebab-case; `claude-*`/`anthropic-*` prefixes discouraged but allowed as documented exceptions), `version` (semver, top-level), `description` (trigger text, ≤1024 chars, no `<` or `>` in field values). Optional Anthropic fields: `compatibility`, `license`, `allowed-tools` (hyphen canonical; `allowed_tools` accepted as alias), `metadata`. Agent roles also declare `owns`, `composes_with`, `spawned_by`.
 
 ## Skill Categories
 

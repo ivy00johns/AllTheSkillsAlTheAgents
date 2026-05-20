@@ -10,7 +10,7 @@ owns:
   directories: [".github/workflows/", "nginx/", "k8s/", "terraform/", "scripts/deploy/"]
   patterns: ["Dockerfile*", "docker-compose*", "Makefile", "justfile"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "frontend-agent", "qe-agent", "deployment-checklist", "observability-agent"]
 spawned_by: ["orchestrator"]
 ---

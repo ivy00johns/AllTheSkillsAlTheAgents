@@ -10,7 +10,7 @@ owns:
   directories: ["src/api/", "src/services/", "src/models/", "src/middleware/", "src/utils/"]
   patterns: []
   shared_read: ["contracts/", "shared/", "src/types/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["frontend-agent", "qe-agent", "infrastructure-agent", "contract-author", "db-migration-agent", "observability-agent"]
 spawned_by: ["orchestrator"]
 ---

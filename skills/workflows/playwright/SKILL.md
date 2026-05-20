@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["qe-agent", "frontend-agent", "deployment-checklist"]
 spawned_by: ["orchestrator", "qe-agent"]
 ---

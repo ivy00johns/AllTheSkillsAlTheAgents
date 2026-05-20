@@ -10,7 +10,7 @@ owns:
   directories: ["contracts/", "schemas/"]
   patterns: ["openapi.yaml", "asyncapi.yaml"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["backend-agent", "frontend-agent", "contract-auditor", "qe-agent"]
 spawned_by: ["orchestrator"]
 ---
