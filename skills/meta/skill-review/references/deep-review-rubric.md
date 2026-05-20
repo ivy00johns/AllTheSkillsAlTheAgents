@@ -24,11 +24,14 @@ Scoring criteria for each dimension evaluated in Mode B (`--scope=<skill-name>`)
 
 Check:
 
-- `name`: kebab-case, ≤64 chars, unique across ecosystem
-- `version`: valid semver (X.Y.Z)
-- `description`: present, multiline YAML string
+- `name`: kebab-case, ≤64 chars, unique across ecosystem, no `claude-` / `anthropic-` prefix
+- No `<` or `>` anywhere in the frontmatter block
+- `version`: valid semver (X.Y.Z), top-level
+- `description`: present, multiline YAML string, ≤1024 chars
 - Agent roles: `owns.directories`, `owns.patterns`, `owns.shared_read` present
-- `allowed_tools`: appropriate for the skill's function
+- `allowed-tools` (hyphen): appropriate for the skill's function. `allowed_tools` (underscore) accepted as deprecated alias
+- `compatibility`: present if the skill has host/tool/env requirements
+- `metadata`: nested object form if used
 - `composes_with`: lists real skill names
 - `spawned_by`: accurate if declared
 - `argument-hint`: present if the skill takes an argument
@@ -56,11 +59,13 @@ Check against description-patterns:
 
 | Score | Criteria |
 |-------|----------|
-| 5 | Body <300 lines, references well-organized, clear pointers, table of contents for large refs |
-| 4 | Body <500 lines, references used, pointers present |
-| 3 | Body approaching 500 lines, some content could move to references |
-| 2 | Body >500 lines, or references exist but aren't linked |
+| 5 | Body <2,000 words and <300 lines, references well-organized, clear pointers, TOC for large refs |
+| 4 | Body ≤5,000 words and ≤500 lines, references used, pointers present |
+| 3 | Body approaching the 5,000-word / 500-line guideline, some content could move to references |
+| 2 | Body >5,000 words OR >500 lines without clear justification, or references exist but aren't linked |
 | 1 | Everything in one massive file, or references broken/missing |
+
+Note: heavy skills (`orchestrator`, `ui-ux-pro-max`, `repo-deep-dive`) earn length and should not be penalized below 3 for size alone — score them on whether the length is actually load-bearing.
 
 Check:
 

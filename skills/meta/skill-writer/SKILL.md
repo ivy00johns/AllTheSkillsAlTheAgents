@@ -1,6 +1,6 @@
 ---
 name: skill-writer
-version: 1.1.0
+version: 1.2.0
 description: |
   Generate new SKILL.md files conforming to the ecosystem's frontmatter spec and structure conventions. Use this skill when creating any new skill, agent role definition, or workflow skill. Trigger whenever someone says "create a skill", "new agent", "write a SKILL.md", or needs to add a role to the skill ecosystem. Also use when reviewing existing skills for spec compliance.
 requires_agent_teams: false
@@ -41,7 +41,7 @@ skill-name/
 Skills use three-level loading:
 
 1. **Metadata** (~100 tokens) — name + description, always in context
-2. **SKILL.md body** (<500 lines) — loaded when skill triggers
+2. **SKILL.md body** (≤5,000 words; soft warning at 500 lines) — loaded when skill triggers
 3. **References** (unlimited) — loaded on demand via explicit reads
 
 Keep SKILL.md bodies concise. Move detailed checklists, templates, and reference tables to `references/` with clear pointers.
@@ -64,11 +64,11 @@ Every SKILL.md starts with YAML frontmatter. See `references/frontmatter-spec.md
 
 Required fields:
 
-- `name` — kebab-case, max 64 chars
-- `version` — semver (start at 1.0.0)
-- `description` — action verb + what it does + trigger contexts (≤200 chars target)
+- `name` — kebab-case, max 64 chars, must NOT start with `claude-` or `anthropic-` (reserved)
+- `version` — semver (start at 1.0.0), top-level
+- `description` — `[What] + [When] + [Capabilities]` anatomy (≤200 chars target, 1024 hard ceiling)
 
-The description is the primary trigger mechanism. Write it "pushy" — enumerate contexts where the skill should activate. See `references/description-patterns.md` for templates.
+The description is the primary trigger mechanism. Write it "pushy" — enumerate contexts where the skill should activate. See `references/description-patterns.md` for templates and the 3-slot anatomy.
 
 ### Step 3: Write the Body
 
@@ -107,8 +107,10 @@ before reporting done.
 ### Step 5: Validate the Skill
 
 - [ ] Frontmatter has all required fields
-- [ ] Description is ≤200 characters and "pushy"
-- [ ] Body is under 500 lines
+- [ ] `name` is kebab-case and does NOT start with `claude-` or `anthropic-`
+- [ ] No `<` or `>` anywhere in frontmatter
+- [ ] Description is ≤200 chars (target) and "pushy"; never exceeds 1024 chars (ceiling)
+- [ ] Body is ≤5,000 words (soft warning past 500 lines)
 - [ ] File ownership doesn't overlap with existing agents (check v1.1 resolved conflicts)
 - [ ] Directory ownership takes precedence over pattern ownership
 - [ ] Reference files are linked from the body
@@ -117,7 +119,7 @@ before reporting done.
 ## Common Mistakes
 
 - **Vague descriptions** — "Helps with backend stuff" won't trigger. Be specific.
-- **Body too long** — Approaching 500 lines? Move content to references.
+- **Body too long** — Approaching 5,000 words or 500 lines? Move content to references.
 - **Missing ownership** — Agent roles must declare owned and off-limits files.
 - **Overlapping ownership** — Two agents can't own the same directory. Directory ownership takes precedence over pattern ownership (see `references/frontmatter-spec.md` §Ownership Resolution Rules).
 - **Ignoring resolved conflicts** — Check the v1.1 resolved conflicts table before declaring ownership of `contracts/`, `.claude/handoffs/`, `CLAUDE.md`, `README.md`, or `tests/performance/`.

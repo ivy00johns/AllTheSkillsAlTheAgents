@@ -9,20 +9,27 @@ Run these for every skill in scope. In Mode A (bulk) they roll up to PASS / WARN
 ### Frontmatter
 
 - [ ] `name` field present, kebab-case, ≤64 chars
+- [ ] `name` does NOT start with `claude-` or `anthropic-` (reserved by Anthropic) — **FAIL**
 - [ ] `name` matches the directory name
-- [ ] `version` field present, valid semver
+- [ ] `version` field present (top-level), valid semver
 - [ ] `description` field present
+- [ ] No `<` or `>` anywhere in the frontmatter block — **FAIL** (security rule)
 - [ ] Description starts with an action verb
-- [ ] Description length ≤200 characters (target, not hard limit)
+- [ ] Description length ≤200 characters (target) and ≤1024 (hard ceiling — **FAIL** if exceeded)
+- [ ] Description follows the `[What] + [When] + [Capabilities]` anatomy
 - [ ] Agent role skills have an `owns` block with `directories`, `patterns`, `shared_read`
-- [ ] `allowed_tools` is appropriate for the skill's function
+- [ ] `allowed-tools` (hyphen, canonical) is appropriate for the skill's function. `allowed_tools` (underscore) still accepted as deprecated alias — flag as WARN
+- [ ] `compatibility` field is present for skills with host/tool requirements (recommended, not required)
+- [ ] `metadata` is a nested object if present (author, category, tags, mcp-server)
 - [ ] `composes_with` references existing skills
 - [ ] `spawned_by` references existing skills
 - [ ] `argument-hint` present if the skill takes an argument
 
 ### Body Structure
 
-- [ ] Body ≤500 lines (the 100-line rule: anything past ~200 should probably move to references)
+- [ ] Body ≤5,000 words (Anthropic guideline) — WARN past this
+- [ ] Body ≤500 lines (this repo's rule of thumb: anything past ~200 should probably move to references) — WARN past this
+- [ ] Heavy skills (`orchestrator`, `ui-ux-pro-max`, `repo-deep-dive`) may exceed both — note as accepted divergence rather than flag
 - [ ] Has a role/purpose statement
 - [ ] Has a process or steps section
 - [ ] Uses imperative voice ("Read the file" not "The file should be read")
@@ -78,7 +85,7 @@ Flag any of these in Mode B; aggregate counts in Mode A.
 - [ ] Instructions that fight against the LLM's natural behavior without justification
 - [ ] Style-over-substance rules (mandating comment formats, variable naming) without practical impact
 - [ ] "Kitchen sink" — trying to do too many things in one skill
-- [ ] Assuming tools or environment features that aren't declared in `allowed_tools` or `requires_*`
+- [ ] Assuming tools or environment features that aren't declared in `allowed-tools`, `compatibility`, or `requires_*`
 
 ## Bulk Scoring Quick Reference
 

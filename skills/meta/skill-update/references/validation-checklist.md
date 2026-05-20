@@ -9,15 +9,18 @@ For every SKILL.md modified in the pass:
 ### Frontmatter
 
 - [ ] YAML parses cleanly (no tab/space mix, no unclosed quotes)
-- [ ] Field order matches house style: `name`, `version`, `description`, `requires_agent_teams`, `requires_claude_code`, `min_plan`, `owns`, `allowed_tools`, `composes_with`, `spawned_by`
-- [ ] `name` is kebab-case, ≤64 chars, unique across the ecosystem
+- [ ] Field order matches house style: `name`, `version`, `description`, `compatibility`, `license`, `allowed-tools`, `metadata`, `requires_agent_teams`, `requires_claude_code`, `min_plan`, `owns`, `composes_with`, `spawned_by`
+- [ ] `name` is kebab-case, ≤64 chars, unique across the ecosystem, does NOT start with `claude-` or `anthropic-`
+- [ ] No `<` or `>` anywhere in the frontmatter block (security rule)
 - [ ] `version` is valid semver — bump MINOR for new behavior, PATCH for fixes, MAJOR for breaks
 - [ ] `description` includes at least one action verb and one trigger phrase
-- [ ] `description` target ≤200 chars per the spec — flag overflow but don't block
+- [ ] `description` target ≤200 chars per the spec — flag overflow but don't block. Hard ceiling 1024 chars — block if exceeded.
+- [ ] `compatibility` string (1-500 chars) present for skills with host/tool/env requirements
 - [ ] `requires_agent_teams` and `requires_claude_code` are booleans
 - [ ] `min_plan` is one of `starter | pro | team | enterprise`
 - [ ] `owns.directories` does not overlap with any other agent role (see resolved-conflicts table in `skills/meta/skill-writer/references/frontmatter-spec.md`)
-- [ ] `allowed_tools` only lists tools the skill actually uses
+- [ ] `allowed-tools` (hyphen, canonical) only lists tools the skill actually uses. `allowed_tools` (underscore) still accepted as deprecated alias — note and migrate when convenient.
+- [ ] `metadata` is a nested object if present (author, category, tags, mcp-server)
 - [ ] `composes_with` references real skill names (or planned skills explicitly noted)
 - [ ] `spawned_by` is empty unless the skill is genuinely spawned by another
 
@@ -25,7 +28,9 @@ Spec source: `skills/meta/skill-writer/references/frontmatter-spec.md`.
 
 ### Body
 
-- [ ] Body is under 500 lines (hard limit)
+- [ ] Body ≤5,000 words (Anthropic guideline) — soft warning past this
+- [ ] Body ≤500 lines (this repo's rule of thumb) — soft warning past this
+- [ ] Heavy skills (`orchestrator`, `ui-ux-pro-max`, `repo-deep-dive`) may exceed both — note as accepted divergence
 - [ ] Body under ~150 lines for SKILL.md files where references absorb the detail — the 100-line rule of thumb favors moving long tables and checklists out
 - [ ] Imperative voice — "Read the file", not "the agent reads the file"
 - [ ] No emojis (house style)
