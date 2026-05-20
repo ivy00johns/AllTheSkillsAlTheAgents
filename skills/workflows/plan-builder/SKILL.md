@@ -1,6 +1,6 @@
 ---
 name: plan-builder
-version: 1.3.0
+version: 1.4.0
 description: |
   Transform research documents, Compass artifacts, PRDs, reference materials, and conversational goals into structured project plans ready for the orchestrator to execute. Use this skill when the user has source material and wants to build something from it, when the user says "make a plan", "plan this out", "I want to build X from this research", or when a plan is needed before invoking the orchestrator. Also trigger when @-mentioned files or attached documents accompany a build request, when the user wants to turn research into a website/app/tool, or when orchestrator would be invoked but no plan exists yet. This skill produces the plan — orchestrator consumes it.
 requires_agent_teams: false
@@ -89,6 +89,10 @@ When the user has a clear goal but no source material:
 - **Flag scale.** If the plan would require more than 6 parallel agents, suggest phasing: build the core in phase 1, extend in phase 2. Large teams need proactive context management (handoffs, phased spawning) to maintain quality.
 - **Respect existing code.** When augmenting an existing project, follow its conventions. Don't propose a React rewrite of a Vue app just because you prefer React.
 
+## Before Handoff: Long-Horizon Plans
+
+For plans affecting systems beyond roughly 30 days — product launches, pricing changes, migrations, anything with time to ripple — run the second-order-effects discipline before declaring the plan finalized. See `references/second-order-effects.md`. Document the **unintended consequence** and **feedback loop** in the plan itself (a short subsection at the end of Architecture Reasoning is the right home), so the orchestrator and downstream agents inherit that context rather than rediscovering it the hard way.
+
 ## Handoff
 
 After the plan is saved:
@@ -113,6 +117,7 @@ Wait for the user's choice. Do not auto-invoke the orchestrator.
 
 - **`references/plan-format.md`** — the section-by-section structure of the plan document (Architecture Reasoning + Build Plan, with templates for each section).
 - **`references/research-extraction.md`** — how to pull a plan out of research docs (synthesize, map to architecture, check existing code, confirm with user).
+- **`references/second-order-effects.md`** — discipline for mapping first, second, and third-order consequences plus the unintended consequence and feedback loop, for any plan affecting systems beyond ~30 days.
 
 ## Output Location
 

@@ -1,6 +1,6 @@
 ---
 name: skill-explorer
-version: 1.0.0
+version: 1.1.0
 description: |
   Help the user discover, recall, understand, and pick the right skill from the available toolkit.
   Use this skill whenever the user is trying to find a skill ("I forgot the name of the one that does X",
@@ -156,7 +156,12 @@ When orchestrator would be wrong, **say so explicitly**: "This isn't a multi-age
 | Inventing skill names                              | If you don't see a skill that fits, say "no skill covers this — closest is X" or "this might warrant a new skill via `skill-writer`" |
 
 
+## Troubleshooting Help
+
+When the user asks why a skill is misbehaving — won't fire, fires too often, ignores its instructions, MCP errors, or feels slow — match their description against the named symptoms in `references/troubleshooting.md` before guessing. Confirm the symptom by what the user observes (not what they think the cause is), then walk the fix sequence.
+
 ## References
 
 - `references/routing-table.md` — fuller table of common requests → recommended skill, used when the four rules of thumb above don't cover the case
+- `references/troubleshooting.md` — symptom taxonomy for skill issues (won't upload, won't trigger, triggers too often, instructions not followed, MCP issues, large context)
 

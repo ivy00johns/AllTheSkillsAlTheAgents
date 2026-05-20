@@ -1,6 +1,6 @@
 ---
 name: skill-writer
-version: 1.2.0
+version: 1.3.0
 description: |
   Generate new SKILL.md files conforming to the ecosystem's frontmatter spec and structure conventions. Use this skill when creating any new skill, agent role definition, or workflow skill. Trigger whenever someone says "create a skill", "new agent", "write a SKILL.md", or needs to add a role to the skill ecosystem. Also use when reviewing existing skills for spec compliance.
 requires_agent_teams: false
@@ -47,6 +47,8 @@ Skills use three-level loading:
 Keep SKILL.md bodies concise. Move detailed checklists, templates, and reference tables to `references/` with clear pointers.
 
 ## Creating a New Skill
+
+> **Iterate on a single task first.** Before you write the skill, prototype the workflow against one real task in a normal conversation. Get it working there. Then extract the winning approach into a skill — leverages Claude's in-context learning and produces faster signal than designing the skill blind. Once you have a working foundation, expand to multiple test cases for coverage.
 
 ### Step 1: Choose the Skill Type
 
@@ -129,3 +131,8 @@ before reporting done.
 
 - `references/frontmatter-spec.md` — Complete field reference with types, rules, and examples
 - `references/description-patterns.md` — Templates for writing effective trigger descriptions
+- `references/body-template.md` — Recommended SKILL.md body structure (title → instructions → examples → troubleshooting) and when to deviate
+- `references/patterns.md` — 5 emergent design patterns (sequential, multi-service, iterative, context-aware, domain-specific) with in-repo examples
+- `references/quick-checklist.md` — 4-section pre-sync checklist (before / during / before sync / after sync)
+- `references/performance-notes-pattern.md` — When to add `## Performance Notes` to combat model laziness, and when not to
+- `references/validation-script-pattern.md` — When to bundle a deterministic `scripts/validate.sh` instead of asking the model to validate in prose
