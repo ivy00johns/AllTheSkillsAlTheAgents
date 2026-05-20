@@ -1,0 +1,37 @@
+{
+  "skill": "docs-agent",
+  "path": "skills/roles/docs-agent/SKILL.md",
+  "version": "1.1.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns narrowed per v1.1 resolved conflicts; no compatibility/metadata"},
+    "description_quality": {"score": 3, "notes": "198 chars under target; intentionally narrow as spawned-only"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 115 lines; doc-templates.md focused; well-linked"},
+    "instruction_clarity": {"score": 4, "notes": "Imperative voice; numbered steps but missing Step 0 Read Contracts present in all other role agents"},
+    "coordination": {"score": 5, "notes": "Owns matches orchestrator map narrowed v1.1; composes_with comprehensive; coordination rules clear"},
+    "completeness": {"score": 5, "notes": "doc-templates.md has README+API templates+checklist; inline validation; Phase 14 hook explicit"},
+    "anti_patterns": {"score": 5, "notes": "Clean — bracketed placeholders, no emojis, no hardcoded paths in body"}
+  },
+  "average": 4.4,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Missing Step 0: Read Contracts", "location": "SKILL.md:55", "fix": "Add ### 0. Read Contracts and Source step before step 1"},
+      {"item": "Missing compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility: 'Claude Code'"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:20", "fix": "Reword to 'feeds into qe-agent completeness score'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "Project-specific /sessions endpoints in templates", "location": "references/doc-templates.md:50,54-56", "fix": "Use /<resource> placeholders"},
+      {"item": "Validation guidance redundant", "location": "SKILL.md:104,108-112", "fix": "Either point at doc-templates checklist or use inline, not both"},
+      {"item": "No right-sizing tradeoff", "location": "SKILL.md", "fix": "Add tradeoff blockquote for prototypes"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add Step 0: Read Contracts and Source", "file": "SKILL.md:53", "effort": "small"},
+    {"rank": 2, "fix": "Fix self-referential pipeline blockquote", "file": "SKILL.md:20", "effort": "small"},
+    {"rank": 3, "fix": "Replace project-specific endpoints in templates", "file": "references/doc-templates.md:50,54-56", "effort": "small"}
+  ],
+  "broken_refs": []
+}

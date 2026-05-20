@@ -1,0 +1,32 @@
+{
+  "skill": "repo-deep-dive",
+  "path": "skills/workflows/repo-deep-dive/SKILL.md",
+  "version": "1.2.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver 1.2.0; no XML brackets; allowed-tools hyphenated; composes_with targets all exist."},
+    "description_quality": {"score": 5, "notes": "891 chars (well under 1024); starts with 'Perform'; 8+ trigger keywords; pushy."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 96 lines / ~700 words; three references all linked with when-to-read guidance; no ref over 300 lines."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; four phases clearly numbered; explains why (e.g., grounds analysis)."},
+    "coordination": {"score": 5, "notes": "All 5 composes_with targets exist; non-agent so no ownership conflicts."},
+    "completeness": {"score": 5, "notes": "All 3 reference files exist and are linked; anti-pattern section explicit."},
+    "anti_patterns": {"score": 5, "notes": "No hardcoded project details in body; MUST/NEVER usage justified; no duplication between body and references."}
+  },
+  "average": 5.0,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "ASCII architecture diagram example in document-template.md contradicts SKILL.md body guidance to prefer mermaid", "location": "skills/workflows/repo-deep-dive/references/document-template.md:90-98", "fix": "Replace ASCII box-art block with a mermaid flowchart TB example"},
+      {"item": "Hardcoded reference name 'AllTheSkills' (old project name)", "location": "skills/workflows/repo-deep-dive/references/document-template.md:167,170", "fix": "Replace 'AllTheSkills' with '{reference-project}' placeholder"},
+      {"item": "Description is pushy but at 891 chars could be tightened to ~500", "location": "skills/workflows/repo-deep-dive/SKILL.md:4-13", "fix": "Merge the 'Use this skill when' and 'Also trigger' sentences to remove keyword duplication"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Swap ASCII architecture diagram example for mermaid flowchart in document-template.md", "file": "skills/workflows/repo-deep-dive/references/document-template.md:90-98", "effort": "small"},
+    {"rank": 2, "fix": "Replace 'AllTheSkills' with '{reference-project}' placeholder", "file": "skills/workflows/repo-deep-dive/references/document-template.md:167,170", "effort": "small"},
+    {"rank": 3, "fix": "Tighten description by merging the two trigger sentences", "file": "skills/workflows/repo-deep-dive/SKILL.md:4-13", "effort": "small"}
+  ],
+  "broken_refs": []
+}

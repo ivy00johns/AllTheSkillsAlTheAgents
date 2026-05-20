@@ -1,0 +1,37 @@
+{
+  "skill": "railway-deploy",
+  "path": "skills/workflows/railway-deploy/SKILL.md",
+  "version": "1.2.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields; semver 1.2.0; canonical allowed-tools; composes_with resolves; owns.patterns non-conflicting."},
+    "description_quality": {"score": 4, "notes": "586 chars with overlapping trigger phrases; trimmable."},
+    "progressive_disclosure": {"score": 4, "notes": "Body 92 lines; three references linked but body delegates heavily (5x 'see dockerfile-recipes.md' in steps 2-6)."},
+    "instruction_clarity": {"score": 4, "notes": "Imperative voice; numbered 6 steps; Step 6 'Optional: Procfile fallback' bullet-listed at same level as required steps."},
+    "coordination": {"score": 5, "notes": "Pattern ownership of railway.toml non-conflicting; composes_with infrastructure-agent + deployment-checklist accurate."},
+    "completeness": {"score": 5, "notes": "All three references exist; external URLs real."},
+    "anti_patterns": {"score": 2, "notes": "Hardcoded 'Skill Madness root .env' (line 33) breaks portability across projects."}
+  },
+  "average": 4.14,
+  "findings": {
+    "critical": [
+      {"item": "Hardcoded 'Skill Madness root .env file' reference breaks cross-project portability", "location": "SKILL.md:33", "fix": "Rephrase to 'current project repo-root .env' or document lookup order"}
+    ],
+    "important": [
+      {"item": "Description 586 chars with overlapping trigger phrases", "location": "SKILL.md:5-10", "fix": "Collapse to 3 distinctive triggers"},
+      {"item": "'Optional: Procfile fallback' listed as a numbered step", "location": "SKILL.md:82", "fix": "Move out of numbered list or mark as optional aside"}
+    ],
+    "nits": [
+      {"item": "compatibility field absent despite railway CLI + Docker dependencies", "location": "SKILL.md:13", "fix": "Add compatibility string"},
+      {"item": "Five repeat 'see references/dockerfile-recipes.md' lines in steps 2-6", "location": "SKILL.md:72,74,76,78,80,82", "fix": "Lift the reference pointer to the section header once"},
+      {"item": "Railway CLI v4.x+ requirement lacks rationale", "location": "SKILL.md:38", "fix": "Add one-line note on why v4 is required"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Remove hardcoded 'Skill Madness root .env' reference for portability", "file": "SKILL.md:33", "effort": "small"},
+    {"rank": 2, "fix": "Trim description from 586 to ~300 chars", "file": "SKILL.md:5-10", "effort": "small"},
+    {"rank": 3, "fix": "Restructure step 6 so 'Optional: Procfile fallback' isn't in the numbered required steps", "file": "SKILL.md:82", "effort": "small"}
+  ],
+  "broken_refs": []
+}

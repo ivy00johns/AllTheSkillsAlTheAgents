@@ -1,0 +1,32 @@
+{
+  "skill": "work-item-brief",
+  "path": "skills/workflows/work-item-brief/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields valid; description 635 chars; allowed-tools hyphenated; composes_with all exist; owns.patterns meaningful."},
+    "description_quality": {"score": 5, "notes": "635 chars; starts with 'Produce'; 6 trigger phrases; FORBIDDEN and REQUIRED callouts make it distinctive."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 92 lines; three references all linked with when-to-read guidance."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; six-step process; forbidden list before required sections; closing reminder for emphasis."},
+    "coordination": {"score": 5, "notes": "All 3 composes_with exist (grill-me, plan-builder, contract-author); Composition section names handoffs."},
+    "completeness": {"score": 5, "notes": "All 3 reference files exist; worked examples and anti-patterns in references; full template provided."},
+    "anti_patterns": {"score": 5, "notes": "MUST/FORBIDDEN justified as load-bearing rule; no hardcoded paths beyond conventional briefs/; no body↔reference duplication."}
+  },
+  "average": 5.0,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "AFK/HITL abbreviations used without expansion on first occurrence", "location": "skills/workflows/work-item-brief/SKILL.md:45", "fix": "Expand on first use: 'AFK (Away From Keyboard) / HITL (Human In The Loop) classification'"},
+      {"item": "Forbidden rule appears 3+ times (body §Forbidden List, §Key Interfaces, §Closing Reminder, references/brief-format.md §Forbidden) — borderline triple-mention", "location": "skills/workflows/work-item-brief/SKILL.md:24-34,49-60,90-92", "fix": "Optional: trim §Closing Reminder if you trust the reader; current pattern works for emphasis"},
+      {"item": "Anti-pattern code block in brief-format.md could use inline '# WRONG' comment for scanability", "location": "skills/workflows/work-item-brief/references/brief-format.md:96-107", "fix": "Add inline marker so casual readers see it's an anti-example"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Expand AFK/HITL abbreviations on first use", "file": "skills/workflows/work-item-brief/SKILL.md:45", "effort": "small"},
+    {"rank": 2, "fix": "Optionally trim §Closing Reminder if triplication of forbidden rule feels heavy", "file": "skills/workflows/work-item-brief/SKILL.md:90-92", "effort": "small"},
+    {"rank": 3, "fix": "Add inline marker to anti-pattern code block in brief-format.md", "file": "skills/workflows/work-item-brief/references/brief-format.md:96-107", "effort": "small"}
+  ],
+  "broken_refs": []
+}

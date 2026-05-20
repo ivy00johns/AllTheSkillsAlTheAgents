@@ -1,0 +1,36 @@
+{
+  "skill": "backend-agent",
+  "path": "skills/roles/backend-agent/SKILL.md",
+  "version": "1.1.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields present; field order drifts from house style (allowed-tools after min_plan); no compatibility or metadata"},
+    "description_quality": {"score": 3, "notes": "207 chars (over 200 target); intentionally narrow since orchestrator-dispatched only; lacks keyword variants by design"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 164 lines; references/validation-checklist.md linked with when-to-read guidance"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice, 8 numbered steps, explains WHY (CORS, error envelope), pitfalls table"},
+    "coordination": {"score": 5, "notes": "Owns matches orchestrator/file-ownership.md; off-limits explicit; composes_with all resolve; db-migration and observability boundaries explained"},
+    "completeness": {"score": 5, "notes": "validation-checklist exists and is linked; Step 0 Read Contracts present; right-sizing in step 3; off-limits enumerated"},
+    "anti_patterns": {"score": 4, "notes": "Fastify-specific section inside generic validation checklist is mild kitchen-sink; otherwise clean"}
+  },
+  "average": 4.4,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Frontmatter field order drift", "location": "SKILL.md:7-15", "fix": "Move allowed-tools above requires_agent_teams to match house order"},
+      {"item": "Description 207 chars exceeds 200-char target", "location": "SKILL.md:5", "fix": "Drop redundant 'Composed by orchestrator during multi-agent builds' clause"},
+      {"item": "Missing compatibility string", "location": "SKILL.md:1-16", "fix": "Add compatibility: 'Claude Code; requires Bash for curl/test commands'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags for catalog discovery"},
+      {"item": "Fastify section in generic checklist", "location": "references/validation-checklist.md:41-61", "fix": "Move to references/fastify-traps.md"},
+      {"item": "Off-limits not its own heading", "location": "SKILL.md:57", "fix": "Promote to ## Off-Limits heading"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Reorder frontmatter to house style", "file": "SKILL.md:7-15", "effort": "small"},
+    {"rank": 2, "fix": "Tighten description to ≤200 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 3, "fix": "Add compatibility field", "file": "SKILL.md:6", "effort": "small"}
+  ],
+  "broken_refs": []
+}

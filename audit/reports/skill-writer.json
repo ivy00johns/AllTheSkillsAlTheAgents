@@ -1,0 +1,35 @@
+{
+  "skill": "skill-writer",
+  "path": "skills/meta/skill-writer/SKILL.md",
+  "version": "1.2.0",
+  "category": "meta",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; no angle brackets; description 376 chars (within ceiling); allowed-tools hyphenated; owns appropriately empty for meta skill; composes_with lists real skills."},
+    "description_quality": {"score": 4, "notes": "Action verb (Generate), 4+ trigger contexts, keyword variants, exclusion clause. 376 chars overshoots 200-char target but stays under 1024 ceiling."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 131 lines / ~819 words. Both references linked with when-to-read guidance. frontmatter-spec.md at 247 lines is below 300-line TOC threshold."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Steps 1-5 with imperative voice. Skill-type table crisp. Body-structure list well organized. Common Mistakes section names anti-patterns with rationale."},
+    "coordination": {"score": 4, "notes": "composes_with [project-profiler, orchestrator] accurate but should also include skill-review and skill-update since both reference frontmatter-spec.md as authoritative."},
+    "completeness": {"score": 5, "notes": "Both reference files exist. Validate-the-Skill checklist concrete. Directory structure illustrated. v1.1 resolved-conflicts referenced."},
+    "anti_patterns": {"score": 5, "notes": "Common Mistakes section enumerates 6 anti-patterns including hardcoded project details. Imperative voice throughout. No emojis, no excessive MUST/NEVER, no hardcoded paths."}
+  },
+  "average": 4.71,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description at 376 chars is ~1.9x the 200-char house target", "location": "SKILL.md:5", "fix": "Trim by removing the trailing 'Also use when reviewing existing skills for spec compliance.' (covered by skill-review) and tighten keyword variants. Target ≤250 chars."}
+    ],
+    "nits": [
+      {"item": "composes_with should include skill-review and skill-update", "location": "SKILL.md:14", "fix": "Add both to the composes_with list."},
+      {"item": "Skill Directory Structure shows templates/ subdirectory not used by any skill in repo", "location": "SKILL.md:31-37", "fix": "Remove the templates/ line or document why nesting is recommended."},
+      {"item": "v1.1 resolved-conflicts reference lacks direct section anchor", "location": "SKILL.md:125", "fix": "Change to 'references/frontmatter-spec.md §Resolved Conflicts (v1.0 → v1.1)'."},
+      {"item": "Step 5 Validate checklist lacks concrete command for ownership conflict checking", "location": "SKILL.md:107-118", "fix": "Add a suggested git grep or scan command for ownership conflicts."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description to under 250 chars by removing the review-existing-skills clause", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Add skill-review and skill-update to composes_with", "file": "SKILL.md:14", "effort": "small"},
+    {"rank": 3, "fix": "Link to frontmatter-spec.md's Resolved Conflicts section directly", "file": "SKILL.md:125", "effort": "small"}
+  ],
+  "broken_refs": []
+}

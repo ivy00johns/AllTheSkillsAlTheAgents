@@ -1,0 +1,33 @@
+{
+  "skill": "mermaid-charts",
+  "path": "skills/workflows/mermaid-charts/SKILL.md",
+  "version": "2.3.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields; semver 2.3.0; canonical hyphenated allowed-tools; all 9 composes_with targets resolve."},
+    "description_quality": {"score": 4, "notes": "954 chars — under 1024 ceiling but well above 200-char target. Strong catch-all trigger coverage; trimmable."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 106 lines; 8 references; advanced-patterns.md (355 lines) has TOC; every reference linked with purpose."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; Core Principle framing; question-based chart-type table; numbered workflow."},
+    "coordination": {"score": 5, "notes": "Empty owns (stateless); 9 composes_with targets all exist."},
+    "completeness": {"score": 5, "notes": "All 8 reference files exist; pre-delivery checklist concrete."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; no hardcoded paths; no body/reference duplication."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 954 chars — close to 1024 ceiling", "location": "SKILL.md:4-15", "fix": "Collapse action-verb enumeration; drop the 'even if user doesn't say mermaid' paragraph; target ~400 chars"}
+    ],
+    "nits": [
+      {"item": "shared_read: ['*'] wildcard is unusual", "location": "SKILL.md:22", "fix": "Replace with empty array or remove field entirely"},
+      {"item": "compatibility field missing despite mmdc dependency for rendering", "location": "SKILL.md:18", "fix": "Add compatibility string declaring optional mmdc requirement"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 954 to ~400 chars", "file": "SKILL.md:4-15", "effort": "small"},
+    {"rank": 2, "fix": "Remove or normalize shared_read: ['*']", "file": "SKILL.md:22", "effort": "small"},
+    {"rank": 3, "fix": "Add compatibility field for mmdc rendering", "file": "SKILL.md:18", "effort": "small"}
+  ],
+  "broken_refs": []
+}

@@ -1,0 +1,33 @@
+{
+  "skill": "project-profiler",
+  "path": "skills/workflows/project-profiler/SKILL.md",
+  "version": "1.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields; semver 1.1.0; canonical allowed-tools; owns.patterns matches v1.1 resolved-conflicts table; all composes_with + spawned_by resolve."},
+    "description_quality": {"score": 5, "notes": "483 chars — closest to 200-char target this batch; 8 explicit trigger phrases; specifies both outputs."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 123 lines; single reference (profile-schema.yaml, 75 lines) linked with purpose; no duplication."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered 7-step process; concrete indicator table; testable quality checklist."},
+    "coordination": {"score": 5, "notes": "Pattern-ownership matches v1.1 resolved-conflicts table verbatim; conflict-resolution note in body; reciprocal spawned_by."},
+    "completeness": {"score": 5, "notes": "Reference exists and is detailed; all process steps map to outputs; off-limits clause explicit."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; no hardcoded paths beyond examples; no duplication."}
+  },
+  "average": 5.00,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "compatibility field absent", "location": "SKILL.md:8", "fix": "Add compatibility string declaring Bash + Read + Write for repo-root and .claude/"},
+      {"item": "200-line cap for CLAUDE.md lacks rationale", "location": "SKILL.md:20,104,119", "fix": "Add one-line note that CLAUDE.md loads into every agent's context"},
+      {"item": "Reference is .yaml not .md — parsers scanning references/*.md would miss it", "location": "references/profile-schema.yaml", "fix": "Acceptable; body links explicitly to the .yaml path"},
+      {"item": "Steps 4 (Auth) and 5 (CI/CD) feel mandatory but should allow null for projects without them", "location": "SKILL.md:79-96", "fix": "Note that auth/CI sections become null in profile.yaml when absent"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add compatibility field", "file": "SKILL.md:8", "effort": "small"},
+    {"rank": 2, "fix": "Add rationale for ≤200-line CLAUDE.md cap (agent context budget)", "file": "SKILL.md:20 or 104", "effort": "small"},
+    {"rank": 3, "fix": "Note that auth/CI steps can yield null when project has neither", "file": "SKILL.md:79-96", "effort": "small"}
+  ],
+  "broken_refs": []
+}

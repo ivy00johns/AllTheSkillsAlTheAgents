@@ -1,0 +1,44 @@
+{
+  "skill": "ui-brief",
+  "path": "skills/workflows/ui-brief/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 3, "notes": "Required fields present and well-formed; allowed-tools hyphenated; but composes_with references 4 skills not in this repo (ui-ux-pro-max, frontend-design, brainstorming, ux-review)."},
+    "description_quality": {"score": 1, "notes": "Description is 1449 chars (measured) — exceeds 1024-char hard ceiling. HARD FAIL per audit checklist. Content itself is excellent (pushy, action-verb-led, exhaustive triggers)."},
+    "progressive_disclosure": {"score": 4, "notes": "Body 186 lines / ~3000 words; brief-template.md (274 lines) is a sensible reference; body could trim Step 1-5 prose."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; two-mode split; five-step flow with verification checklist; explains WHY; anti-patterns table is excellent."},
+    "coordination": {"score": 2, "notes": "4 of 7 composes_with entries do not exist as in-repo skills; semantic ambiguity if they're meant as external plugin refs."},
+    "completeness": {"score": 4, "notes": "brief-template.md reference exists. 'Examples' section references external project files (THE-GAUNTLET.md at AllTheSkills repo, UI-CHALLENGE.md at MarketsBeRigged repo) that may be inaccessible."},
+    "anti_patterns": {"score": 4, "notes": "Hardcoded old project name 'AllTheSkills' (line 183); MUST used sparingly with justification; no body↔reference duplication."}
+  },
+  "average": 3.29,
+  "findings": {
+    "critical": [
+      {"item": "Description is 1449 chars — exceeds 1024 hard ceiling (HARD FAIL)", "location": "skills/workflows/ui-brief/SKILL.md:5", "fix": "Trim to ≤800 chars: collapse named-style enumeration, collapse reference-app enumeration, drop the 'Also trigger before invoking...' sentence"},
+      {"item": "composes_with lists 4 skills not in this repo: ui-ux-pro-max, frontend-design, brainstorming, ux-review", "location": "skills/workflows/ui-brief/SKILL.md:14", "fix": "Either remove them (leaving frontend-agent, orchestrator, playwright) OR extend the spec to support external plugin references"}
+    ],
+    "important": [
+      {"item": "Hardcoded old project name 'AllTheSkills repo root'", "location": "skills/workflows/ui-brief/SKILL.md:183", "fix": "Replace with 'Skill Madness repo root' or remove the external example reference"},
+      {"item": "Body at warn threshold (186 lines); How To Run prose could move to references/process-guide.md", "location": "skills/workflows/ui-brief/SKILL.md:91-152", "fix": "Optional — extract 30-40 lines of Step 1-5 detail to a process-guide reference"}
+    ],
+    "nits": [
+      {"item": "Anti-patterns table line 168 confuses person — 'the user' is third person, not first-plural", "location": "skills/workflows/ui-brief/SKILL.md:168", "fix": "Clarify to 'first-person plural (we, us) sparingly; second-person (you) preferred'"},
+      {"item": "Line 152 'Show, do not narrate' deserves callout in the Step 5 verification checklist", "location": "skills/workflows/ui-brief/SKILL.md:142-152", "fix": "Add as a checklist item"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "CRITICAL: Reduce description from 1449 → ≤1024 chars (target ≤800)", "file": "skills/workflows/ui-brief/SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Fix broken composes_with refs: drop the 4 non-existent skill names or migrate to external-ref convention", "file": "skills/workflows/ui-brief/SKILL.md:14", "effort": "small"},
+    {"rank": 3, "fix": "Replace hardcoded 'AllTheSkills repo root' with 'Skill Madness'", "file": "skills/workflows/ui-brief/SKILL.md:183", "effort": "small"}
+  ],
+  "broken_refs": [
+    "composes_with: ui-ux-pro-max (not in repo)",
+    "composes_with: frontend-design (not in repo)",
+    "composes_with: brainstorming (not in repo)",
+    "composes_with: ux-review (not in repo)",
+    "Body line 183: 'AllTheSkills repo root' — old project name (renamed to Skill Madness)",
+    "Body line 184: external 'MarketsBeRigged repo root' reference — may not be accessible to all users"
+  ]
+}

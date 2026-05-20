@@ -1,0 +1,35 @@
+{
+  "skill": "diagnose-loop",
+  "path": "skills/workflows/diagnose-loop/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description 603 chars; composes_with targets exist; empty owns block harmless"},
+    "description_quality": {"score": 5, "notes": "Implicit action verb; 9+ trigger phrases including conversational; explains thesis (Phase 1 IS the skill)"},
+    "progressive_disclosure": {"score": 5, "notes": "84 lines body; 2 refs + 1 script linked with when-to-read; no duplication; refs well-sectioned"},
+    "instruction_clarity": {"score": 5, "notes": "6-phase numbered with WHY explanations; explicit forbidden anti-pattern; tradeoff caveat at top"},
+    "coordination": {"score": 4, "notes": "composes_with lists playwright/qe-agent but body line 73 recommends architecture-rescue which is missing"},
+    "completeness": {"score": 5, "notes": "All refs exist; 10 recipes with when/loop/sharpen; 3 worked hypothesis examples; cleanup checklist explicit"},
+    "anti_patterns": {"score": 5, "notes": "No hardcoding; ranked methods avoid kitchen-sink; tradeoff caveat permits skipping for trivial bugs"}
+  },
+  "average": 4.7,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "composes_with missing architecture-rescue (referenced in body line 73)", "location": "SKILL.md:14", "fix": "Add architecture-rescue to composes_with array"},
+      {"item": "Description 603 chars vs 200 target", "location": "SKILL.md:4-5", "fix": "Trim methodology preamble; keep trigger phrases"}
+    ],
+    "nits": [
+      {"item": "Empty owns block fields are workflow noise", "location": "SKILL.md:9-12", "fix": "Remove"},
+      {"item": "mattpocock attribution lacks URL", "location": "SKILL.md:20", "fix": "Add URL"},
+      {"item": "feedback-loop-recipes.md 187 lines without TOC", "location": "references/feedback-loop-recipes.md", "fix": "Add TOC if it grows past 300"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add architecture-rescue to composes_with (body line 73 recommends it)", "file": "SKILL.md:14", "effort": "small"},
+    {"rank": 2, "fix": "Trim description to ≤200 chars; drop phase enumeration", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 3, "fix": "Add URL to mattpocock 'diagnose' pattern attribution", "file": "SKILL.md:20", "effort": "small"}
+  ],
+  "broken_refs": []
+}

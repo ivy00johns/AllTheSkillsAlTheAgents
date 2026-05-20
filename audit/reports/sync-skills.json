@@ -1,0 +1,37 @@
+{
+  "skill": "sync-skills",
+  "path": "skills/workflows/sync-skills/SKILL.md",
+  "version": "2.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 3, "notes": "All required fields present; valid semver; allowed-tools hyphenated; BUT composes_with references two non-existent skills (skill-updater, skill-audit)."},
+    "description_quality": {"score": 5, "notes": "565 chars; starts with 'Sync'; 10+ trigger phrases including /sync-skills slash command."},
+    "progressive_disclosure": {"score": 4, "notes": "Body 136 lines; scripts/ directory holds implementation; no references/ directory but defensible since skill is a CLI wrapper."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; clear Link/Copy/Pull modes; excellent Quick Reference; explains WHY behind flattened symlinks."},
+    "coordination": {"score": 2, "notes": "composes_with lists two non-existent skills — broken cross-references that prevent auto-composition."},
+    "completeness": {"score": 5, "notes": "Script exists; flag table complete; 9 worked examples; edge cases covered."},
+    "anti_patterns": {"score": 5, "notes": "No hardcoded project details; conventional global paths; no MUST/NEVER abuse; no duplication body↔scripts."}
+  },
+  "average": 4.14,
+  "findings": {
+    "critical": [
+      {"item": "composes_with references two skills that do not exist (skill-updater, skill-audit)", "location": "skills/workflows/sync-skills/SKILL.md:14", "fix": "Change to composes_with: ['skill-update', 'skill-review'] — the actual skill names in skills/meta/"}
+    ],
+    "important": [],
+    "nits": [
+      {"item": "Body has no references/ directory; flag table could move to references/cli-reference.md", "location": "skills/workflows/sync-skills/SKILL.md:94-126", "fix": "Optional: extract to references/cli-reference.md for stricter progressive disclosure"},
+      {"item": "Rationale for flattened Claude Code symlinks duplicated at lines 30 and 77", "location": "skills/workflows/sync-skills/SKILL.md:30,77", "fix": "Keep explanation in §Link Mode; trim line 30 to cross-reference"},
+      {"item": "No explanation of why Cursor dir is 'skills-cursor' not 'skills'", "location": "skills/workflows/sync-skills/SKILL.md:28", "fix": "Add one-line footnote explaining the naming choice"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Fix broken composes_with references (CRITICAL): replace skill-updater→skill-update, skill-audit→skill-review", "file": "skills/workflows/sync-skills/SKILL.md:14", "effort": "small"},
+    {"rank": 2, "fix": "Remove duplicated rationale for flattened Claude Code symlinks", "file": "skills/workflows/sync-skills/SKILL.md:30,77", "effort": "small"},
+    {"rank": 3, "fix": "Add note explaining Cursor's skills-cursor/ naming choice", "file": "skills/workflows/sync-skills/SKILL.md:28", "effort": "small"}
+  ],
+  "broken_refs": [
+    "composes_with: skill-updater (does not exist — correct name: skill-update)",
+    "composes_with: skill-audit (does not exist — correct name: skill-review)"
+  ]
+}

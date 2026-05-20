@@ -1,0 +1,36 @@
+{
+  "skill": "security-agent",
+  "path": "skills/roles/security-agent/SKILL.md",
+  "version": "1.1.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns tight and non-conflicting; no compatibility/metadata"},
+    "description_quality": {"score": 3, "notes": "235 chars over 200 target; intentionally narrow as spawned-only"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 153 lines; owasp-checklist.md focused; clear linking"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered steps with bash; clearest role-boundary section across role agents"},
+    "coordination": {"score": 5, "notes": "Tight ownership; strong boundaries with QE and code-review; composes_with comprehensive"},
+    "completeness": {"score": 5, "notes": "OWASP A01-A10 reference covers all categories; Step 0 contracts present; report template included"},
+    "anti_patterns": {"score": 5, "notes": "Clean — no hardcoded paths, no emojis, WHY explained for boundaries"}
+  },
+  "average": 4.6,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 235 chars exceeds 200 target", "location": "SKILL.md:5", "fix": "Drop 'Composed by orchestrator during multi-agent builds' clause"},
+      {"item": "Missing compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility: 'Claude Code; requires Bash + npm/pip/govulncheck'"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:20", "fix": "Replace 'Reports to qe-agent via qa-report.json' with 'Findings feed into qe-agent security score'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "No explicit right-sizing tradeoff", "location": "SKILL.md", "fix": "Add tradeoff blockquote for prototype builds"},
+      {"item": "Report template uses [brackets] vs ${} convention", "location": "SKILL.md:116-137", "fix": "Standardize on ${PLACEHOLDER}"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Fix self-referential pipeline blockquote", "file": "SKILL.md:20", "effort": "small"},
+    {"rank": 2, "fix": "Tighten description to ≤200 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 3, "fix": "Add compatibility field", "file": "SKILL.md frontmatter", "effort": "small"}
+  ],
+  "broken_refs": []
+}

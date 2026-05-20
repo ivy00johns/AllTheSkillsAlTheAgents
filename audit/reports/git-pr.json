@@ -1,0 +1,34 @@
+{
+  "skill": "git-pr",
+  "path": "skills/git/git-pr/SKILL.md",
+  "version": "1.2.0",
+  "category": "git",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; description 552 chars folded; > at L4 is YAML scalar marker; allowed-tools hyphenated; owns empty for guide skill; composes_with lists real local skills."},
+    "description_quality": {"score": 5, "notes": "Action verb (Guide for creating and updating), 10 trigger keyword variants, proactive trigger statement."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 137 lines / ~550 words. No references/ directory (correct for reference-card scope). All workflow content self-contained."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Workflow steps with imperative voice. Body Structure provides exact template. HEREDOC pattern shown with rationale. Pre-Push Checklist captures key gates."},
+    "coordination": {"score": 5, "notes": "composes_with [git-commit, git-pr-feedback] both exist and are accurate pairings. spawned_by empty. owns correctly empty."},
+    "completeness": {"score": 5, "notes": "All content self-contained. Title examples concrete. Body template inline. Workflow covers full PR lifecycle (create/update/status). No reference files needed."},
+    "anti_patterns": {"score": 4, "notes": "Imperative voice. No emojis. Templates marked as adjustable. No explicit Anti-Pattern callout (sibling git-commit has one) — adding one would parallel sibling structure."}
+  },
+  "average": 4.86,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "owns.shared_read wildcard not needed for a gh CLI guide skill", "location": "SKILL.md:19", "fix": "Change to [] or ['./']."},
+      {"item": "Description uses > folded scalar with semantically-meaningless line breaks", "location": "SKILL.md:4-12", "fix": "Stylistic — consider single paragraph or | block scalar for uniformity."},
+      {"item": "No explicit Anti-Pattern callout (sibling git-commit has one)", "location": "SKILL.md (end of file)", "fix": "Append e.g. 'Forbidden: Pushing directly to main without a PR' for sibling parity."},
+      {"item": "L33 cross-reference to git-commit lacks explicit path", "location": "SKILL.md:33", "fix": "Change to [git-commit](../git-commit/SKILL.md)."},
+      {"item": "HEREDOC template at L91-105 uses placeholder Summary/Test plan bullets", "location": "SKILL.md:91-105", "fix": "Add a note that real PRs should bring concrete bullets, not placeholders."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Tighten owns.shared_read wildcard", "file": "SKILL.md:19", "effort": "small"},
+    {"rank": 2, "fix": "Add an Anti-Pattern callout for sibling parity with git-commit", "file": "SKILL.md (end of file)", "effort": "small"},
+    {"rank": 3, "fix": "Add explicit path to git-commit cross-reference at L33", "file": "SKILL.md:33", "effort": "small"}
+  ],
+  "broken_refs": []
+}

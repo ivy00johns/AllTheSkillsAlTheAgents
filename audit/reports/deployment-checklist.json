@@ -1,0 +1,35 @@
+{
+  "skill": "deployment-checklist",
+  "path": "skills/workflows/deployment-checklist/SKILL.md",
+  "version": "1.1.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description 416 chars; allowed-tools hyphenated; field order correct; all 4 composes_with targets exist"},
+    "description_quality": {"score": 5, "notes": "Action verb 'Run'; 8 explicit trigger phrases covering formal and conversational invocations; pushy"},
+    "progressive_disclosure": {"score": 5, "notes": "76 lines body; one ref linked at line 41 with 'Run through in order'; clean split between Quick Reference (body) and bash commands (ref)"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; clear sectioned process; explicit gate at line 35; structured output template"},
+    "coordination": {"score": 5, "notes": "Three coordination contracts spelled out; verb-level boundary ('validates...does not modify'); reciprocal with orchestrator"},
+    "completeness": {"score": 4, "notes": "Reference well-organized; bash commands hardcode frontend/backend Python/npm stack assumptions"},
+    "anti_patterns": {"score": 4, "notes": "Hardcoded project structure (frontend/+backend/, ports 8000/5173, alembic+npm) in bash commands"}
+  },
+  "average": 4.6,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Bash commands assume frontend/backend Python+npm split", "location": "references/pre-deploy.md:7-19,:86-99,:104-113,:125-139", "fix": "Add header note for adaptation, or restructure into stack-conditional sections"},
+      {"item": "Description 416 chars vs 200 target", "location": "SKILL.md:4-5", "fix": "Drop 'Use this skill when preparing...' middle clause (redundant with trigger list)"}
+    ],
+    "nits": [
+      {"item": "Empty owns block on workflow skill", "location": "SKILL.md:9-12", "fix": "Remove"},
+      {"item": "'cd X && ...' chains won't persist cwd in Bash tool", "location": "references/pre-deploy.md:9,13,15,17", "fix": "Use subshell '(cd X && ...)' or '--prefix X'"},
+      {"item": "Output template could extract to references/report-template.md if it grows", "location": "SKILL.md:55-76", "fix": "Move when needed"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add stack-agnostic guidance to bash commands in pre-deploy.md", "file": "references/pre-deploy.md", "effort": "medium"},
+    {"rank": 2, "fix": "Trim description to ≤200 chars; drop redundant middle clause", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 3, "fix": "Fix 'cd X && ...' chains to subshells for tool-environment safety", "file": "references/pre-deploy.md:9,13,15,17", "effort": "small"}
+  ],
+  "broken_refs": []
+}

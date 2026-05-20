@@ -1,0 +1,38 @@
+{
+  "skill": "dependency-coordinator",
+  "path": "skills/workflows/dependency-coordinator/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 3, "notes": "Required fields present; description 238 chars. Non-standard fields disable-model-invocation and type not in spec. Missing composes_with/spawned_by/allowed-tools despite body composition section."},
+    "description_quality": {"score": 3, "notes": "Action verb 'Authors', 238 chars; 'Not user-invocable' intentionally narrow surface; no keyword-variant triggers"},
+    "progressive_disclosure": {"score": 5, "notes": "110 lines body; 3 refs linked with when-to-read context; no duplication"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative; clear sectioned process; numbered steps; explicit dry-install verification"},
+    "coordination": {"score": 3, "notes": "Composition in body lines 105-110 not declared in frontmatter; spawned_by:[orchestrator] missing; ecosystem-level checks can't validate"},
+    "completeness": {"score": 4, "notes": "All 3 refs exist; templates thorough; but external citation to docs/qa/skill-ecosystem-audit-2026-04-30.md won't resolve"},
+    "anti_patterns": {"score": 4, "notes": "Hardcoded 'Bazaar gauntlet 2026-04-30' narrative in references; skill body explicitly addresses common anti-patterns"}
+  },
+  "average": 3.9,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Non-standard frontmatter fields disable-model-invocation, type:contract", "location": "SKILL.md:4,:6", "fix": "Remove; move intent to description body"},
+      {"item": "composes_with missing from frontmatter despite body declaration", "location": "SKILL.md:7", "fix": "Add composes_with:[contract-author, infrastructure-agent, contract-auditor, orchestrator]"},
+      {"item": "spawned_by:[orchestrator] missing", "location": "SKILL.md:7", "fix": "Add spawned_by:[orchestrator] (reciprocal)"},
+      {"item": "Hardcoded 'Bazaar gauntlet' project citations in references", "location": "references/known-conflict-deps.md:75, references/dependencies-md-template.md:47", "fix": "Generalize incident name; remove out-of-repo doc path"},
+      {"item": "Missing allowed-tools declaration", "location": "SKILL.md:7", "fix": "Add allowed-tools:[Read, Write, Edit, Bash, Glob]"}
+    ],
+    "nits": [
+      {"item": "Pipeline-position blockquote duplicates coordination section", "location": "SKILL.md:11 vs :68-72", "fix": "Drop one"},
+      {"item": "Quality checklist could move to references if it grows", "location": "SKILL.md:83-90", "fix": "Consider extracting"},
+      {"item": "Orchestrator Phase 4 referenced 3x", "location": "SKILL.md:29, :70, :110", "fix": "Normalize"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Add composes_with, spawned_by, allowed-tools, requires_claude_code; remove non-standard disable-model-invocation and type fields", "file": "SKILL.md:4-7", "effort": "small"},
+    {"rank": 2, "fix": "Generalize Bazaar-gauntlet citations and remove out-of-repo doc path", "file": "references/known-conflict-deps.md:75, references/dependencies-md-template.md:47", "effort": "small"},
+    {"rank": 3, "fix": "Document the intentional narrow trigger surface (or add user-invocation triggers) in description", "file": "SKILL.md:5", "effort": "small"}
+  ],
+  "broken_refs": ["docs/qa/skill-ecosystem-audit-2026-04-30.md (cited in 2 reference files; lives outside skill repo)"]
+}

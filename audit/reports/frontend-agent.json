@@ -1,0 +1,36 @@
+{
+  "skill": "frontend-agent",
+  "path": "skills/roles/frontend-agent/SKILL.md",
+  "version": "1.2.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns has both directories and patterns; no compatibility/metadata; composes_with has 8 entries"},
+    "description_quality": {"score": 3, "notes": "220 chars over 200 target; intentionally narrow as spawned-only; action verbs present"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 160 lines, references 130 lines, linked with when-to-read"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered steps 0-7 with 3a/3b; explains WHY; pitfalls table"},
+    "coordination": {"score": 5, "notes": "Owns matches orchestrator map; off-limits explicit; CORS handoff to backend explicit"},
+    "completeness": {"score": 5, "notes": "validation-checklist exists; Step 0 contracts present; right-sizing in step 1"},
+    "anti_patterns": {"score": 4, "notes": "Vite/PostCSS-specific section inside generic checklist; duplicate ## Build Verification heading"}
+  },
+  "average": 4.4,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Duplicate ## Build Verification heading", "location": "references/validation-checklist.md:7,70", "fix": "Rename second to ## Dev Server"},
+      {"item": "Description 220 chars exceeds 200 target", "location": "SKILL.md:5", "fix": "Drop the composes-with redundant clause"},
+      {"item": "Missing compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility: 'Claude Code; requires Bash + Node toolchain'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "Vite CSS traps in generic checklist", "location": "references/validation-checklist.md:42-68", "fix": "Move to references/css-import-traps.md"},
+      {"item": "Off-limits not own heading", "location": "SKILL.md:55", "fix": "Promote to ## Off-Limits"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Fix duplicate Build Verification heading", "file": "references/validation-checklist.md:70", "effort": "small"},
+    {"rank": 2, "fix": "Tighten description to ≤200 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 3, "fix": "Add compatibility field", "file": "SKILL.md frontmatter", "effort": "small"}
+  ],
+  "broken_refs": []
+}

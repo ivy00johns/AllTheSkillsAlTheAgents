@@ -1,0 +1,34 @@
+{
+  "skill": "architecture-rescue",
+  "path": "skills/workflows/architecture-rescue/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields valid; description ~747 chars (under 1024 ceiling, over 200-char target); empty owns block unusual for non-agent workflow"},
+    "description_quality": {"score": 4, "notes": "Action verb 'Find', 8+ trigger phrases, pushy and domain-specific; could trim methodology preamble"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 66 lines; two references linked with when-to-read guidance; no duplication"},
+    "instruction_clarity": {"score": 5, "notes": "6 numbered imperative steps with WHY, explicit output template, explicit 'do not skip to interface design' guardrail"},
+    "coordination": {"score": 4, "notes": "All three composes_with targets exist; handoff to grill-me and maintain-context explicit in process; agent-role fields declared empty unnecessarily"},
+    "completeness": {"score": 5, "notes": "Both refs exist, both linked, content matches; thorough examples"},
+    "anti_patterns": {"score": 5, "notes": "No hardcoded paths, no excessive MUST/NEVER, no duplication, no kitchen-sink, allowed-tools match needs"}
+  },
+  "average": 4.6,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 747 chars — well over 200-char target", "location": "SKILL.md:4", "fix": "Trim methodology preamble; keep trigger keywords"}
+    ],
+    "nits": [
+      {"item": "Empty owns block with shared_read:['*'] on non-agent workflow", "location": "SKILL.md:8-11", "fix": "Remove owns block entirely"},
+      {"item": "mattpocock attribution lacks URL", "location": "references/architecture-language.md:5", "fix": "Add link to mattpocock's LANGUAGE.md"},
+      {"item": "Ousterhout attribution lacks URL", "location": "references/architecture-language.md:45", "fix": "Add citation/link"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description to ≤200 chars by removing methodology preamble; keep trigger keywords and action verb", "file": "SKILL.md:4", "effort": "small"},
+    {"rank": 2, "fix": "Remove agent-role owns block (this is a workflow, not an agent role)", "file": "SKILL.md:8-11", "effort": "small"},
+    {"rank": 3, "fix": "Add attribution URLs for Ousterhout's APoSD and mattpocock's LANGUAGE.md", "file": "references/architecture-language.md:5,:45", "effort": "small"}
+  ],
+  "broken_refs": []
+}

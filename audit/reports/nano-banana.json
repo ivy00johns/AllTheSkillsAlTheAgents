@@ -1,0 +1,35 @@
+{
+  "skill": "nano-banana",
+  "path": "skills/workflows/nano-banana/SKILL.md",
+  "version": "1.2.0",
+  "category": "workflows",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "Required fields present; semver; canonical allowed-tools; composes_with targets exist."},
+    "description_quality": {"score": 4, "notes": "615 chars — under 1024 but ~3× the 200-char target; strong trigger coverage with catch-all."},
+    "progressive_disclosure": {"score": 4, "notes": "Body 135 lines; two references linked with purpose. CLI param table + prompt examples could move to references."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered 4-step workflow; concrete find -L invocation for symlinked install."},
+    "coordination": {"score": 5, "notes": "Empty owns (stateless); composes_with targets resolve."},
+    "completeness": {"score": 5, "notes": "Both references exist; bundled generate_image.py script present; error handling covered."},
+    "anti_patterns": {"score": 5, "notes": "No emojis; only hardcoded URL is a legitimate signup page."}
+  },
+  "average": 4.71,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Hardcoded 'Skill Madness root .env' assumption breaks portability when installed in another project", "location": "SKILL.md:47", "fix": "Rephrase to 'current project repo-root .env' or document the lookup chain"}
+    ],
+    "nits": [
+      {"item": "Aspect-ratio list inconsistent: four bulleted ratios then comma-list of the rest", "location": "SKILL.md:38-43", "fix": "Table-ify or bullet all aspect ratios"},
+      {"item": "Mismatch between narrative model name (gemini-2.5-flash-image) and CLI example (--model standard)", "location": "SKILL.md:33,78", "fix": "Clarify that 'standard' is the alias"},
+      {"item": "compatibility field absent despite Bash + Python 3 + Gemini API requirements", "location": "SKILL.md:13", "fix": "Add compatibility string"},
+      {"item": "Reference file is 'imagen-4-prompting.md' but skill is Nano Banana — naming confusion", "location": "SKILL.md:134", "fix": "Rename or add explicit cross-model note in the reference"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Remove hardcoded 'Skill Madness root .env' reference for cross-project portability", "file": "SKILL.md:47", "effort": "small"},
+    {"rank": 2, "fix": "Add compatibility field declaring Bash + Python 3 + GEMINI_API_KEY", "file": "SKILL.md:13", "effort": "small"},
+    {"rank": 3, "fix": "Trim description from 615 to ~300 chars by removing redundant trigger phrases", "file": "SKILL.md:4-10", "effort": "small"}
+  ],
+  "broken_refs": []
+}

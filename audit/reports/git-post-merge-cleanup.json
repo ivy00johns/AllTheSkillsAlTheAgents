@@ -1,0 +1,34 @@
+{
+  "skill": "git-post-merge-cleanup",
+  "path": "skills/git/git-post-merge-cleanup/SKILL.md",
+  "version": "1.0.0",
+  "category": "git",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 5, "notes": "All required fields present; valid semver; description 958 chars folded (under 1024); > is YAML scalar marker (permitted); allowed-tools hyphenated; owns empty for refs-only skill; composes_with lists real local skills; requires_claude_code true (correct — needs Bash)."},
+    "description_quality": {"score": 5, "notes": "Action verb (Clean up everything stale), enumerates capabilities, 16+ trigger variants, proactive trigger when git worktree list shows extras, mentions flags. 958 chars at upper end but within ceiling."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 199 lines / ~1400 words. Two references linked with explicit when-to-read guidance. Both refs under 300-line TOC threshold."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Steps 1-7 with imperative voice. Each step explains WHY. 'Classification IS the safety net' framing excellent. Empty-category rule thoughtful UX."},
+    "coordination": {"score": 5, "notes": "composes_with [git-commit, git-pr] both exist and accurate. spawned_by empty correct. owns correctly empty."},
+    "completeness": {"score": 5, "notes": "All workflow content self-contained with concrete git commands. Edge Cases section covers nothing-to-clean, permission errors, squash-merge, large counts. Safety rules explicit. Both reference files exist and address gaps."},
+    "anti_patterns": {"score": 5, "notes": "Safety rules enumerate 5 destructive-action constraints with rationale. Default behavior is scan→plan→confirm. --force use explained. Never assumes 'main'. No emojis, no hardcoded paths."}
+  },
+  "average": 5.00,
+  "findings": {
+    "critical": [],
+    "important": [],
+    "nits": [
+      {"item": "Description 958 chars uses 16+ trigger variants; could trim to ~700 chars without losing coverage", "location": "SKILL.md:4-17", "fix": "Drop 'tidy git state', 'lots of things merged', 'I have too many branches', 'clean up my git' (covered by stronger variants)."},
+      {"item": "Description uses > folded scalar with semantically-meaningless line breaks", "location": "SKILL.md:4-17", "fix": "Consistency nit with other git/ skills."},
+      {"item": "L17 references 'git-pr merges' but git-pr doesn't merge — slight misframing", "location": "SKILL.md:17", "fix": "Change 'after a run of git-pr merges several PRs in a row' to 'after a batch of PRs land'."},
+      {"item": "L195-197 edge case 'Squash-merge not detected' references worktree rules but check also applies to branches", "location": "SKILL.md:195-197", "fix": "Make explicit that empty-diff classifier covers both branches without worktrees and worktrees themselves."},
+      {"item": "L153-154 branch -d positional example could note xargs/for-loop for large batches", "location": "SKILL.md:153-154", "fix": "Add a note for batch deletion readability."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 958 → ~700 chars by removing redundant trigger variants", "file": "SKILL.md:4-17", "effort": "small"},
+    {"rank": 2, "fix": "Clarify the 'git-pr merges' framing at L17 (git-pr doesn't merge)", "file": "SKILL.md:17", "effort": "small"},
+    {"rank": 3, "fix": "Make explicit that squash-merge empty-diff classifier applies to branches too", "file": "SKILL.md:195-197", "effort": "small"}
+  ],
+  "broken_refs": []
+}

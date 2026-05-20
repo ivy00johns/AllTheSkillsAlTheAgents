@@ -1,0 +1,38 @@
+{
+  "skill": "claude-design-brief",
+  "path": "skills/workflows/claude-design-brief/SKILL.md",
+  "version": "1.3.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 2, "notes": "HARD FAIL: description 1191 chars exceeds 1024 ceiling. Other fields valid; reserved claude- prefix documented in body per spec."},
+    "description_quality": {"score": 4, "notes": "Excellent content (action verb, 11+ triggers, sibling distinction, audience scope) but length violation undermines"},
+    "progressive_disclosure": {"score": 4, "notes": "120 lines body; 8 reference files all linked with when-to-read guidance; no duplication"},
+    "instruction_clarity": {"score": 5, "notes": "5 numbered imperative steps with verification checklist; 'Announce at start' pattern; sharp anti-pattern guidance"},
+    "coordination": {"score": 4, "notes": "All 4 composes_with targets resolve (ui-brief in workflows, ui-ux-pro-max/frontend-design/brainstorming as plugins)"},
+    "completeness": {"score": 3, "notes": "All 8 ref files exist and linked, but SKILL.md:120 references SovereignSampson/CLAUDE-DESIGN-PROMPT.md — author-machine-only path"},
+    "anti_patterns": {"score": 3, "notes": "Hardcoded project path at SKILL.md:120; direction-examples lean heavily on one specific project (Sovereign Sampson); variation-and-risks mentions GOP staffers/Substack readers"}
+  },
+  "average": 3.6,
+  "findings": {
+    "critical": [
+      {"item": "Description 1191 chars exceeds 1024 hard ceiling", "location": "SKILL.md:4-5", "fix": "Delete the 'Distinguish from ui-brief' sentence (~280 chars); trim trigger list from 11 to ~6"},
+      {"item": "Hardcoded path to SovereignSampson/CLAUDE-DESIGN-PROMPT.md", "location": "SKILL.md:120", "fix": "Drop the line or replace with generic pointer to references/direction-examples/"}
+    ],
+    "important": [
+      {"item": "Sovereign Sampson naming throughout direction-examples", "location": "references/direction-examples/{safe,bold,experimental}.md:17-32", "fix": "Anonymize project name; introduce as 'Worked sample (anonymized political advocacy site)'"},
+      {"item": "GOP staffers/Substack readers example is politically scoped", "location": "references/variation-and-risks.md:33", "fix": "Replace with generic audience-pair"},
+      {"item": "Empty owns block on non-agent workflow", "location": "SKILL.md:9-12", "fix": "Remove owns block"}
+    ],
+    "nits": [
+      {"item": "'Announce at start' pattern is unusual", "location": "SKILL.md:26", "fix": "Normalize across skills or move to house-style"},
+      {"item": "Final check in prompt-template.md duplicates SKILL.md verification list", "location": "references/prompt-template.md:155-170", "fix": "Make one canonical and reference the other"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 1191 to ≤1024 chars (≤200 preferred); delete sibling-distinction sentence, trim trigger list", "file": "SKILL.md:4-5", "effort": "small"},
+    {"rank": 2, "fix": "Remove SovereignSampson/CLAUDE-DESIGN-PROMPT.md reference (author-machine-only path)", "file": "SKILL.md:120", "effort": "small"},
+    {"rank": 3, "fix": "Generalize Sovereign Sampson naming in direction-examples and variation-and-risks", "file": "references/direction-examples/*.md, references/variation-and-risks.md:33", "effort": "medium"}
+  ],
+  "broken_refs": ["SovereignSampson/CLAUDE-DESIGN-PROMPT.md (SKILL.md:120) — author-machine-only"]
+}

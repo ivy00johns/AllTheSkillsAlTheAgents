@@ -1,0 +1,37 @@
+{
+  "skill": "orchestrator",
+  "path": "skills/orchestrator/SKILL.md",
+  "version": "1.8.0",
+  "category": "orchestrator",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 2, "notes": "Description is 1444 chars — exceeds the 1024-char Anthropic hard ceiling (brief flags as FAIL). Otherwise compliant: kebab-case name, valid semver, no angle brackets, allowed-tools hyphenated, owns/composes_with/spawned_by present."},
+    "description_quality": {"score": 3, "notes": "Strong action verbs (Lead, INVOKES, DISPATCHES), explicit exclusions, keyword variants — but 1444 chars exceeds the 1024 hard ceiling. Essay-length where a tight trigger paragraph is needed."},
+    "progressive_disclosure": {"score": 4, "notes": "Body 233 lines / ~3330 words — within the 5000-word soft ceiling for a heavy skill. All references well-organized and linked with when-to-read guidance. Largest reference is phase-guide.md at 185 lines (below 300-line TOC threshold)."},
+    "instruction_clarity": {"score": 4, "notes": "Numbered Quick Start 0-14, clear imperative voice, good WHY rationale (50% effort on design). Step 9a interleaved with 10-13 awkwardly. Steps 3 and 13 are dense paragraphs mixing multiple actions."},
+    "coordination": {"score": 5, "notes": "Ownership minimal and correct (only .gitignore pattern, shared_read for contracts/ and .claude/handoffs/). Composes_with exhaustive and accurate. file-ownership.md reference exists. spawned_by correctly empty for top-level coordinator."},
+    "completeness": {"score": 5, "notes": "All 9 references/*.md files exist. qa-report-schema path at L153 resolves to roles/qe-agent/references/qa-report-schema.json. Definition of Done checklist is thorough."},
+    "anti_patterns": {"score": 4, "notes": "Dedicated Anti-Patterns table with prevention rationale. Minor: duplicate Anti-Pattern header at L194-196 below the main table. DoD has 9 + 9a + 10 numbering glitch. No hardcoded project paths or excessive MUST/NEVER without rationale."}
+  },
+  "average": 3.86,
+  "findings": {
+    "critical": [
+      {"item": "Description exceeds 1024-char Anthropic ceiling (1444 chars)", "location": "SKILL.md:5", "fix": "Compress to ≤200 char tight trigger paragraph; move long INVOKES/DISPATCHES enumeration and 'does NOT preempt' list into a new ## Composition body section."}
+    ],
+    "important": [
+      {"item": "Definition of Done numbering bug (9 + 9a then 10)", "location": "SKILL.md:209-215", "fix": "Renumber 9a → 10 and shift 10-13 down to 11-14, or fold 9 + 9a together with sub-bullets."},
+      {"item": "Orphan duplicate 'Anti-Pattern' header below main Anti-Patterns table", "location": "SKILL.md:194-196", "fix": "Delete and add as a new row in the L191 table: 'Spawning without explicit AFK/HITL classification | Every agent dispatch must declare it can finish unattended.'"}
+    ],
+    "nits": [
+      {"item": "Quick Start uses 0-indexed step which can confuse", "location": "SKILL.md:65", "fix": "Rename Step 0 to Step 1 and shift subsequent."},
+      {"item": "Field order drift: allowed-tools after owns rather than before", "location": "SKILL.md:13", "fix": "Move allowed-tools to between min_plan (L8) and owns (L9) per house style."},
+      {"item": "composes_with mixes plugin-namespaced (claude-mem:*) with bare names without note", "location": "SKILL.md:25", "fix": "Add a body comment that some composed skills are external (plugins, superpowers)."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Compress description below 1024-char ceiling; move enumerations to a Composition body section", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Fix Definition of Done numbering (9, 9a, 10 sequence)", "file": "SKILL.md:209-215", "effort": "small"},
+    {"rank": 3, "fix": "Merge orphan Anti-Pattern header into the main Anti-Patterns table as a new row", "file": "SKILL.md:194-196", "effort": "small"}
+  ],
+  "broken_refs": []
+}

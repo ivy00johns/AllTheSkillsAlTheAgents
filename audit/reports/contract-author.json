@@ -1,0 +1,35 @@
+{
+  "skill": "contract-author",
+  "path": "skills/contracts/contract-author/SKILL.md",
+  "version": "1.3.0",
+  "category": "contracts",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "All required fields present and correct; no angle brackets; allowed-tools hyphenated; owns/composes_with/spawned_by populated. Minor: shared_read uses wildcard ['*']."},
+    "description_quality": {"score": 4, "notes": "Action verb (Generate), 5+ keyword variants, names bundled templates. 983 chars — under 1024 ceiling but ~5x the 200-char house target."},
+    "progressive_disclosure": {"score": 5, "notes": "Body 235 lines / ~1680 words — well within guidelines. 6 templates in references/ all linked with when-to-read guidance. No reference >300 lines. No duplication."},
+    "instruction_clarity": {"score": 5, "notes": "Numbered Process steps 0a-9 with imperative voice, each explains WHY (42% multi-agent failures, right-sizing rationale). Quality Checklist at step 9 gives a handoff bar."},
+    "coordination": {"score": 5, "notes": "Owns contracts/ and schemas/ per v1.1 resolved-conflicts table. owns.patterns = openapi.yaml/asyncapi.yaml. No overlaps. composes_with all resolve (backend-agent, frontend-agent, contract-auditor, qe-agent). spawned_by [orchestrator] accurate."},
+    "completeness": {"score": 5, "notes": "All 6 referenced template files exist with reasonable sizes (87-251 lines). Output section enumerates exact deliverable paths. Right-sizing section guards against blind template application."},
+    "anti_patterns": {"score": 5, "notes": "Explicit anti-pattern against speculative authoring. Right-Sizing actively guards against over-engineering. No hardcoded specifics. MUSTs bounded with rationale."}
+  },
+  "average": 4.71,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 983 chars overshoots 200-char house target by ~5x", "location": "SKILL.md:5", "fix": "Remove trailing 'Bundles 6 templates...' sentence (already covered in body). Drops ~150 chars."}
+    ],
+    "nits": [
+      {"item": "owns.shared_read uses wildcard ['*']", "location": "SKILL.md:12", "fix": "Replace with explicit list like ['plans/', 'docs/', 'src/', 'tests/']."},
+      {"item": "Step numbering uses 0a/0b/1/2... awkwardly", "location": "SKILL.md:46-181", "fix": "Promote 0a → 1 and shift rest down by 2."},
+      {"item": "File ownership table at L143-149 is untagged fenced code block", "location": "SKILL.md:143-149", "fix": "Tag as markdown or convert to actual markdown table syntax."},
+      {"item": "requires_claude_code: true may be over-broad for this skill's tool needs", "location": "SKILL.md:7", "fix": "Verify CLI-only features are genuinely required; otherwise consider false."}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description by ~150 chars by removing the bundled-templates sentence", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Replace owns.shared_read wildcard with explicit directory list", "file": "SKILL.md:12", "effort": "small"},
+    {"rank": 3, "fix": "Renumber Process steps to remove 0a/0b decimal sub-steps", "file": "SKILL.md:46-181", "effort": "small"}
+  ],
+  "broken_refs": []
+}

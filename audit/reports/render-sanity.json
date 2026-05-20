@@ -1,0 +1,42 @@
+{
+  "skill": "render-sanity",
+  "path": "skills/workflows/render-sanity/SKILL.md",
+  "version": "1.0.0",
+  "category": "workflows",
+  "verdict": "NEEDS WORK",
+  "scores": {
+    "frontmatter_compliance": {"score": 2, "notes": "Description 1388 chars — exceeds 1024 hard ceiling (hard FAIL per audit-checklist). Semver OK; allowed-tools hyphenated; missing compatibility / metadata."},
+    "description_quality": {"score": 2, "notes": "Content is high-quality but exceeds 1024 hard cap; cannot ship as-is."},
+    "progressive_disclosure": {"score": 2, "notes": "No references/ directory; body 217 lines is dense — several blocks (smell pattern table, report template, scope-boundary section) should move to references."},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered 5-step workflow; four named checks with concrete tables; explains WHY."},
+    "coordination": {"score": 2, "notes": "composes_with includes ux-review + feature-dev and spawned_by includes ux-review — none exist in repo skills/. Orchestrator reciprocates render-sanity heavily."},
+    "completeness": {"score": 4, "notes": "Body self-contained; report template fully specified; workflow concrete. Missing: extracted references; example completed reports."},
+    "anti_patterns": {"score": 4, "notes": "One justified MUST-style rule; no emojis; no hardcoded paths; tight focus."}
+  },
+  "average": 3.00,
+  "findings": {
+    "critical": [
+      {"item": "Description 1388 chars exceeds 1024 hard ceiling (per audit-checklist this is a FAIL)", "location": "SKILL.md:5", "fix": "Trim to ~600 chars by collapsing inline failure-mode enumeration into one summary clause; keep trigger phrases + 'BEFORE build declared done' framing"},
+      {"item": "composes_with lists ux-review + feature-dev and spawned_by lists ux-review — none exist in repo skills/", "location": "SKILL.md:14,15", "fix": "Remove from arrays, OR qualify with plugin namespace (e.g., superpowers:feature-dev)"}
+    ],
+    "important": [
+      {"item": "No references/ directory despite dense body content", "location": "SKILL.md (whole file)", "fix": "Create references/smell-patterns.md and references/report-template.md; trim body from 217 to ~120 lines"},
+      {"item": "owns block absent; inconsistent with other workflow skills in this batch", "location": "SKILL.md:after line 5", "fix": "Add owns: { directories: [], patterns: [], shared_read: ['*'] } for consistency"}
+    ],
+    "nits": [
+      {"item": "compatibility field absent despite Playwright MCP tool dependencies", "location": "SKILL.md:6", "fix": "Add compatibility string"},
+      {"item": "'What this skill is NOT' section is great but ~10 lines that could be a reference", "location": "SKILL.md:193-201", "fix": "Optional: extract to references/scope-boundaries.md"},
+      {"item": "Hardcoded port list could miss exotic ports", "location": "SKILL.md:116", "fix": "Add a comment noting the list is illustrative"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Trim description from 1388 to ≤1024 chars (target ~600) — HARD-FAIL blocker", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 2, "fix": "Remove or namespace ux-review + feature-dev in composes_with and spawned_by", "file": "SKILL.md:14,15", "effort": "small"},
+    {"rank": 3, "fix": "Extract Check 1 pattern table and Step 4 report template to references/", "file": "SKILL.md:36-43,142-182", "effort": "medium"}
+  ],
+  "broken_refs": [
+    "composes_with: ux-review (not in repo skills/)",
+    "composes_with: feature-dev (not in repo skills/)",
+    "spawned_by: ux-review (not in repo skills/)"
+  ]
+}

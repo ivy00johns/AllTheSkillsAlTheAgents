@@ -1,0 +1,37 @@
+{
+  "skill": "performance-agent",
+  "path": "skills/roles/performance-agent/SKILL.md",
+  "version": "1.2.0",
+  "category": "roles",
+  "verdict": "SHIP",
+  "scores": {
+    "frontmatter_compliance": {"score": 4, "notes": "Required fields present; owns matches orchestrator carve-out for tests/performance/; no compatibility/metadata"},
+    "description_quality": {"score": 3, "notes": "207 chars over 200 target; intentionally narrow as spawned-only"},
+    "progressive_disclosure": {"score": 5, "notes": "Body 137 lines; k6-patterns.md focused; clear linking"},
+    "instruction_clarity": {"score": 5, "notes": "Imperative voice; numbered steps; scenario types precise; report template"},
+    "coordination": {"score": 5, "notes": "Owns matches orchestrator carve-out; off-limits explicit; coordination rules with qe/backend/infrastructure"},
+    "completeness": {"score": 5, "notes": "k6-patterns.md has smoke/load/stress/soak templates; Step 0 contracts present; inline validation"},
+    "anti_patterns": {"score": 4, "notes": "k6-patterns uses project-specific /api/v1/sessions; Locust/JMeter/Artillery share k6 template by reference rather than dedicated files"}
+  },
+  "average": 4.4,
+  "findings": {
+    "critical": [],
+    "important": [
+      {"item": "Description 207 chars exceeds 200 target", "location": "SKILL.md:5", "fix": "Drop 'Composed by orchestrator during multi-agent builds' clause"},
+      {"item": "Hardcoded /api/v1/sessions endpoint", "location": "references/k6-patterns.md:35,48,135", "fix": "Replace with ${RESOURCE_PATH} placeholders"},
+      {"item": "Missing compatibility string", "location": "SKILL.md frontmatter", "fix": "Add compatibility: 'Claude Code; requires Bash + k6'"}
+    ],
+    "nits": [
+      {"item": "No metadata block", "location": "SKILL.md frontmatter", "fix": "Add metadata.author/category/tags"},
+      {"item": "Validation checklist inline vs in references", "location": "SKILL.md:130-134", "fix": "Extract to references/validation-checklist.md for consistency"},
+      {"item": "Self-referential pipeline blockquote", "location": "SKILL.md:20", "fix": "Reword to feed-into-qe-score"},
+      {"item": "No right-sizing tradeoff", "location": "SKILL.md", "fix": "Add tradeoff blockquote for prototype builds"}
+    ]
+  },
+  "top_fixes": [
+    {"rank": 1, "fix": "Replace hardcoded endpoints with placeholders", "file": "references/k6-patterns.md:35,48,135", "effort": "small"},
+    {"rank": 2, "fix": "Tighten description to ≤200 chars", "file": "SKILL.md:5", "effort": "small"},
+    {"rank": 3, "fix": "Move inline validation checklist to references", "file": "SKILL.md:130-134", "effort": "small"}
+  ],
+  "broken_refs": []
+}
