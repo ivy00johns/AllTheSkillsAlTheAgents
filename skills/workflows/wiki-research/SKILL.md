@@ -1,6 +1,6 @@
 ---
 name: wiki-research
-version: 2.1.0
+version: 2.2.0
 description: |
   Use this skill BEFORE any codebase exploration, repo-deep-dive, or raw source reading when
   the project has an Obsidian-style wiki (index.md + wiki/ directory). Always invoke when an
@@ -91,6 +91,10 @@ After reading targeted pages, one of three situations applies:
 **Topic isn't in the wiki at all**:
 - Check `CLAUDE.md` for a source map or directory pointer
 - Proceed with targeted exploration (grep/glob first, not broad reads)
+
+## Step 5 — Synthesize Without Flattening
+
+When the output of this protocol is a summary, comparison, or write-up drawn from **3+ sources** on the same topic, run the contradiction-finding discipline before drafting — see `references/contradiction-finding.md`. The default failure mode of multi-source synthesis is silently smoothing conflicts into false consensus; this discipline forces the disagreements to stay on the page where downstream readers can see them.
 
 ## Standard Lookup Cost
 

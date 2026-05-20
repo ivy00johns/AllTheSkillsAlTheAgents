@@ -1,6 +1,6 @@
 ---
 name: skill-review
-version: 1.1.0
+version: 1.2.0
 argument-hint: skill-name or 'all'
 description: |
   Review skills for quality, consistency, triggering accuracy, and adherence to the 100-line rule. Two modes: 'all' (bulk ecosystem-wide scan for ownership conflicts, gaps, length outliers, weak triggers) or a single skill name (deep dive on description quality, body structure, anti-pattern naming, cross-references). Outputs a structured report consumable by skill-update. Trigger on: 'audit skills', 'review this skill', 'health check skills', 'skill ecosystem health', 'is this skill any good', 'scan all skills', 'check my skills', 'deep review', 'bulk review', 'what needs fixing'.
@@ -92,14 +92,39 @@ Read `SKILL.md` and every file in `references/`. Score these dimensions against 
 
 #### B2. Live Trigger Testing
 
-If `/skill-creator` is available, use its eval infrastructure to test whether the skill actually triggers:
+Every deep-review report **must** include an explicit triggering test block in this exact format (matches Anthropic's recommended format for skill triggering tests):
 
-1. Generate 3–5 realistic prompts that **should** trigger this skill
-2. Generate 2–3 near-miss prompts that should **not** trigger it
-3. Run trigger evaluation via skill-creator's description optimization tooling
-4. Report should-trigger hit rate and false-positive rate. List any problem triggers.
+```text
+Should trigger:
+- "<paraphrase 1 — realistic phrasing a user would actually say>"
+- "<paraphrase 2 — different angle / different keyword cluster>"
+- "<paraphrase 3 — edge phrasing that should still match>"
 
-If `/skill-creator` is unavailable, skip this phase and note it in the report.
+Should NOT trigger:
+- "<near-miss 1 — adjacent task that belongs to a different skill>"
+- "<near-miss 2 — vague prompt that should NOT pull this skill in>"
+```
+
+Minimum 3 positives and 2 negatives. Generate from the skill's stated purpose, not from optimistic intent. If you can't write a plausible negative, the skill's scope is too broad — flag that.
+
+If `/skill-creator` or its eval infrastructure is available, run the block as an actual trigger evaluation:
+
+1. Feed the should-trigger prompts; record hit rate
+2. Feed the should-NOT-trigger prompts; record false-positive rate
+3. Report both rates with examples of any problem triggers
+
+If `/skill-creator` is unavailable, the triggering test block is still required — just unrun. Note "evaluation not executed" in the report.
+
+#### B3. Performance Comparison (optional)
+
+For high-traffic skills where it's worth proving the skill improves over no-skill baseline, run a small A/B:
+
+1. Pick 2 representative task prompts
+2. **Without skill enabled:** record total messages, tool calls, failed calls, total tokens
+3. **With skill enabled:** record the same metrics
+4. Report the deltas — fewer back-and-forths, fewer failed calls, and lower total tokens are the wins. A skill that doesn't move any of these is not earning its load cost.
+
+Skip this for niche or first-version skills where the comparison would be noise. Note "performance comparison skipped — low-traffic skill" in the report.
 
 #### B3. Output Quality Sampling
 

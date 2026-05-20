@@ -1,6 +1,6 @@
 ---
 name: deployment-checklist
-version: 1.1.0
+version: 1.2.0
 description: |
   Run pre-deployment verification checklists before pushing to staging or production. Use this skill when preparing for deployment, running pre-deploy checks, verifying environment configs, or validating build artifacts. Trigger on: "pre-deploy check", "deployment checklist", "ready to ship", "is this ready for prod", "deploy readiness", "release checklist", "can we deploy", "verify the build", "pre-flight check".
 requires_agent_teams: false
@@ -49,6 +49,15 @@ Run through `references/pre-deploy.md` in order. Each section must pass before m
 5. **Database** — migrations applied, rollback tested?
 6. **Infrastructure** — Docker builds, health checks pass?
 7. **Integration** — services connect, CORS works?
+
+### Required Step Before Sign-Off
+
+After all seven sections pass, run the assumption audit — see `references/assumption-audit.md` — and resolve the most-dangerous assumption before issuing the final `READY` verdict. A clean checklist with an unexamined load-bearing assumption is still a `NOT READY`.
+
+## Reference Documents
+
+- **`references/pre-deploy.md`** — the seven-section pre-deploy checklist with commands and acceptance criteria.
+- **`references/assumption-audit.md`** — required pre-sign-off discipline that surfaces explicit and implicit assumptions, names the most-dangerous one, and defines executable tests for each implicit assumption.
 
 ## Output
 
