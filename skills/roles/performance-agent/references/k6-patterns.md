@@ -29,10 +29,11 @@ export const options = {
 };
 
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:8000';
+const RESOURCE_PATH = __ENV.RESOURCE_PATH || '/api/v1/resource';
 
 export default function () {
-  // Create session
-  const createRes = http.post(`${BASE_URL}/api/v1/sessions`,
+  // Create resource
+  const createRes = http.post(`${BASE_URL}${RESOURCE_PATH}`,
     JSON.stringify({ title: `Load Test ${Date.now()}` }),
     { headers: { 'Content-Type': 'application/json' } }
   );
@@ -42,10 +43,10 @@ export default function () {
   });
 
   if (createRes.status === 201) {
-    const sessionId = JSON.parse(createRes.body).id;
+    const resourceId = JSON.parse(createRes.body).id;
 
-    // Get session
-    const getRes = http.get(`${BASE_URL}/api/v1/sessions/${sessionId}`);
+    // Get resource
+    const getRes = http.get(`${BASE_URL}${RESOURCE_PATH}/${resourceId}`);
     check(getRes, {
       'get status is 200': (r) => r.status === 200,
     });
@@ -128,12 +129,12 @@ k6 run --out json=results.json script.js
 ```javascript
 import { Trend, Counter } from 'k6/metrics';
 
-const createSessionDuration = new Trend('create_session_duration');
-const createSessionErrors = new Counter('create_session_errors');
+const createResourceDuration = new Trend('create_resource_duration');
+const createResourceErrors = new Counter('create_resource_errors');
 
 export default function () {
-  const res = http.post(`${BASE_URL}/api/v1/sessions`, ...);
-  createSessionDuration.add(res.timings.duration);
-  if (res.status !== 201) createSessionErrors.add(1);
+  const res = http.post(`${BASE_URL}${RESOURCE_PATH}`, ...);
+  createResourceDuration.add(res.timings.duration);
+  if (res.status !== 201) createResourceErrors.add(1);
 }
 ```

@@ -72,4 +72,4 @@ When the audit-from-build process surfaces a new conflict-prone dep:
 
 ## Sources
 
-- This skill was extracted from a real multi-agent build (the Bazaar gauntlet, 2026-04-30) where 5 parallel agents wrote independent package.json files and produced an esbuild postinstall failure on `pnpm install`. The fix was `pnpm.overrides: { esbuild: "0.21.5" }`. That incident is documented in `docs/qa/skill-ecosystem-audit-2026-04-30.md` finding F-2.
+- This skill was extracted from a real multi-agent build where 5 parallel agents wrote independent package.json files and produced an esbuild postinstall failure on `pnpm install`. The fix was `pnpm.overrides: { esbuild: "0.21.5" }`.

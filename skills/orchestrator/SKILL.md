@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-version: 1.8.0
+version: 1.8.1
 description: |
   Lead coordinator and conductor for multi-agent builds using Claude Code. Takes a plan or mission document, executes its phases end-to-end, and orchestrates parallel role-agents with a contract-first architecture. The orchestrator is the conductor — not the only player: it INVOKES other skills (nano-banana for imagery, ui-ux-pro-max + frontend-design for UI quality, ux-review for post-build validation, repo-deep-dive for reference research, llm-wiki for project knowledge bases, mermaid-charts for diagrams, deployment-checklist for ship readiness) at the appropriate phase, and DISPATCHES role-agents (backend, frontend, db, infra, security, observability, performance, docs, qe) for parallel implementation. Use this skill when building a project with multiple agents, coordinating an agent team build, executing a multi-phase mission document, or when the user mentions "agent team", "parallel build", "multi-agent", "swarm build", "team build", a "MISSION.md" file, or wants to split work across multiple Claude sessions. Trigger even for simple build requests like "build X — use an agent team". This is the primary entry point for any orchestrated build. It does NOT preempt brainstorming, plan-builder, writing-plans, frontend-design, ui-ux-pro-max, nano-banana, claude-design-brief, ui-brief, repo-deep-dive, llm-wiki, ux-review, feature-dev, or claude-mem — it COMPOSES with them, invoking each at the phase where it earns its keep.
 requires_agent_teams: false
@@ -42,6 +42,14 @@ This skill assumes a contract-first multi-agent build model:
 - `qe-agent` gates the build via `qa-report.json`
 
 For single-agent or ad-hoc work, this skill is not the right tool.
+
+## Composition
+
+The orchestrator is the conductor — not the only player. It composes with three groups of skills:
+
+- **INVOKES at the right phase:** `nano-banana` (seed imagery), `ui-ux-pro-max` + `frontend-design` (UI quality), `ux-review` + `render-sanity` (post-build validation), `repo-deep-dive` (reference research), `llm-wiki` (project knowledge base), `mermaid-charts` (architecture diagrams), `deployment-checklist` (ship readiness).
+- **DISPATCHES role-agents in parallel:** `backend-agent`, `frontend-agent`, `infrastructure-agent`, `db-migration-agent`, `security-agent`, `observability-agent`, `performance-agent`, `docs-agent`, `qe-agent`, `code-review-agent`.
+- **DOES NOT preempt:** `brainstorming`, `plan-builder`, `writing-plans`, `claude-design-brief`, `ui-brief`, `feature-dev`, `claude-mem:*`. If any of these belong before the build starts, let them run first — orchestrator picks up from the artifacts they produce.
 
 <what-to-do>
 
@@ -190,10 +198,7 @@ When agents approach context limits, follow the handoff protocol in `references/
 | **Declaring done without ux-review on UI builds** | Tests pass + dev server boots is not the bar for a UI project. After the build, invoke `ux-review` (or run Playwright + screenshots manually) and address what comes back. Visual quality is verifiable; verify it. |
 | **Treating "ux-review invoked" as the post-build gate** | Process-level checks ("did the skill run?") let visible bugs ship — stale mock IDs leaking into "live" pages, lone `?` / generic-fallback placeholder text where real data should be, lists rendering plausibly but linking to dead targets, "Couldn't load X · Unauthorized" dead-end shells on auth-gated routes. These render with 0 console errors and pass every test-suite-based gate. The outcome-level gate is `render-sanity`: its four objective checks (smell scan, click-through every list, signed-out matrix, signed-in matrix) must return PASS. A "ux-review invoked" line in MISSION_SKILLS.md without a render-sanity PASS is the bug v1.7's process rigor was masking. |
 | **Skipping `render-sanity` when the dev stack isn't up** | Don't invoke validation against a dead port and call it green. Either bring up the stack first (the workspace already has a one-command `dev` script per workspace-bootstrap rules) or report "Cannot run — dev server not responding." Silent skips are how broken builds get declared done. |
-
-## Anti-Pattern
-
-> **Forbidden:** Spawning an agent without explicit AFK/HITL classification. Every agent dispatch must declare it can finish unattended.
+| **Spawning an agent without AFK/HITL classification** | Forbidden. Every agent dispatch must declare whether it can finish unattended (AFK) or needs a human in the loop (HITL). Undeclared dispatches stall builds the moment a prompt fires with no one watching. |
 
 ## Definition of Done
 
@@ -208,11 +213,11 @@ ALL must be true:
 7. **Mission skill manifest closed out** — `coordination/MISSION_SKILLS.md` exists and shows every skill the mission explicitly named, each with either ✅ (invoked) or a one-line reason for skipping. A mission that names `nano-banana`, `ui-ux-pro-max`, `frontend-design`, `ux-review`, `repo-deep-dive`, etc. and gets a build with none of them invoked is a regression, not a deliverable.
 8. **Visual assets exist for UI builds** — if the project has a UI, real seed imagery exists in `assets/` or `web/public/` (generated via `nano-banana` or sourced via another path). The bar is "looks like a product"; "stub URL placeholders" doesn't meet it.
 9. **Post-build UX review passed for UI builds** — `ux-review` invoked (or equivalent Playwright + screenshots pass), and the issues it surfaces are fixed or recorded.
-9a. **Render-sanity returned PASS for UI builds** — `render-sanity` walked every user-facing route in a real browser, ran all four checks (smell scan, click-through, signed-out matrix, signed-in matrix), and returned zero critical findings. Process-level "I invoked ux-review" is not the same as outcome-level "the four checks came back clean" — render-sanity is the outcome gate. A FAIL here blocks the build until the criticals are fixed.
-10. Contract changelog clean
-11. QA gate passed — QE agent tests written, executed, and passing
-12. **One-command dev is wired** — for any project with multiple services, the workspace root has a single `dev` (or equivalent) script that runs the whole dev stack in one terminal with prefixed output. See `references/workspace-bootstrap.md`.
-13. **End-state report** — a single file (e.g., `BUILD_RESULTS.md` or the build's git commit summary) lists what shipped, what was deferred, the mission skill checklist state, and explicit handoff items for the user. The user should be able to read this file and know exactly where the build stopped.
+10. **Render-sanity returned PASS for UI builds** — `render-sanity` walked every user-facing route in a real browser, ran all four checks (smell scan, click-through, signed-out matrix, signed-in matrix), and returned zero critical findings. Process-level "I invoked ux-review" is not the same as outcome-level "the four checks came back clean" — render-sanity is the outcome gate. A FAIL here blocks the build until the criticals are fixed.
+11. Contract changelog clean
+12. QA gate passed — QE agent tests written, executed, and passing
+13. **One-command dev is wired** — for any project with multiple services, the workspace root has a single `dev` (or equivalent) script that runs the whole dev stack in one terminal with prefixed output. See `references/workspace-bootstrap.md`.
+14. **End-state report** — a single file (e.g., `BUILD_RESULTS.md` or the build's git commit summary) lists what shipped, what was deferred, the mission skill checklist state, and explicit handoff items for the user. The user should be able to read this file and know exactly where the build stopped.
 
 </what-to-do>
 

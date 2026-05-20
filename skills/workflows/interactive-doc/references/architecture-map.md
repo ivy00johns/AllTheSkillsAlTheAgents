@@ -4,9 +4,9 @@ The doc you write when someone asks "how does this system fit together?" The rea
 
 ## When this is the right pattern
 
-- "How does The Hive work?"
+- "How does {example-project} work?"
 - "Show me how the orchestrator hands off to qe-agent"
-- "Map out the AI-Hub microservices and how they talk"
+- "Map out the microservices and how they talk"
 - "How does this unfamiliar repo fit together?" (onboarding)
 
 If the user wants to *teach* a concept (with a live demo), use the concept-explainer pattern instead. If they want to *compare* approaches, use the comparison pattern. Architecture maps are about spatial structure, not pedagogy.
@@ -139,8 +139,8 @@ The canonical .md for an architecture map is a real document — full prose, Mer
 
 ```markdown
 ---
-title: How the Hive orchestrator dispatches to agents
-tags: [hive, architecture, orchestrator]
+title: How the {example-project} orchestrator dispatches to agents
+tags: [{example-project}, architecture, orchestrator]
 type: architecture-map
 html: ./orchestrator-dispatch.html
 date: 2026-05-09
@@ -149,7 +149,7 @@ status: stable
 related: ["[[skill-md-explainer]]", "[[capability-matcher]]"]
 ---
 
-# How the Hive orchestrator dispatches to agents
+# How the {example-project} orchestrator dispatches to agents
 
 > [!tldr]
 > The orchestrator builds a task envelope, resolves it to an agent via
@@ -198,7 +198,7 @@ function dispatch(envelope: Envelope) {
 
 > [!warning] Gotcha
 > Agents registered after the orchestrator boots aren't visible until
-> the next manifest reload. This bit us during the [[hive-hot-reload]] work.
+> the next manifest reload. This bit us during the [[hot-reload]] work.
 
 ## A request, end to end
 

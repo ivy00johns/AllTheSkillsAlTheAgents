@@ -1,6 +1,6 @@
 ---
 name: skill-writer
-version: 1.2.0
+version: 1.2.1
 description: |
   Generate new SKILL.md files conforming to the ecosystem's frontmatter spec and structure conventions. Use this skill when creating any new skill, agent role definition, or workflow skill. Trigger whenever someone says "create a skill", "new agent", "write a SKILL.md", or needs to add a role to the skill ecosystem. Also use when reviewing existing skills for spec compliance.
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: []
 allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
-composes_with: ["project-profiler", "orchestrator"]
+composes_with: ["project-profiler", "orchestrator", "skill-review", "skill-update"]
 spawned_by: []
 ---
 
@@ -32,8 +32,7 @@ Generate correctly structured SKILL.md files for the Claude Code skill ecosystem
 skill-name/
 ├── SKILL.md              # Required — frontmatter + instructions
 └── references/           # Optional — loaded on demand
-    ├── detailed-guide.md
-    └── templates/
+    └── detailed-guide.md
 ```
 
 ## Progressive Disclosure

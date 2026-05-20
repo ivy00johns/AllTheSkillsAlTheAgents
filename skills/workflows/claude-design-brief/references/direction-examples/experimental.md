@@ -14,7 +14,7 @@ An "experimental" direction means: it commits to a pattern that's unusual enough
 
 The experimental direction's job is to show the user a pattern they haven't seen yet from this project. If they reject it, that's useful data. If they pick it up, you've found the moat.
 
-## Worked Sample — Sovereign Sampson "Bone & Olive"
+## Worked Sample — {political-advocacy-site} "Bone & Olive"
 
 ```text
 Direction C: Bone & Olive

@@ -14,7 +14,7 @@ A "safe" direction means: convention-respecting layout, restrained palette, neut
 
 The safe direction's job is to be the version the user can show their most conservative stakeholder without flinching. It still has to be opinion-dense — "safe" does not mean "generic SaaS."
 
-## Worked Sample — Sovereign Sampson "Navy Field"
+## Worked Sample — {political-advocacy-site} "Navy Field"
 
 ```text
 Direction A: Navy Field

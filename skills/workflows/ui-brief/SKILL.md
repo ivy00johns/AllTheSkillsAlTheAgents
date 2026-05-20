@@ -1,6 +1,6 @@
 ---
 name: ui-brief
-version: 1.0.0
+version: 1.0.1
 description: |
   Generate opinionated, design-led briefs for building or rebuilding UIs that lead with the product's actual moat instead of converging on generic SaaS dashboard patterns. Use this skill whenever the user wants a detailed UI prompt or spec to hand off — for a fresh greenfield build OR a rebuild of an existing UI. Trigger on phrases like "write me a UI brief", "the current UI sucks, redesign it", "make this not look like every shadcn admin", "I need a prompt for the frontend", "design brief for X", "the design feels generic", "build a UI for [project] but make it look like [reference]", or when the user wants a paste-into-fresh-session brief to hand to a frontend agent or orchestrator. Works across every domain — operator consoles, dashboards, marketing sites, e-commerce, social, creative tools, mobile apps. Also trigger before invoking ui-ux-pro-max / frontend-design / frontend-agent on any non-trivial UI work, when the user names a target reference app (Linear, Notion, Figma, Arc, Stripe, Vercel, Datadog, Bloomberg, Posthog, etc.) or a named style (bento-grid, glassmorphism, claymorphism, brutalism, neumorphism, minimalism, skeuomorphism), or when prior chat history shows the user just wrote one of these briefs and wants to capture the pattern. Produces a standalone Markdown file with positioning, design-language rules, page-by-page treatment, component primitives, motion discipline, and a verifiable Definition of Done.
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: ["*"]
 allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
-composes_with: ["ui-ux-pro-max", "frontend-design", "frontend-agent", "orchestrator", "ux-review", "playwright", "brainstorming"]
+composes_with: ["superpowers:ui-ux-pro-max", "superpowers:frontend-design", "superpowers:brainstorming", "superpowers:ux-review", "frontend-agent", "orchestrator", "playwright"]
 spawned_by: []
 ---
 
@@ -180,7 +180,7 @@ The brief is a standalone Markdown file. It must be paste-ready into a fresh Cla
 
 Two reference briefs are linked from this skill's parent repo (when running inside the Skill Madness context):
 
-- **Greenfield** — `THE-GAUNTLET.md` at the AllTheSkills repo root. Single-prompt greenfield stress test for "Bazaar" (eBay × PayPal × Twitter). Called for bento-grid item cards, glassmorphism trust badges, dark-mode default, full responsive. The UI section is one phase of a larger build brief — the design language was opinion-dense even without an existing UI to diagnose.
+- **Greenfield** — `THE-GAUNTLET.md` at the Skill Madness repo root. Single-prompt greenfield stress test for "Bazaar" (eBay × PayPal × Twitter). Called for bento-grid item cards, glassmorphism trust badges, dark-mode default, full responsive. The UI section is one phase of a larger build brief — the design language was opinion-dense even without an existing UI to diagnose.
 - **Rebuild** — `UI-CHALLENGE.md` at the MarketsBeRigged repo root. Diagnoses the existing trading dashboard's "generic shadcn admin grid" failure mode and prescribes a Bloomberg × Linear × TradingView replacement that leads with the LLM-reasoning moat.
 
 Both followed the structure above. Read them when in doubt about voice. The greenfield one shows how to lean into target styles; the rebuild one shows how to diagnose and replace.

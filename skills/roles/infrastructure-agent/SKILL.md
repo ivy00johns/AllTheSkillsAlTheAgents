@@ -1,8 +1,9 @@
 ---
 name: infrastructure-agent
-version: 1.1.0
+version: 1.1.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Builds containerization, orchestration, CI/CD, and deployment configuration for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
+compatibility: "Claude Code; requires Bash + docker CLI + lsof"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # Infrastructure Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Infra config feeds into qe-agent deployment/observability scores. Owns: `.github/workflows/`, `nginx/`, `k8s/`, `terraform/`, `scripts/deploy/`.
 
 Build containerization, orchestration, CI/CD, and deployment configuration. You package and connect what other agents build.
 
@@ -65,27 +66,54 @@ Before writing any infrastructure config, read:
 
 ### 1. Docker Configuration
 
-Pin versions, production deps only, non-root user, health checks, efficient layering.
+Write per-service `Dockerfile`s. Each should:
+
+- Pin base-image versions (e.g. `node:20.11-alpine`, not `node:latest`) so builds are reproducible
+- Install production deps only in the final stage; use multi-stage builds for compiled languages
+- Run as a non-root user; add `HEALTHCHECK` directives that hit the service's `/health` endpoint
+- Order layers so dependency installation is cached separately from source copies
 
 ### 2. Service Orchestration
 
-docker-compose.yml: service names match agents, ports from env vars, Docker service names for connections, depends_on with health checks, volumes for persistence.
+Write `docker-compose.yml` for the whole stack:
+
+- One service per role-agent's service (backend, frontend, db, worker, etc.), named to match the service map
+- Ports and credentials sourced from env vars (`${BACKEND_PORT}`, `${DB_PASSWORD}`) — never hardcoded
+- Inter-service URLs use Docker service names (`http://backend:8000`), not `localhost`
+- `depends_on` with `condition: service_healthy` so dependents wait for upstream readiness
+- Named volumes for any stateful service (database data, uploaded files, cache)
 
 ### 3. Environment Configuration
 
-`.env.example` with sensible defaults for all services.
+Create `.env.example` at repo root listing every variable any service reads, with safe defaults for local dev (no real secrets, no production hostnames). Verify each var is documented in the README env-vars table.
 
 ### 4. Development Scripts
 
-Makefile: up, down, build, logs, clean, dev.
+Write a `Makefile` (or `justfile`) so common workflows are one command:
+
+- `up` / `down` — start/stop the full stack via compose
+- `build` — rebuild images from current source
+- `logs` — tail logs across services
+- `clean` — drop volumes + remove containers (destructive reset)
+- `dev` — start with hot-reload mounts wired in
 
 ### 5. CI/CD Pipeline
 
-GitHub Actions/GitLab CI: install → lint → build → test → docker build.
+Write a workflow (`.github/workflows/ci.yml` or `.gitlab-ci.yml`) that runs on every PR:
+
+- Install dependencies (cached by lockfile hash)
+- Run lint, then build, then test — each step gates the next
+- Build Docker images last and push to a registry only on the default branch
+- Fail loudly on any non-zero exit and surface the failing step in the summary
 
 ### 6. Reverse Proxy (if needed)
 
-nginx proxying /api/ to backend, serving frontend static files.
+When the project serves frontend and backend on one origin, write an nginx config that:
+
+- Proxies `/api/` (and `/ws/` if WebSockets exist) to the backend service
+- Serves frontend static files from the built `dist/` (or framework equivalent) with sensible cache headers
+- Forwards `X-Forwarded-*` headers so the backend sees the real client IP
+- Includes a fallback to `index.html` for SPA client-side routing
 
 ## Coordination Rules
 

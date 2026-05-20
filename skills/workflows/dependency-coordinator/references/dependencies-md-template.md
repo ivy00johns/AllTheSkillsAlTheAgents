@@ -44,5 +44,5 @@ When a pin needs to bump (security advisory, new feature required by a consumer)
 
 ## Why this file exists
 
-Five parallel agents writing independent package manifests produced a real production failure during the Bazaar build (2026-04-30): conflicting transitive esbuild versions caused `pnpm install` to error during postinstall. The fix was a `pnpm.overrides` block — but reactive. This file makes the policy proactive and auditable. See `docs/qa/skill-ecosystem-audit-2026-04-30.md` finding F-2 for the full incident.
+Five parallel agents writing independent package manifests produced a real production failure: conflicting transitive esbuild versions caused `pnpm install` to error during postinstall. The fix was a `pnpm.overrides` block — but reactive. This file makes the policy proactive and auditable.
 ```

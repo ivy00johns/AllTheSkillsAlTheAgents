@@ -1,6 +1,6 @@
 ---
 name: skill-update
-version: 1.1.0
+version: 1.1.1
 description: |
   Plan and apply changes to an existing skill in one workflow. Reads a skill-deep-review or skill-audit report (or inline findings), drafts an edit list with the agent's recommended answer attached to each item, walks the user through the changes one at a time, applies them, and re-runs lint and frontmatter checks. Use after running skill-review or skill-audit and you are ready to ship changes. Trigger on: "apply the review", "update this skill", "fix the skill", "ship the recommendations", "edit this skill", "let's improve it", "apply the plan", "implement the changes", "make those edits".
 requires_agent_teams: false
@@ -21,16 +21,16 @@ Plan and apply changes to an existing skill in a single walk-through. Consumes a
 
 ## When to Use
 
-- A `skill-deep-review` or `skill-audit` report exists and the user wants next steps
+- A `skill-review` report exists and the user wants next steps
 - The user said something like "apply the review", "ship the recommendations", "fix this skill"
 - A short list of fixes is in the chat and the user wants them applied with confirmation
 - Simple direct edits where planning and applying is one motion, not two
 
-If there is no review yet, run `skill-review` (deep) or `skill-audit` (broad) first and come back.
+If there is no review yet, run `skill-review` first and come back.
 
 ## Inputs
 
-- **Review source** — a `skill-deep-review` report, a `skill-audit` report, or inline findings from chat
+- **Review source** — a `skill-review` report (single-skill or `--scope=all`), or inline findings from chat
 - **Target skill(s)** — SKILL.md path(s) to edit
 - **Scope (optional)** — priority levels to walk ("just P0", "P0 and P1", "all")
 
@@ -42,9 +42,9 @@ Read every report and note provided. Extract:
 
 - Each issue with its severity, affected skill, file, and dimension
 - Each recommendation
-- Trigger-testing results (from `skill-deep-review`) and coverage gaps (from `skill-audit`)
+- Trigger-testing results and coverage gaps from `skill-review`
 
-Deduplicate — if audit and deep-review flag the same issue, merge them. Group by category:
+Deduplicate — if the same issue surfaces from both a bulk pass and a deep-dive review, merge them. Group by category:
 
 | Category | Examples |
 |----------|----------|
@@ -97,7 +97,7 @@ For batches of 10+ independent edits across different skills, parallel-dispatch 
 After all edits in this pass:
 
 - Re-read every modified SKILL.md and validate frontmatter against `skills/meta/skill-writer/references/frontmatter-spec.md`
-- Confirm body length is within spec guidance — ≤5,000 words and ≤500 lines (soft warnings); warn over ~100 lines when content could move to references
+- Confirm body length is within spec guidance — ≤5,000 words and ≤500 lines (soft warnings); when content could move to references, prefer that over inflating the SKILL.md body
 - Resolve all reference links in modified files
 - If `owns` fields changed, re-check there are no overlaps with other agent roles
 - Run markdownlint if available — `.markdownlint.json` is at repo root

@@ -1,6 +1,6 @@
 ---
 name: llm-wiki
-version: 1.1.0
+version: 1.1.1
 description: |
   Bootstrap and maintain LLM-powered personal knowledge bases (wikis) for any project or
   domain. Use when the user wants to create a "second brain", knowledge base, personal wiki,
@@ -17,7 +17,7 @@ requires_claude_code: false
 min_plan: starter
 owns:
   directories: []
-  patterns: ["index.md", "log.md", "overview.md"]
+  patterns: ["wiki/index.md", "wiki/log.md", "wiki/overview.md"]
   shared_read: ["raw/", "wiki/"]
 allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["wiki-research", "repo-deep-dive", "project-profiler", "mermaid-charts"]

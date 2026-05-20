@@ -123,6 +123,6 @@ End the plan with:
 
 ## Post-Implementation
 - [ ] Re-run skill-review on any skill with P0 edits
-- [ ] Run skill-audit if ownership changed
+- [ ] Re-run skill-review (`--scope=all`) if ownership changed
 - [ ] Sync repo to global locations
 ```

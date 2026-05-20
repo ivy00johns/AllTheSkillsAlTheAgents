@@ -1,6 +1,6 @@
 ---
 name: claude-design-brief
-version: 1.3.0
+version: 1.3.1
 description: |
   Generate paste-ready prompts for Claude Design (the artifact / design-canvas tool at claude.ai, distinct from Claude Code) that are so specific and committed that Claude Design skips its Q&A loop and goes straight to building. Use this skill whenever the user wants to produce hi-fi design mockups, an interactive prototype, an artifact-based mockup canvas, multiple design directions on a canvas, or compare safe / bold / experimental directions inside Claude. Trigger on phrases like "build mockups in Claude Design", "design canvas prompt", "hi-fi design mockup", "interactive prototype in claude", "claude design prompt", "make me a mockup prompt", "I want directions A/B/C in claude", "stop letting claude design ask me 15 questions", "claude design keeps asking", "compare safe / bold / experimental", or "build me variations on a design canvas". Distinguish from `ui-brief`: ui-brief produces a long Markdown spec for Claude Code / a frontend agent to BUILD the production site; this skill produces a short paste-ready prompt for Claude Design's canvas to MOCK UP variations. Works for any product type — personal brand sites, advocacy sites, dashboards, marketing sites, portfolios.
 requires_agent_teams: false
@@ -11,7 +11,7 @@ owns:
   patterns: []
   shared_read: ["*"]
 allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
-composes_with: ["ui-brief", "ui-ux-pro-max", "frontend-design", "brainstorming"]
+composes_with: ["ui-brief", "superpowers:ui-ux-pro-max", "superpowers:frontend-design", "superpowers:brainstorming"]
 spawned_by: []
 ---
 
@@ -117,4 +117,4 @@ See `references/anti-patterns.md` for the 12 anti-patterns (decide-for-me echoed
 - `references/anti-patterns.md` — the 12 anti-patterns and prevention rules, composition notes, output-file convention
 - `references/prompt-template.md` — sample prompt structure (reference, not a form)
 
-A real worked example lives at `SovereignSampson/CLAUDE-DESIGN-PROMPT.md` — read it for the variation rubric in action, the four-axis distinct-direction discipline, the with-brief mode source-material translation, and the per-direction font-fallback pattern.
+Worked examples live in `references/direction-examples/` — read the safe / bold / experimental files for the variation rubric in action, the four-axis distinct-direction discipline, and the per-direction font-fallback pattern.

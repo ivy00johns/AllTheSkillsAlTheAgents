@@ -1,8 +1,9 @@
 ---
 name: security-agent
-version: 1.1.0
+version: 1.1.1
 disable-model-invocation: true
 description: "Orchestrator-dispatched only. Audits codebases for security vulnerabilities, reviews auth implementations, and verifies OWASP compliance for multi-agent builds. Composed by orchestrator during multi-agent builds. Not user-invocable."
+compatibility: "Claude Code; requires Bash + npm/pip/govulncheck"
 requires_agent_teams: false
 requires_claude_code: true
 min_plan: starter
@@ -17,7 +18,7 @@ spawned_by: ["orchestrator"]
 
 # Security Agent
 
-> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Reports to `qe-agent` via `qa-report.json`. Owns: `.github/security/`.
+> **Pipeline position.** Spawned by `orchestrator` after contracts are authored. Reads `contract-author`'s output from `/contracts/`. Security findings feed into qe-agent security score. Owns: `.github/security/`.
 
 Audit the codebase for security vulnerabilities. You find and report problems — you do not fix them.
 

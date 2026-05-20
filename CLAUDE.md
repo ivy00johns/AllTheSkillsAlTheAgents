@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A multi-agent orchestration toolkit for Claude Code — 46 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
+A multi-agent orchestration toolkit for Claude Code — 47 OSS-publishable skills in `skills/`. Skills are symlinked to `~/.claude/skills/` for global availability.
 
 The toolkit targets Claude Code as the primary host but the SKILL.md format is platform-agnostic — Claude.ai, Copilot CLI, Codex, and Gemini CLI all consume it. Skills should describe work in terms of capabilities ("read the file", "run the command") rather than Claude-Code-specific tool names where reasonable, so the same skill body works across hosts.
 
@@ -41,7 +41,7 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 - **`skills/contracts/`** (2) — contract-author (generates contracts from templates) and contract-auditor (verifies implementations match). Templates: OpenAPI, AsyncAPI, Pydantic, TypeScript, JSON Schema.
 - **`skills/meta/`** (4) — skill-writer, skill-review, skill-update, skill-explorer.
 - **`skills/git/`** (4) — Git workflow conventions: git-commit, git-pr, git-pr-feedback, git-post-merge-cleanup.
-- **`skills/workflows/`** (25) — plan-builder, context-manager, deployment-checklist, dependency-coordinator, project-profiler, wiki-research, interactive-doc, settings-consolidator, sync-skills, ui-brief, claude-design-brief, mermaid-charts, nano-banana, playwright, repo-deep-dive, llm-wiki, railway-deploy, architecture-rescue, caveman, diagnose-loop, grill-me, maintain-context, zoom-out, setup-project-skills, work-item-brief.
+- **`skills/workflows/`** (26) — plan-builder, context-manager, deployment-checklist, dependency-coordinator, project-profiler, wiki-research, interactive-doc, settings-consolidator, sync-skills, ui-brief, claude-design-brief, mermaid-charts, nano-banana, playwright, render-sanity, repo-deep-dive, llm-wiki, railway-deploy, architecture-rescue, caveman, diagnose-loop, grill-me, maintain-context, zoom-out, setup-project-skills, work-item-brief.
 
 ## Key Design Decisions
 

@@ -51,9 +51,9 @@ Base URL: `http://localhost:8000/api/v1`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/sessions` | Create a new session |
-| `GET` | `/sessions` | List all sessions |
-| `GET` | `/sessions/:id` | Get session by ID |
+| `POST` | `/<resource>` | Create a new <resource> |
+| `GET` | `/<resource>` | List all <resource> |
+| `GET` | `/<resource>/:id` | Get <resource> by ID |
 
 See [API Documentation](docs/api.md) for full details.
 
