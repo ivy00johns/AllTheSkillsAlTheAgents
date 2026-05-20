@@ -19,7 +19,7 @@ owns:
   directories: []
   patterns: ["index.md", "log.md", "overview.md"]
   shared_read: ["raw/", "wiki/"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["wiki-research", "repo-deep-dive", "project-profiler", "mermaid-charts"]
 spawned_by: []
 ---

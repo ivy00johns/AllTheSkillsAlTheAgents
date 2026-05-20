@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: []
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 composes_with: ["playwright", "qe-agent"]
 spawned_by: []
 ---

@@ -9,7 +9,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Grep", "Glob", "Write"]
+allowed-tools: ["Read", "Grep", "Glob", "Write"]
 composes_with: ["grill-me", "maintain-context", "diagnose-loop"]
 spawned_by: []
 ---

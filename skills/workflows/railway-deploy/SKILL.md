@@ -15,7 +15,7 @@ owns:
   directories: []
   patterns: ["railway.toml"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["infrastructure-agent", "deployment-checklist"]
 spawned_by: []
 ---

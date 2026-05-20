@@ -20,7 +20,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["skills/"]
-allowed_tools: ["Read", "Grep", "Glob", "Bash"]
+allowed-tools: ["Read", "Grep", "Glob", "Bash"]
 composes_with: ["skill-audit", "skill-deep-review", "skill-writer"]
 spawned_by: []
 ---

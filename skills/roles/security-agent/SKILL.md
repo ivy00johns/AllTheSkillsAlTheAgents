@@ -10,7 +10,7 @@ owns:
   directories: [".github/security/"]
   patterns: ["SECURITY.md"]
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Grep", "Glob", "Bash"]
+allowed-tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 composes_with: ["backend-agent", "frontend-agent", "qe-agent", "code-review-agent", "infrastructure-agent"]
 spawned_by: ["orchestrator"]
 ---

@@ -16,7 +16,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Bash"]
+allowed-tools: ["Read", "Bash"]
 composes_with: ["git-pr", "git-branch-cleanup"]
 spawned_by: []
 ---

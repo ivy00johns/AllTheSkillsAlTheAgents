@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
 composes_with: ["ui-ux-pro-max", "frontend-design", "frontend-agent", "orchestrator", "ux-review", "playwright", "brainstorming"]
 spawned_by: []
 ---

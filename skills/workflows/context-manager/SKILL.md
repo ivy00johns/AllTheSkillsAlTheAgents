@@ -10,7 +10,7 @@ owns:
   directories: [".claude/handoffs/"]
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob"]
 composes_with: ["orchestrator"]
 spawned_by: ["orchestrator"]
 ---

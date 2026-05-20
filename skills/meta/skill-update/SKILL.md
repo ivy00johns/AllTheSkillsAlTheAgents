@@ -10,7 +10,7 @@ owns:
   directories: ["skills/"]
   patterns: []
   shared_read: []
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 composes_with: ["skill-review", "skill-writer", "sync-skills"]
 spawned_by: []
 ---

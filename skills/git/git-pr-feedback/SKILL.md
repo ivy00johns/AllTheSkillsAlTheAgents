@@ -17,7 +17,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep"]
 composes_with: ["git-pr", "git-commit"]
 spawned_by: []
 ---

@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Grep", "Glob"]
 composes_with: ["wiki-research", "qe-agent", "security-agent", "backend-agent", "frontend-agent"]
 spawned_by: ["orchestrator"]
 ---

@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 composes_with: ["orchestrator", "project-profiler", "mermaid-charts", "contract-author"]
 spawned_by: []
 ---

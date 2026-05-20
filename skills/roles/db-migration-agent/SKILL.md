@@ -10,7 +10,7 @@ owns:
   directories: ["migrations/", "seeds/", "prisma/", "alembic/"]
   patterns: []
   shared_read: ["src/models/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "infrastructure-agent", "qe-agent"]
 spawned_by: ["orchestrator"]
 ---

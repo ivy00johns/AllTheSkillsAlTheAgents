@@ -10,7 +10,7 @@ owns:
   directories: ["tests/performance/", "load-tests/"]
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 composes_with: ["backend-agent", "infrastructure-agent", "qe-agent"]
 spawned_by: ["orchestrator"]
 ---

@@ -9,7 +9,7 @@ owns:
   directories: []
   patterns: ["CONTEXT.md", "docs/adr/**"]
   shared_read: []
-allowed_tools: ["Read", "Write", "Edit", "Grep", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob"]
 composes_with: ["grill-me", "architecture-rescue"]
 spawned_by: []
 ---

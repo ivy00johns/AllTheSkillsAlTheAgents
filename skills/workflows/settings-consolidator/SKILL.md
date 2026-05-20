@@ -21,7 +21,7 @@ owns:
   directories: []
   patterns: ["settings.local.json"]
   shared_read: ["~/.claude/", "**/.claude/"]
-allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob"]
 composes_with: ["sync-skills"]
 spawned_by: []
 ---

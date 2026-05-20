@@ -24,7 +24,7 @@ Scoring criteria for each dimension evaluated in Mode B (`--scope=<skill-name>`)
 
 Check:
 
-- `name`: kebab-case, ≤64 chars, unique across ecosystem, no `claude-` / `anthropic-` prefix
+- `name`: kebab-case, ≤64 chars, unique across ecosystem. `claude-` / `anthropic-` prefixes trigger a WARN (not FAIL); acceptable when the skill targets the corresponding Anthropic product and documents the exception.
 - No `<` or `>` anywhere in the frontmatter block
 - `version`: valid semver (X.Y.Z), top-level
 - `description`: present, multiline YAML string, ≤1024 chars

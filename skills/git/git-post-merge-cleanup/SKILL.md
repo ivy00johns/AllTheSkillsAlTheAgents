@@ -22,7 +22,7 @@ owns:
   directories: []
   patterns: []
   shared_read: []
-allowed_tools: ["Bash", "Read", "Write"]
+allowed-tools: ["Bash", "Read", "Write"]
 composes_with: ["git-commit", "git-pr"]
 spawned_by: []
 ---

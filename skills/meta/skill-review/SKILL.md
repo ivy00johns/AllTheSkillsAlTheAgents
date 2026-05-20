@@ -11,7 +11,7 @@ owns:
   directories: []
   patterns: []
   shared_read: ["skills/"]
-allowed_tools: ["Read", "Glob", "Grep", "Bash", "Write"]
+allowed-tools: ["Read", "Glob", "Grep", "Bash", "Write"]
 composes_with: ["skill-update", "skill-writer"]
 spawned_by: []
 ---
@@ -61,8 +61,9 @@ Optimize for speed. Score quickly, flag issues, move on. Use subagents to parall
 
 Run these check categories. Full checklist lives in `references/audit-checklist.md`.
 
-- **Frontmatter consistency** — required fields present, name matches directory and does NOT start with `claude-` or `anthropic-`, version is valid semver, description starts with action verb and is ≤200 chars
-- **Spec compliance (FAIL)** — no `<` or `>` anywhere in frontmatter (security rule); no reserved-prefix name (`claude-*` / `anthropic-*`); description ≤1024 chars (hard ceiling)
+- **Frontmatter consistency** — required fields present, name matches directory, version is valid semver, description starts with action verb and is ≤200 chars
+- **Spec compliance (FAIL)** — no `<` or `>` in frontmatter field values (security rule); description ≤1024 chars (hard ceiling)
+- **Spec compliance (WARN)** — reserved-prefix name (`claude-*` / `anthropic-*`). Acceptable as a documented exception when the skill targets the corresponding Anthropic product. Verify the documented exception exists in the skill body.
 - **Tool field naming** — `allowed-tools` (hyphen) is canonical; `allowed_tools` (underscore) accepted as deprecated alias (warn but don't fail)
 - **Ownership conflict detection** — collect every `owns.directories` and `owns.patterns` across agent roles. Flag overlaps. Validate against the v1.1 resolved conflicts table in `frontmatter-spec.md`
 - **Description quality scoring** — has action verb, ≥3 trigger contexts, keyword variants, states exclusions if ambiguous, estimated "pushiness" (low/medium/high)

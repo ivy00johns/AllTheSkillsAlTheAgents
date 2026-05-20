@@ -10,12 +10,14 @@ owns:
   directories: []
   patterns: []
   shared_read: ["*"]
-allowed_tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
 composes_with: ["ui-brief", "ui-ux-pro-max", "frontend-design", "brainstorming"]
 spawned_by: []
 ---
 
 # Claude Design Brief
+
+> **Naming exception:** This skill's name starts with `claude-` — a prefix Anthropic reserves for first-party skills. Kept deliberately: the skill targets **Claude Design** specifically, and a name that doesn't say "claude" would be less discoverable. Per `skills/meta/skill-writer/references/frontmatter-spec.md`, `skill-review` WARNs but does not FAIL on this pattern when the skill genuinely targets the corresponding Anthropic product.
 
 Produce paste-ready prompts for **Claude Design** (the artifact/design-canvas tool at claude.ai) that are vivid and project-specific enough that Claude Design has nothing left to ask — it opens its canvas and starts drawing on the first message.
 

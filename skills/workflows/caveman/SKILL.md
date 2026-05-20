@@ -10,7 +10,7 @@ owns:
   directories: []
   patterns: []
   shared_read: []
-allowed_tools: []
+allowed-tools: []
 composes_with: []
 spawned_by: []
 ---
