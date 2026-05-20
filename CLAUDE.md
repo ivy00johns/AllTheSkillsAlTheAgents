@@ -28,11 +28,11 @@ Every skill follows this structure:
 
 ```text
 skill-name/
-├── SKILL.md              # YAML frontmatter + markdown instructions (<500 lines)
+├── SKILL.md              # YAML frontmatter + markdown instructions (≤5,000 words; warn at 500 lines)
 └── references/           # On-demand reference files (unlimited size)
 ```
 
-All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-writer/references/frontmatter-spec.md`. Required fields: `name` (kebab-case), `version` (semver), `description` (trigger text). Agent roles also declare `owns`, `allowed_tools`, `composes_with`, `spawned_by`.
+All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-writer/references/frontmatter-spec.md`. This spec aligns with Anthropic's official Agent Skills standard. Required fields: `name` (kebab-case, no `claude-`/`anthropic-` prefix), `version` (semver, top-level), `description` (trigger text, ≤1024 chars, no `<` or `>`). Optional Anthropic fields: `compatibility`, `license`, `allowed-tools` (hyphen canonical; `allowed_tools` accepted as alias), `metadata`. Agent roles also declare `owns`, `composes_with`, `spawned_by`.
 
 ## Skill Categories
 
@@ -55,7 +55,7 @@ All SKILL.md files use the frontmatter convention defined in `skills/meta/skill-
 
 When modifying a skill:
 
-- Keep SKILL.md body under 500 lines; move detail to `references/`
+- Keep SKILL.md body ≤5,000 words (Anthropic guideline); soft warning past 500 lines. Move detail to `references/`. Heavy skills may exceed when the length is load-bearing.
 - Description field is the primary trigger mechanism — include action verbs, specific contexts, and keyword variations
 - `owns.directories` must not overlap with other agent roles
 - Maintain the frontmatter convention (see `skills/meta/skill-writer/references/frontmatter-spec.md`)

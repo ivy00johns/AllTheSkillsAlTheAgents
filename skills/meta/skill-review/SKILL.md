@@ -1,6 +1,6 @@
 ---
 name: skill-review
-version: 1.0.0
+version: 1.1.0
 argument-hint: skill-name or 'all'
 description: |
   Review skills for quality, consistency, triggering accuracy, and adherence to the 100-line rule. Two modes: 'all' (bulk ecosystem-wide scan for ownership conflicts, gaps, length outliers, weak triggers) or a single skill name (deep dive on description quality, body structure, anti-pattern naming, cross-references). Outputs a structured report consumable by skill-update. Trigger on: 'audit skills', 'review this skill', 'health check skills', 'skill ecosystem health', 'is this skill any good', 'scan all skills', 'check my skills', 'deep review', 'bulk review', 'what needs fixing'.
@@ -61,10 +61,12 @@ Optimize for speed. Score quickly, flag issues, move on. Use subagents to parall
 
 Run these check categories. Full checklist lives in `references/audit-checklist.md`.
 
-- **Frontmatter consistency** — required fields present, name matches directory, version is valid semver, description starts with action verb and is ≤200 chars
+- **Frontmatter consistency** — required fields present, name matches directory and does NOT start with `claude-` or `anthropic-`, version is valid semver, description starts with action verb and is ≤200 chars
+- **Spec compliance (FAIL)** — no `<` or `>` anywhere in frontmatter (security rule); no reserved-prefix name (`claude-*` / `anthropic-*`); description ≤1024 chars (hard ceiling)
+- **Tool field naming** — `allowed-tools` (hyphen) is canonical; `allowed_tools` (underscore) accepted as deprecated alias (warn but don't fail)
 - **Ownership conflict detection** — collect every `owns.directories` and `owns.patterns` across agent roles. Flag overlaps. Validate against the v1.1 resolved conflicts table in `frontmatter-spec.md`
 - **Description quality scoring** — has action verb, ≥3 trigger contexts, keyword variants, states exclusions if ambiguous, estimated "pushiness" (low/medium/high)
-- **Progressive disclosure** — SKILL.md body line count, references linked from body, body >500 lines flagged, references >300 lines without TOC flagged
+- **Progressive disclosure** — SKILL.md body line + word count, references linked from body, body >5,000 words OR >500 lines flagged (soft warning), references >300 lines without TOC flagged
 - **Cross-skill consistency** — `composes_with` and `spawned_by` point to real skills, no circular `composes_with` chains, no orphan reference files
 - **Coverage gaps** — compare inventory against `docs/architecture.md`, `CLAUDE.md`, and the orchestrator's File Ownership Map; flag roles or workflows referenced but not implemented
 
@@ -82,7 +84,7 @@ Read `SKILL.md` and every file in `references/`. Score these dimensions against 
 
 1. **Frontmatter compliance** — required fields, types, semver, optional fields used appropriately
 2. **Description quality** — action verb, trigger contexts, keyword variants, length, "pushiness"
-3. **Progressive disclosure** — body under 500 lines, references used appropriately, clear pointers
+3. **Progressive disclosure** — body ≤5,000 words (soft warning past 500 lines), references used appropriately, clear pointers
 4. **Instruction clarity** — imperative voice, logical flow, no ambiguity, explains "why" not just "what"
 5. **Coordination** — ownership declarations, `composes_with` accuracy, no overlaps
 6. **Completeness** — referenced files exist, no dead links, validation checklists where needed
