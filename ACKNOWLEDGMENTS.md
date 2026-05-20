@@ -9,10 +9,11 @@ are not yet catalogued here. Those credits will be back-filled.
 What's currently documented below:
 
 - **Recent additions (May 2026)** — patterns and skill content being adopted
-from `mattpocock/skills` and `multica-ai/andrej-karpathy-skills` (which
-itself distills observations from Andrej Karpathy). These attributions
-cover the specific new skills and in-place edits introduced in the current
-update cycle, not Skill-Madness's overall design.
+from Anthropic's official "Agent Skills" guide, `mattpocock/skills`, and
+`multica-ai/andrej-karpathy-skills` (which itself distills observations from
+Andrej Karpathy). These attributions cover the specific new skills,
+spec changes, and in-place edits introduced in the current update cycle —
+not Skill-Madness's overall design.
 - **Multi-tool installer pipeline** — the `scripts/convert.sh` /
 `scripts/install.sh` machinery that lets one canonical `SKILL.md` install
 into eleven AI coding tools. Adapted from `msitarzewski/agency-agents`.
@@ -27,6 +28,41 @@ please open an issue — back-filling is active work.
 These attributions cover skills being added or patterns being adopted in the
 current update cycle. They do not represent Skill-Madness's full lineage —
 prior influences exist and will be credited as they're catalogued.
+
+## Anthropic — "The Complete Guide to Building Skills for Claude"
+
+- **Resource:** [The Complete Guide to Building Skills for Claude](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf) (32-page PDF, published May 2026)
+- **Companion repository:** [anthropics/skills](https://github.com/anthropics/skills) — Anthropic's open Agent Skills standard
+- **Author:** Anthropic
+- **License:** The PDF is published as a free educational resource. No standalone OSS license is declared on the PDF itself; the Agent Skills standard (`anthropics/skills`) is an open standard intended for portable cross-platform skill adoption.
+
+The current update cycle aligns Skill-Madness's frontmatter spec and skill-design conventions with Anthropic's official Agent Skills standard as documented in this guide. The substance of that alignment is tracked in `IMPROVEMENT_PLAN.md` and lands across PRs #3 and #4. Specifically:
+
+**Phase 1 — Frontmatter spec alignment (PR #3):**
+
+- Adopted Anthropic's canonical frontmatter fields: hyphenated `allowed-tools` (with the prior `allowed_tools` underscore form accepted as a deprecated alias), the nested `metadata` object (author, category, tags, mcp-server), the `compatibility` string field, and the `license` field.
+- Adopted Anthropic's forbidden frontmatter rules: no XML angle brackets `<` / `>` (security risk — frontmatter loads into the system prompt), no `claude-*` or `anthropic-*` name prefixes (reserved).
+- Adopted Anthropic's description ceiling (1024 chars) and the `[What] + [When] + [Capabilities]` description anatomy.
+- Relaxed Skill-Madness's hard 500-line SKILL.md body limit to Anthropic's recommended 5,000-word guideline.
+
+**Phase 2 — Reference docs derived from the guide (PR #4):**
+
+- `skills/meta/skill-writer/references/body-template.md` — Anthropic's recommended SKILL.md body structure (H1 → `## Instructions` → `### Step N` → `## Examples` → `## Troubleshooting`).
+- `skills/meta/skill-writer/references/patterns.md` — the 5 emergent skill design patterns Anthropic cataloged (Sequential workflow orchestration, Multi-MCP coordination, Iterative refinement, Context-aware tool selection, Domain-specific intelligence), each mapped to an in-repo example.
+- `skills/meta/skill-writer/references/quick-checklist.md` — Anthropic's Reference A "Quick checklist" (before-you-start / during / before-upload / after-upload).
+- `skills/meta/skill-writer/references/performance-notes-pattern.md` — the `## Performance Notes` pattern from p.26 (combats model laziness on validation-heavy skills).
+- `skills/meta/skill-writer/references/validation-script-pattern.md` — the "bundle a deterministic check script" advanced technique from p.26.
+- `skills/meta/skill-explorer/references/troubleshooting.md` — Anthropic's troubleshooting taxonomy from Chapter 5 (skill won't upload, doesn't trigger, triggers too often, instructions not followed, MCP issues, large context issues).
+
+**Phase 4 — Process additions (PR #4):**
+
+- "Iterate on a single task first" guidance in `skill-writer` (from p.15).
+- Required Should-trigger / Should-NOT-trigger block format in every `skill-review` deep-review report (from p.15).
+- Optional performance-comparison output (with-skill vs without-skill — token count, failed-call count, back-and-forth count) in `skill-review` (from p.16).
+
+Quotation of the guide for instructional purposes (paraphrased examples, structural patterns, the 5-pattern catalog) is treated as fair-use educational quotation. Anthropic owns the original material; any code or content derived here remains under Skill-Madness's repo license.
+
+---
 
 ## mattpocock/skills — "Skills For Real Engineers"
 
